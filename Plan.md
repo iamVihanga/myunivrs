@@ -36,3 +36,5 @@
 - Testing and bug fixes
 
 This plan provides a solid foundation for your real estate listing website with all the features you requested, proper database relationships, and comprehensive SEO strategy.
+
+<!-- https://youtu.be/n4u_k9s9OEI?t=1763 -->
