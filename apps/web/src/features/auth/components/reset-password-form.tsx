@@ -1,5 +1,11 @@
 "use client";
+import { CheckIcon } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useId } from "react";
+import { toast } from "sonner";
 
+import { Alert, AlertDescription, AlertTitle } from "@repo/ui/components/alert";
 import { Button } from "@repo/ui/components/button";
 import {
   Card,
@@ -11,28 +17,25 @@ import {
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 import { cn } from "@repo/ui/lib/utils";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useId } from "react";
 
 import { authClient } from "@/lib/auth-client";
-import { CheckIcon } from "lucide-react";
-import { CiFacebook } from "react-icons/ci";
-import { toast } from "sonner";
-import { signinSchema, type SigninSchemaT } from "../schemas";
+import { resetPasswordSchema, type ResetPasswordSchemaT } from "../schemas";
 
-export function SiginForm({
+export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const toastId = useId();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const token = searchParams.get("token");
 
   const form = useAppForm({
-    validators: { onChange: signinSchema },
+    validators: { onChange: resetPasswordSchema },
     defaultValues: {
-      email: "",
-      password: ""
+      newPassword: "",
+      confirmPassword: ""
     },
     onSubmit: ({ value }) => handleSignin(value)
   });
@@ -46,16 +49,21 @@ export function SiginForm({
     [form]
   );
 
-  const handleSignin = async (values: SigninSchemaT) => {
-    await authClient.signIn.email({
-      email: values.email,
-      password: values.password,
+  const handleSignin = async (values: ResetPasswordSchemaT) => {
+    if (!token) {
+      toast.error("Invalid or expired token", { id: toastId });
+      return;
+    }
+
+    await authClient.resetPassword({
+      newPassword: values.newPassword,
+      token,
       fetchOptions: {
         onRequest() {
-          toast.loading("Signing in...", { id: toastId });
+          toast.loading("Updating Password...", { id: toastId });
         },
         onSuccess(ctx) {
-          toast.success("User signed in successfully!", { id: toastId });
+          toast.success("Password updated successfully!", { id: toastId });
           router.push("/dashboard");
         },
         onError(ctx) {
@@ -77,31 +85,26 @@ export function SiginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!token && (
+            <Alert>
+              <AlertTitle>{`Invalid or expired token`}</AlertTitle>
+              <AlertDescription>
+                {`Please request a new password reset link or validate token is correct.`}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form.AppForm>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
-                <div className="flex flex-col gap-4">
-                  <Button variant="outline" className="w-full">
-                    <CiFacebook className="size-5" />
-                    Signin with Facebook
-                  </Button>
-                </div>
-                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                  <span className="bg-card text-muted-foreground relative z-10 px-2">
-                    Or continue with
-                  </span>
-                </div>
-
-                {/* -------- */}
-
                 <form.AppField
-                  name="email"
+                  name="newPassword"
                   children={(field) => (
                     <field.FormItem>
-                      <field.FormLabel>Email</field.FormLabel>
+                      <field.FormLabel>New Password</field.FormLabel>
                       <field.FormControl>
                         <Input
-                          placeholder="john@example.com"
+                          placeholder="******"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
@@ -113,21 +116,13 @@ export function SiginForm({
                 />
 
                 <form.AppField
-                  name="password"
+                  name="confirmPassword"
                   children={(field) => (
                     <field.FormItem>
-                      <div className="w-full flex items-center justify-between">
-                        <field.FormLabel>Password</field.FormLabel>
-                        <Link
-                          href="/forgot-password"
-                          className="text-xs text-secondary-foreground underline-offset-4 hover:underline"
-                        >
-                          Forgot Password?
-                        </Link>
-                      </div>
+                      <field.FormLabel>Confirm Password</field.FormLabel>
                       <field.FormControl>
                         <Input
-                          placeholder=""
+                          placeholder="******"
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                           onBlur={field.handleBlur}
@@ -144,10 +139,11 @@ export function SiginForm({
                   <Button
                     type="submit"
                     className="w-full"
+                    disabled={form.state.isSubmitting || !token}
                     loading={form.state.isSubmitting}
                     icon={form.state.isSubmitSuccessful && <CheckIcon />}
                   >
-                    Sign In
+                    Update Password
                   </Button>
                 </div>
                 <div className="text-center text-sm">
@@ -162,10 +158,6 @@ export function SiginForm({
           </form.AppForm>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   );
 }

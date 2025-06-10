@@ -37,12 +37,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 <!--
 
-
 "@nextplate/api": "workspace:_",
 "@nextplate/rpc": "workspace:_",
+"@repo/database": "workspace:*",
 "@repo/eslint-config": "workspace:^",
 "@repo/typescript-config": "workspace:^",
 "@repo/ui": "workspace:*",
-
 
  -->
