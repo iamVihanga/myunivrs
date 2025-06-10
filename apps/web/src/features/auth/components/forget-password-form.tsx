@@ -17,11 +17,10 @@ import { useCallback, useId } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { CheckIcon } from "lucide-react";
-import { CiFacebook } from "react-icons/ci";
 import { toast } from "sonner";
-import { signinSchema, type SigninSchemaT } from "../schemas";
+import { forgotPasswordSchema, type ForgotPasswordSchemaT } from "../schemas";
 
-export function SiginForm({
+export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -29,12 +28,11 @@ export function SiginForm({
   const router = useRouter();
 
   const form = useAppForm({
-    validators: { onChange: signinSchema },
+    validators: { onChange: forgotPasswordSchema },
     defaultValues: {
-      email: "",
-      password: ""
+      email: ""
     },
-    onSubmit: ({ value }) => handleSignin(value)
+    onSubmit: ({ value }) => handleForgotPassword(value)
   });
 
   const handleSubmit = useCallback(
@@ -46,17 +44,19 @@ export function SiginForm({
     [form]
   );
 
-  const handleSignin = async (values: SigninSchemaT) => {
-    await authClient.signIn.email({
+  const handleForgotPassword = async (values: ForgotPasswordSchemaT) => {
+    await authClient.forgetPassword({
       email: values.email,
-      password: values.password,
+      redirectTo: "/reset-password",
       fetchOptions: {
         onRequest() {
-          toast.loading("Signing in...", { id: toastId });
+          toast.loading("Requesting Password Reset...", { id: toastId });
         },
         onSuccess(ctx) {
-          toast.success("User signed in successfully!", { id: toastId });
-          router.push("/dashboard");
+          toast.success("Password reset link sent!", {
+            id: toastId,
+            description: "Check your email inbox for get the link"
+          });
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
@@ -70,30 +70,16 @@ export function SiginForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-heading font-bold">
-            Welcome back
+            Reset Password
           </CardTitle>
           <CardDescription>
-            Signin with your Email or Facebook account
+            Request a password reset link to be sent to your email.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form.AppForm>
             <form onSubmit={handleSubmit}>
               <div className="grid gap-6">
-                <div className="flex flex-col gap-4">
-                  <Button variant="outline" className="w-full">
-                    <CiFacebook className="size-5" />
-                    Signin with Facebook
-                  </Button>
-                </div>
-                <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                  <span className="bg-card text-muted-foreground relative z-10 px-2">
-                    Or continue with
-                  </span>
-                </div>
-
-                {/* -------- */}
-
                 <form.AppField
                   name="email"
                   children={(field) => (
@@ -112,34 +98,6 @@ export function SiginForm({
                   )}
                 />
 
-                <form.AppField
-                  name="password"
-                  children={(field) => (
-                    <field.FormItem>
-                      <div className="w-full flex items-center justify-between">
-                        <field.FormLabel>Password</field.FormLabel>
-                        <Link
-                          href="/forgot-password"
-                          className="text-xs text-secondary-foreground underline-offset-4 hover:underline"
-                        >
-                          Forgot Password?
-                        </Link>
-                      </div>
-                      <field.FormControl>
-                        <Input
-                          placeholder=""
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                        />
-                      </field.FormControl>
-                      <field.FormMessage />
-                    </field.FormItem>
-                  )}
-                />
-
-                {/* -------- */}
-
                 <div className="grid gap-6">
                   <Button
                     type="submit"
@@ -147,7 +105,7 @@ export function SiginForm({
                     loading={form.state.isSubmitting}
                     icon={form.state.isSubmitSuccessful && <CheckIcon />}
                   >
-                    Sign In
+                    Request Link
                   </Button>
                 </div>
                 <div className="text-center text-sm">
@@ -162,10 +120,6 @@ export function SiginForm({
           </form.AppForm>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   );
 }
