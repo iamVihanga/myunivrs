@@ -1,5 +1,12 @@
-import { SiginForm } from "@/features/auth/components/signin-form";
+import { SigninForm } from "@/features/auth/components/signin-form";
+import { headers } from "next/headers";
 
-export default function SigninPage() {
-  return <SiginForm />;
+export default async function SigninPage() {
+  const headersList = await headers();
+  const header_url = headersList.get("x-url") || "";
+
+  const pathname = new URL(header_url).pathname;
+  const isAgent = pathname === "/signup";
+
+  return <SigninForm type={isAgent ? "agent" : "user"} />;
 }

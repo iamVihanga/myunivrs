@@ -21,10 +21,15 @@ import { cn } from "@repo/ui/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { signupSchema, type SignupSchema } from "../schemas";
 
+interface SignupFormProps {
+  type?: "agent" | "user";
+}
+
 export function SignupForm({
   className,
+  type = "user",
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & SignupFormProps) {
   const toastId = useId();
   const router = useRouter();
 
@@ -58,7 +63,7 @@ export function SignupForm({
         },
         onSuccess(ctx) {
           toast.success("User registered successfully !", { id: toastId });
-          router.push("/signin");
+          router.push(type === "agent" ? "/setup" : "/signin");
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
@@ -72,7 +77,7 @@ export function SignupForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl font-heading font-bold">
-            Get Started
+            Get Started {type === "agent" && " as Agent"}
           </CardTitle>
           <CardDescription>
             Signup with your Email or Facebook account

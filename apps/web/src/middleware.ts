@@ -18,6 +18,9 @@ export default async function authMiddleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-url", request.url);
+
   if (authRoutes.includes(pathname) || isProtectedPath) {
     // Fetch session
     const { data: session } = await betterFetch<Session>(
@@ -32,19 +35,67 @@ export default async function authMiddleware(request: NextRequest) {
     );
 
     // If Auth route and Already authenticated,
-    // Redirect back to dashboard
+    // Redirect back
     if (authRoutes.includes(pathname) && session) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // If Dashboard route and Not authenticated,
+    // If protected route and Not authenticated,
     // Redirect back to signin
     if (isProtectedPath && !session) {
       return NextResponse.redirect(new URL("/signin", request.url));
     }
+
+    /**
+     * If dashboard route and authenticated,
+     * Check, is user have active organization id in session,
+     * If not, fetch list of organizations,
+     * If user have at least organization, switch to first organization,
+     * Otherwise, send 404 response
+     */
+    if (pathname === "/dashboard" && session) {
+      if (!session.session.activeOrganizationId) {
+        const { data: organizationsList } = await betterFetch(
+          "/api/auth/organization/list",
+          {
+            baseURL: request.nextUrl.origin,
+            headers: {
+              //get the cookie from the request
+              cookie: request.headers.get("cookie") || ""
+            }
+          }
+        );
+
+        if (!organizationsList || (organizationsList as []).length === 0) {
+          return NextResponse.redirect(new URL("/404", request.url));
+        }
+
+        const orgId = (organizationsList as any[])?.[0]?.id as string;
+
+        const switchRes = await betterFetch(
+          "/api/auth/organization/set-active",
+          {
+            baseURL: request.nextUrl.origin,
+            headers: {
+              cookie: request.headers.get("cookie") || ""
+            },
+            method: "POST",
+            body: { organizationId: orgId }
+          }
+        );
+
+        console.log(
+          `Agent '${session.session.userId}' switched to organization: '${orgId}'`
+        );
+      }
+    }
   }
 
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders
+    }
+  });
 }
 
 export const config = {

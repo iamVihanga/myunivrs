@@ -1,3 +1,4 @@
+import { Separator } from "@repo/ui/components/separator";
 import { SchoolIcon } from "lucide-react";
 import React from "react";
 
@@ -13,7 +14,11 @@ export default function AuthLayout({ children }: Props) {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <SchoolIcon className="size-4" />
           </div>
-          <span className="font-heading text-primary/90">HomeVille</span>
+          <span className="font-heading text-primary/90 font-bold h-4 flex items-center gap-1">
+            HomeVille
+            <Separator orientation="vertical" />
+            <span className="font-normal">Agent</span>
+          </span>
         </a>
         {children}
       </div>
