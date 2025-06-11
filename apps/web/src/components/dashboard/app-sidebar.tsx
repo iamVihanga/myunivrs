@@ -1,21 +1,12 @@
 "use client";
 
 import {
-  IconCamera,
-  IconChartBar,
+  IconBuildings,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
   IconHelp,
   IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
   IconSearch,
-  IconSettings,
-  IconUsers
+  IconSettings
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -23,6 +14,7 @@ import { NavDocuments } from "@/components/dashboard/nav-documents";
 import { NavMain } from "@/components/dashboard/nav-main";
 import { NavSecondary } from "@/components/dashboard/nav-secondary";
 import { NavUser } from "@/components/dashboard/nav-user";
+import { authClient } from "@/lib/auth-client";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from "@repo/ui/components/sidebar";
+import { Skeleton } from "@repo/ui/components/skeleton";
 
 const data = {
   user: {
@@ -44,74 +37,6 @@ const data = {
       title: "Dashboard",
       url: "#",
       icon: IconDashboard
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers
-    }
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#"
-        },
-        {
-          title: "Archived",
-          url: "#"
-        }
-      ]
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#"
-        },
-        {
-          title: "Archived",
-          url: "#"
-        }
-      ]
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#"
-        },
-        {
-          title: "Archived",
-          url: "#"
-        }
-      ]
     }
   ],
   navSecondary: [
@@ -133,38 +58,38 @@ const data = {
   ],
   documents: [
     {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord
+      name: "Housing",
+      url: "/dashboard/housing",
+      icon: IconBuildings
     }
   ]
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const activeOrg = authClient.useActiveOrganization();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
-            </SidebarMenuButton>
+            {activeOrg.isPending ? (
+              <Skeleton className="h-6 w-full rounded-md" />
+            ) : activeOrg.data ? (
+              <SidebarMenuButton
+                asChild
+                className="data-[slot=sidebar-menu-button]:!p-1.5"
+              >
+                <div>
+                  <IconInnerShadowTop className="!size-5" />
+                  <span className="text-base font-semibold">
+                    {activeOrg.data.name}
+                  </span>
+                </div>
+              </SidebarMenuButton>
+            ) : (
+              <></>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
