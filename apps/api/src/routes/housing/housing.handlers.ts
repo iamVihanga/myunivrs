@@ -7,7 +7,13 @@ import type { AppRouteHandler } from "@/types";
 import { db } from "@/db";
 import { housing } from "@repo/database/schemas";
 
-import type { CreateRoute, GetOneRoute, ListRoute } from "./housing.routes";
+import type {
+  CreateRoute,
+  DeleteRoute,
+  GetOneRoute,
+  ListRoute,
+  UpdateRoute
+} from "./housing.routes";
 
 // List housing entries route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
@@ -112,4 +118,53 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
     );
 
   return c.json(housingEntry, HttpStatusCodes.OK);
+};
+
+// Update housing entry route handler
+export const update: AppRouteHandler<UpdateRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  // Check if housing entry exists
+  const existingEntry = await db.query.housing.findFirst({
+    where: eq(housing.id, id)
+  });
+
+  if (!existingEntry) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  // Update the housing entry
+  const [updated] = await db
+    .update(housing)
+    .set({ ...body, updatedAt: new Date() })
+    .where(eq(housing.id, id))
+    .returning();
+
+  return c.json(updated, HttpStatusCodes.OK);
+};
+
+// Delete housing entry route handler
+export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+
+  // Check if housing entry exists
+  const existingEntry = await db.query.housing.findFirst({
+    where: eq(housing.id, id)
+  });
+
+  if (!existingEntry) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  // Delete the housing entry
+  await db.delete(housing).where(eq(housing.id, id));
+
+  return c.body(null, HttpStatusCodes.NO_CONTENT);
 };

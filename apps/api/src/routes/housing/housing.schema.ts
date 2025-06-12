@@ -17,8 +17,8 @@ export const insertHousingSchema = createInsertSchema(housing, {
 
 export const updateHousingSchema = createInsertSchema(housing)
   .omit({
-    createdAt: true,
-    updatedAt: true
+    id: true,
+    createdAt: true
   })
   .partial();
 
@@ -26,3 +26,5 @@ export const updateHousingSchema = createInsertSchema(housing)
 export type Housing = z.infer<typeof selectHousingSchema>;
 
 export type InsertHousing = z.infer<typeof insertHousingSchema>;
+
+export type UpdateHousing = z.infer<typeof updateHousingSchema>;

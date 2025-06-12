@@ -83,6 +83,61 @@ export const getOne = createRoute({
   }
 });
 
+// Update route definition
+export const update = createRoute({
+  tags,
+  summary: "Update an existing housing entry",
+  path: "/{id}",
+  method: "put",
+  request: {
+    params: stringIdParamSchema,
+    body: jsonContentRequired(
+      insertHousingSchema,
+      "The housing entry to update"
+    )
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      selectHousingSchema,
+      "The updated housing entry"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      errorMessageSchema,
+      "Housing entry not found"
+    ),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      errorMessageSchema,
+      "The validation error(s)"
+    )
+  }
+});
+
+// Delete route definition
+export const remove = createRoute({
+  tags,
+  summary: "Delete a housing entry",
+  path: "/{id}",
+  method: "delete",
+  request: {
+    params: stringIdParamSchema
+  },
+  responses: {
+    [HttpStatusCodes.NO_CONTENT]: {
+      description: "Housing entry deleted successfully"
+    },
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Housing entry not found"
+    ),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(IdParamsSchema),
+      "Invalid ID format"
+    )
+  }
+});
+
 export type ListRoute = typeof list;
 export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
+export type UpdateRoute = typeof update;
+export type DeleteRoute = typeof remove;
