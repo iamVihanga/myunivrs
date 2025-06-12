@@ -4,7 +4,12 @@ import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
-import { errorMessageSchema, stringIdParamSchema } from "@/lib/helpers";
+import {
+  errorMessageSchema,
+  getPaginatedSchema,
+  queryParamsSchema,
+  stringIdParamSchema
+} from "@/lib/helpers";
 import { insertHousingSchema, selectHousingSchema } from "./housing.schema";
 
 const tags: string[] = ["Housing"];
@@ -15,10 +20,17 @@ export const list = createRoute({
   summary: "List all housing entries",
   path: "/",
   method: "get",
+  request: {
+    query: queryParamsSchema
+  },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.array(selectHousingSchema),
+      getPaginatedSchema(z.array(selectHousingSchema)),
       "The list of housing entries"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      errorMessageSchema,
+      "An error occurred while fetching the housing entries"
     )
   }
 });
