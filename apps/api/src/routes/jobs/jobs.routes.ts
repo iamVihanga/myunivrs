@@ -51,6 +51,10 @@ export const create = createRoute({
       selectJobSchema,
       "The created job entry"
     ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthorized access"
+    ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"

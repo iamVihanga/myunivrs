@@ -9,7 +9,7 @@ import {
   GetOneRoute,
   ListRoute,
   RemoveRoute,
-  UpdateRoute,
+  UpdateRoute
 } from "./jobs.routes";
 
 // List jobs entries route handler
@@ -18,7 +18,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     page = "1",
     limit = "10",
     sort = "asc",
-    search,
+    search
   } = c.req.valid("query");
 
   // Convert to numbers and validate
@@ -51,7 +51,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         return fields.createdAt;
       }
       return desc(fields.createdAt);
-    },
+    }
   });
 
   // Get total count for pagination metadata
@@ -69,7 +69,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   const [jobsEntities, _totalCount] = await Promise.all([
     query,
-    totalCountQuery,
+    totalCountQuery
   ]);
 
   const totalCount = _totalCount[0]?.count || 0;
@@ -84,8 +84,8 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         currentPage: pageNum,
         totalPages,
         totalCount,
-        limit: limitNum,
-      },
+        limit: limitNum
+      }
     },
     HttpStatusCodes.OK
   );
@@ -94,8 +94,25 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 // Create new jobs entry route handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const jobsEntry = c.req.valid("json");
+  const session = c.get("session");
 
-  const [inserted] = await db.insert(jobs).values(jobsEntry).returning();
+  // Check is user is authenticated
+  if (!session) {
+    return c.json(
+      {
+        message: "This user is unauthenticated, You need to sign in first !"
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const [inserted] = await db
+    .insert(jobs)
+    .values({
+      ...jobsEntry,
+      agentProfile: session?.activeOrganizationId
+    })
+    .returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
@@ -105,7 +122,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
   const jobsEntry = await db.query.jobs.findFirst({
-    where: eq(jobs.id, id),
+    where: eq(jobs.id, id)
   });
 
   if (!jobsEntry)
@@ -124,7 +141,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
 
   //Check if jobs entry exists
   const existingEntry = await db.query.jobs.findFirst({
-    where: eq(jobs.id, id),
+    where: eq(jobs.id, id)
   });
 
   if (!existingEntry) {
@@ -150,7 +167,7 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
 
   // Check if jobs entry exists
   const existingEntry = await db.query.jobs.findFirst({
-    where: eq(jobs.id, id),
+    where: eq(jobs.id, id)
   });
 
   if (!existingEntry) {
