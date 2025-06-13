@@ -10,14 +10,18 @@ import {
   queryParamsSchema,
   stringIdParamSchema
 } from "@/lib/helpers";
-import { insertHousingSchema, selectHousingSchema } from "./housing.schema";
+import {
+  insertProductCategorySchema,
+  selectProductCategorySchema,
+  updateProductCategorySchema
+} from "./categories.schema";
 
-const tags: string[] = ["Housing"];
+const tags: string[] = ["Product Categories"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all housing entries",
+  summary: "List all product categories",
   path: "/",
   method: "get",
   request: {
@@ -25,12 +29,12 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectHousingSchema)),
-      "The list of housing entries"
+      getPaginatedSchema(z.array(selectProductCategorySchema)),
+      "The list of product categories"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the housing entries"
+      "An error occurred while fetching product categories"
     )
   }
 });
@@ -38,19 +42,19 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new housing entry",
+  summary: "Create a new product category",
   path: "/",
   method: "post",
   request: {
     body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to create"
+      insertProductCategorySchema,
+      "The product category to create"
     )
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectHousingSchema,
-      "The created housing entry"
+      selectProductCategorySchema,
+      "The created product category"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -65,7 +69,7 @@ export const create = createRoute({
 
 export const getOne = createRoute({
   tags,
-  summary: "Get a single housing entry by ID",
+  summary: "Get a single product category by ID",
   method: "get",
   path: "/{id}",
   request: {
@@ -73,12 +77,12 @@ export const getOne = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "Requested housing entry"
+      selectProductCategorySchema,
+      "Requested product category"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Product category not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -90,20 +94,20 @@ export const getOne = createRoute({
 // Update route definition
 export const update = createRoute({
   tags,
-  summary: "Update an existing housing entry",
+  summary: "Update an existing product category",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
     body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to update"
+      updateProductCategorySchema,
+      "The product category to update"
     )
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "The updated housing entry"
+      selectProductCategorySchema,
+      "The updated product category"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -111,7 +115,7 @@ export const update = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Housing entry not found"
+      "Product category not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
@@ -123,7 +127,7 @@ export const update = createRoute({
 // Delete route definition
 export const remove = createRoute({
   tags,
-  summary: "Delete a housing entry",
+  summary: "Delete a product category",
   path: "/{id}",
   method: "delete",
   request: {
@@ -132,7 +136,7 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Housing entry deleted successfully"
+      "Product category deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -140,7 +144,33 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Product category not found"
+    ),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(IdParamsSchema),
+      "Invalid ID format"
+    )
+  }
+});
+
+// Get products by category route definition
+export const getProducts = createRoute({
+  tags,
+  summary: "Get products by category ID",
+  method: "get",
+  path: "/{id}/products",
+  request: {
+    params: stringIdParamSchema,
+    query: queryParamsSchema
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(z.any())), // Using z.any() since we don't have direct access to product schema here
+      "Products in this category"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Product category not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -154,3 +184,4 @@ export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
 export type UpdateRoute = typeof update;
 export type DeleteRoute = typeof remove;
+export type GetProductsRoute = typeof getProducts;

@@ -5,7 +5,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/types";
 
 import { db } from "@/db";
-import { housing } from "@repo/database/schemas";
+import { events } from "@repo/database/schemas";
 
 import type {
   CreateRoute,
@@ -13,9 +13,9 @@ import type {
   GetOneRoute,
   ListRoute,
   UpdateRoute
-} from "./housing.routes";
+} from "./events.routes";
 
-// List housing entries route handler
+// List events entries route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const {
     page = "1",
@@ -30,7 +30,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const offset = (pageNum - 1) * limitNum;
 
   // Build query conditions
-  const query = db.query.housing.findMany({
+  const query = db.query.events.findMany({
     limit: limitNum,
     offset,
     where: (fields, { ilike, and, or }) => {
@@ -60,17 +60,17 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   // Get total count for pagination metadata
   const totalCountQuery = db
     .select({ count: sql<number>`count(*)` })
-    .from(housing)
+    .from(events)
     .where(
       search
         ? or(
-            ilike(housing.title, `%${search}%`),
-            ilike(housing.description, `%${search}%`)
+            ilike(events.title, `%${search}%`),
+            ilike(events.description, `%${search}%`)
           )
         : undefined
     );
 
-  const [housingEntries, _totalCount] = await Promise.all([
+  const [eventsEntries, _totalCount] = await Promise.all([
     query,
     totalCountQuery
   ]);
@@ -82,7 +82,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   return c.json(
     {
-      data: housingEntries,
+      data: eventsEntries,
       meta: {
         currentPage: pageNum,
         totalPages,
@@ -94,9 +94,9 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   );
 };
 
-// Create new housing entry route handler
+// Create new events entry route handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const housingEntry = c.req.valid("json");
+  const eventsEntry = c.req.valid("json");
   const session = c.get("session");
 
   if (!session) {
@@ -108,29 +108,29 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const [inserted] = await db.insert(housing).values(housingEntry).returning();
+  const [inserted] = await db.insert(events).values(eventsEntry).returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// Get single housing entry route handler
+// Get single events entry route handler
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  const housingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  const eventsEntry = await db.query.events.findFirst({
+    where: eq(events.id, id)
   });
 
-  if (!housingEntry)
+  if (!eventsEntry)
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
 
-  return c.json(housingEntry, HttpStatusCodes.OK);
+  return c.json(eventsEntry, HttpStatusCodes.OK);
 };
 
-// Update housing entry route handler
+// Update events entry route handler
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
@@ -145,9 +145,9 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // Check if housing entry exists
-  const existingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  // Check if events entry exists
+  const existingEntry = await db.query.events.findFirst({
+    where: eq(events.id, id)
   });
 
   if (!existingEntry) {
@@ -157,17 +157,17 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // Update the housing entry
+  // Update the events entry
   const [updated] = await db
-    .update(housing)
+    .update(events)
     .set({ ...body, updatedAt: new Date() })
-    .where(eq(housing.id, id))
+    .where(eq(events.id, id))
     .returning();
 
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-// Delete housing entry route handler
+// Delete events entry route handler
 export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session");
@@ -181,9 +181,9 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     );
   }
 
-  // Check if housing entry exists
-  const existingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  // Check if events entry exists
+  const existingEntry = await db.query.events.findFirst({
+    where: eq(events.id, id)
   });
 
   if (!existingEntry) {
@@ -193,11 +193,11 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     );
   }
 
-  // Delete the housing entry
-  await db.delete(housing).where(eq(housing.id, id));
+  // Delete the events entry
+  await db.delete(events).where(eq(events.id, id));
 
   return c.json(
-    { message: "Housing entry deleted successfully" },
+    { message: "Event entry deleted successfully" },
     HttpStatusCodes.OK
   );
 };

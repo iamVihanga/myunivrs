@@ -10,27 +10,37 @@ import {
   queryParamsSchema,
   stringIdParamSchema
 } from "@/lib/helpers";
-import { insertHousingSchema, selectHousingSchema } from "./housing.schema";
+import {
+  insertSellSwapSchema,
+  selectSellSwapSchema,
+  updateSellSwapSchema
+} from "./sellswaps.schema";
 
-const tags: string[] = ["Housing"];
+const tags: string[] = ["Sell Swaps"];
+
+// Extend query params to include type filter
+const sellSwapQueryParams = queryParamsSchema.extend({
+  type: z.enum(["sell", "swap"]).optional(),
+  categoryId: z.string().optional()
+});
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all housing entries",
+  summary: "List all sell/swap items",
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema
+    query: sellSwapQueryParams
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectHousingSchema)),
-      "The list of housing entries"
+      getPaginatedSchema(z.array(selectSellSwapSchema)),
+      "The list of sell/swap items"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the housing entries"
+      "An error occurred while fetching sell/swap items"
     )
   }
 });
@@ -38,19 +48,19 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new housing entry",
+  summary: "Create a new sell/swap item",
   path: "/",
   method: "post",
   request: {
     body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to create"
+      insertSellSwapSchema,
+      "The sell/swap item to create"
     )
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectHousingSchema,
-      "The created housing entry"
+      selectSellSwapSchema,
+      "The created sell/swap item"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -65,7 +75,7 @@ export const create = createRoute({
 
 export const getOne = createRoute({
   tags,
-  summary: "Get a single housing entry by ID",
+  summary: "Get a single sell/swap item by ID",
   method: "get",
   path: "/{id}",
   request: {
@@ -73,12 +83,12 @@ export const getOne = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "Requested housing entry"
+      selectSellSwapSchema,
+      "Requested sell/swap item"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Sell/swap item not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -90,28 +100,32 @@ export const getOne = createRoute({
 // Update route definition
 export const update = createRoute({
   tags,
-  summary: "Update an existing housing entry",
+  summary: "Update an existing sell/swap item",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
     body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to update"
+      updateSellSwapSchema,
+      "The sell/swap item to update"
     )
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "The updated housing entry"
+      selectSellSwapSchema,
+      "The updated sell/swap item"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthenticated request"
     ),
+    [HttpStatusCodes.FORBIDDEN]: jsonContent(
+      errorMessageSchema,
+      "Action Forbidden"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Housing entry not found"
+      "Sell/swap item not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
@@ -123,7 +137,7 @@ export const update = createRoute({
 // Delete route definition
 export const remove = createRoute({
   tags,
-  summary: "Delete a housing entry",
+  summary: "Delete a sell/swap item",
   path: "/{id}",
   method: "delete",
   request: {
@@ -132,7 +146,11 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Housing entry deleted successfully"
+      "Sell/swap item deleted successfully"
+    ),
+    [HttpStatusCodes.FORBIDDEN]: jsonContent(
+      errorMessageSchema,
+      "Action Forbidden"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -140,11 +158,62 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Sell/swap item not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
+    )
+  }
+});
+
+// Get by category route definition
+export const getByCategory = createRoute({
+  tags,
+  summary: "Get sell/swap items by category ID",
+  method: "get",
+  path: "/category/{id}",
+  request: {
+    params: stringIdParamSchema,
+    query: queryParamsSchema
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(selectSellSwapSchema)),
+      "Sell/swap items in this category"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Category not found"
+    ),
+    [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(IdParamsSchema),
+      "Invalid ID format"
+    )
+  }
+});
+
+// Get my listings route definition
+export const getMyListings = createRoute({
+  tags,
+  summary: "Get sell/swap items created by the current user",
+  method: "get",
+  path: "/my-listings",
+  request: {
+    query: queryParamsSchema
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      getPaginatedSchema(z.array(selectSellSwapSchema)),
+      "User's sell/swap items"
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
+      errorMessageSchema,
+      "An error occurred while fetching the listings"
     )
   }
 });
@@ -154,3 +223,5 @@ export type CreateRoute = typeof create;
 export type GetOneRoute = typeof getOne;
 export type UpdateRoute = typeof update;
 export type DeleteRoute = typeof remove;
+export type GetByCategoryRoute = typeof getByCategory;
+export type GetMyListingsRoute = typeof getMyListings;

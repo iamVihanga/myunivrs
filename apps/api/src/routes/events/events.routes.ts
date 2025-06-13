@@ -10,14 +10,19 @@ import {
   queryParamsSchema,
   stringIdParamSchema
 } from "@/lib/helpers";
-import { insertHousingSchema, selectHousingSchema } from "./housing.schema";
 
-const tags: string[] = ["Housing"];
+import {
+  insertEventsSchema,
+  selectEventsSchema,
+  updateEventsSchema
+} from "./events.schema";
+
+const tags: string[] = ["Events"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all housing entries",
+  summary: "List all events",
   path: "/",
   method: "get",
   request: {
@@ -25,12 +30,12 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectHousingSchema)),
-      "The list of housing entries"
+      getPaginatedSchema(z.array(selectEventsSchema)),
+      "The list of event entries"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the housing entries"
+      "An error occurred while fetching the event entries"
     )
   }
 });
@@ -38,19 +43,16 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new housing entry",
+  summary: "Create a new event entry",
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to create"
-    )
+    body: jsonContentRequired(insertEventsSchema, "The event entry to create")
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectHousingSchema,
-      "The created housing entry"
+      selectEventsSchema,
+      "The created event entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -65,7 +67,7 @@ export const create = createRoute({
 
 export const getOne = createRoute({
   tags,
-  summary: "Get a single housing entry by ID",
+  summary: "Get a single event entry by ID",
   method: "get",
   path: "/{id}",
   request: {
@@ -73,12 +75,12 @@ export const getOne = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "Requested housing entry"
+      selectEventsSchema,
+      "Requested event entry"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Event entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -90,20 +92,17 @@ export const getOne = createRoute({
 // Update route definition
 export const update = createRoute({
   tags,
-  summary: "Update an existing housing entry",
+  summary: "Update an existing event entry",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to update"
-    )
+    body: jsonContentRequired(updateEventsSchema, "The event entry to update")
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "The updated housing entry"
+      selectEventsSchema,
+      "The updated event entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -111,7 +110,7 @@ export const update = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Housing entry not found"
+      "event entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
@@ -123,7 +122,7 @@ export const update = createRoute({
 // Delete route definition
 export const remove = createRoute({
   tags,
-  summary: "Delete a housing entry",
+  summary: "Delete a event entry",
   path: "/{id}",
   method: "delete",
   request: {
@@ -132,7 +131,7 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Housing entry deleted successfully"
+      "Event entry deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -140,7 +139,7 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Event entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
