@@ -3,13 +3,17 @@ import {
   errorMessageSchema,
   getPaginatedSchema,
   queryParamsSchema,
-  stringIdParamSchema,
+  stringIdParamSchema
 } from "@/lib/helpers";
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
-import { insertJobsSchema, selectJobSchema } from "./jobs.schema";
+import {
+  insertJobsSchema,
+  selectJobSchema,
+  updateJobsSchema
+} from "./jobs.schema";
 
 const tags: string[] = ["jobs"];
 // List route definition
@@ -19,7 +23,7 @@ export const list = createRoute({
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema,
+    query: queryParamsSchema
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -29,8 +33,8 @@ export const list = createRoute({
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
       "An error occurred while fetching the job entries"
-    ),
-  },
+    )
+  }
 });
 
 // Create route definition
@@ -40,7 +44,7 @@ export const create = createRoute({
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(insertJobsSchema, "The created job entry"),
+    body: jsonContentRequired(insertJobsSchema, "The created job entry")
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
@@ -50,8 +54,8 @@ export const create = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"
-    ),
-  },
+    )
+  }
 });
 
 export const getOne = createRoute({
@@ -60,7 +64,7 @@ export const getOne = createRoute({
   path: "/{id}",
   method: "get",
   request: {
-    params: stringIdParamSchema,
+    params: stringIdParamSchema
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectJobSchema, "Requested jobs entry"),
@@ -71,8 +75,8 @@ export const getOne = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    ),
-  },
+    )
+  }
 });
 
 // Update route definition
@@ -83,7 +87,7 @@ export const update = createRoute({
   method: "put",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(insertJobsSchema, "The Job entry to update"),
+    body: jsonContentRequired(updateJobsSchema, "The Job entry to update")
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -97,8 +101,8 @@ export const update = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"
-    ),
-  },
+    )
+  }
 });
 
 // Delete route definition
@@ -108,11 +112,11 @@ export const remove = createRoute({
   path: "/{id}",
   method: "delete",
   request: {
-    params: stringIdParamSchema,
+    params: stringIdParamSchema
   },
   responses: {
     [HttpStatusCodes.NO_CONTENT]: {
-      description: "Job entry deleted successfully",
+      description: "Job entry deleted successfully"
     },
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
@@ -121,8 +125,8 @@ export const remove = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    ),
-  },
+    )
+  }
 });
 
 export type ListRoute = typeof list;
