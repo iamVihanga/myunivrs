@@ -98,6 +98,10 @@ export const update = createRoute({
       selectJobSchema,
       "The updated housing entry"
     ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
       "Job entry not found"
@@ -122,6 +126,10 @@ export const remove = createRoute({
     [HttpStatusCodes.NO_CONTENT]: {
       description: "Job entry deleted successfully"
     },
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
       "Job entry not found"

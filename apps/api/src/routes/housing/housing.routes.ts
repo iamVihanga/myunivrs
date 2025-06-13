@@ -52,6 +52,10 @@ export const create = createRoute({
       selectHousingSchema,
       "The created housing entry"
     ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"
@@ -101,6 +105,10 @@ export const update = createRoute({
       selectHousingSchema,
       "The updated housing entry"
     ),
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
       "Housing entry not found"
@@ -125,6 +133,10 @@ export const remove = createRoute({
     [HttpStatusCodes.NO_CONTENT]: {
       description: "Housing entry deleted successfully"
     },
+    [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
+      errorMessageSchema,
+      "Unauthenticated request"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
       "Housing entry not found"

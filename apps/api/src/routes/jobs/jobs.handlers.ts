@@ -138,6 +138,16 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   //Check if jobs entry exists
   const existingEntry = await db.query.jobs.findFirst({
@@ -164,6 +174,16 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
 // Delete housing entry route handler
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   // Check if jobs entry exists
   const existingEntry = await db.query.jobs.findFirst({

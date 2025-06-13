@@ -97,6 +97,16 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 // Create new housing entry route handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const housingEntry = c.req.valid("json");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   const [inserted] = await db.insert(housing).values(housingEntry).returning();
 
@@ -124,6 +134,16 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   // Check if housing entry exists
   const existingEntry = await db.query.housing.findFirst({
@@ -150,6 +170,16 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
 // Delete housing entry route handler
 export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   // Check if housing entry exists
   const existingEntry = await db.query.housing.findFirst({
