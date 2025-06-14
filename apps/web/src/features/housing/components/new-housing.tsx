@@ -27,7 +27,10 @@ export function NewHousing() {
   const [formData, setFormData] = useState<InsertHousing>({
     title: "",
     description: "",
-    images: []
+    images: [],
+    address: "",
+    price: "",
+    link: ""
   });
 
   const handleChange = (
@@ -39,17 +42,30 @@ export function NewHousing() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Form validation
+    if (!formData.title || !formData.address || !formData.price) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // For now, use empty array for images as mentioned
       await createHousing({
         ...formData,
         images: []
       });
 
       toast.success("Housing listing created successfully!");
-      setFormData({ title: "", description: "", images: [] });
+      setFormData({
+        title: "",
+        description: "",
+        images: [],
+        address: "",
+        price: "",
+        link: ""
+      });
       setOpen(false);
       router.refresh();
     } catch (error) {
@@ -63,11 +79,15 @@ export function NewHousing() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button icon={<PlusIcon />} size="sm">
+        <Button
+          icon={<PlusIcon />}
+          size="sm"
+          className="bg-cyan-600 hover:bg-cyan-700"
+        >
           Add New Listing
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Housing Listing</DialogTitle>
@@ -77,7 +97,9 @@ export function NewHousing() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">
+                Title <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="title"
                 name="title"
@@ -87,6 +109,46 @@ export function NewHousing() {
                 required
               />
             </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="address">
+                Address <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="address"
+                name="address"
+                placeholder="Enter property address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="price">
+                Price <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="price"
+                name="price"
+                placeholder="Enter property price"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="link">Website Link</Label>
+              <Input
+                id="link"
+                name="link"
+                placeholder="https://example.com"
+                value={formData.link || ""}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -98,7 +160,6 @@ export function NewHousing() {
                 rows={4}
               />
             </div>
-            {/* Image handling removed as per your request */}
           </div>
           <DialogFooter>
             <Button
@@ -110,7 +171,11 @@ export function NewHousing() {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-cyan-600 hover:bg-cyan-700"
+            >
               {isSubmitting ? "Creating..." : "Create Listing"}
             </Button>
           </DialogFooter>

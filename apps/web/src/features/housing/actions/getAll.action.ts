@@ -2,10 +2,33 @@
 
 import { client } from "@/lib/rpc";
 
-export async function getAllHousing() {
-  const response = await client.api.housing.$get();
+type GetHousingParams = {
+  page?: string;
+  limit?: string;
+  sort?: "asc" | "desc";
+  search?: string;
+};
 
-  const housings = await response.json();
+export async function getAllHousing({
+  page = "1",
+  limit = "8",
+  sort = "desc",
+  search = ""
+}: GetHousingParams = {}) {
+  const response = await client.api.housing.$get({
+    query: {
+      page,
+      limit,
+      sort,
+      search
+    }
+  });
 
-  return housings;
+  if (!response.ok) {
+    const { message } = await response.json();
+    throw new Error(message);
+  }
+
+  const data = await response.json();
+  return data;
 }
