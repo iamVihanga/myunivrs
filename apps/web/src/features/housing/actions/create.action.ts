@@ -8,6 +8,13 @@ export async function createHousing(data: InsertHousing) {
     json: data
   });
 
+  if (!response.ok) {
+    const { message } = await response.json();
+    console.log({ message });
+
+    throw new Error(message);
+  }
+
   const createdHousing = await response.json();
 
   return createdHousing;

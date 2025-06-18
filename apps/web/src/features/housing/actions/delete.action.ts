@@ -1,13 +1,17 @@
 "use server";
 
+import { client } from "@/lib/rpc";
 import { revalidatePath } from "next/cache";
 
 export async function deleteHousing(id: string) {
-  // Note: You'll need to implement this endpoint in your API
-  // await client.api.housing[":id"].$delete({
-  //   param: { id }
-  // });
+  const response = await client.api.housing[":id"].$delete({
+    param: { id }
+  });
+
+  const result = await response.json();
 
   // Revalidate the page to show the updated housing list
   revalidatePath("/dashboard/housing");
+
+  return result;
 }

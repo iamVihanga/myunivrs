@@ -15,7 +15,7 @@ import {
   updateJobsSchema
 } from "./jobs.schema";
 
-const tags: string[] = ["jobs"];
+const tags: string[] = ["Jobs"];
 // List route definition
 export const list = createRoute({
   tags,
@@ -123,9 +123,10 @@ export const remove = createRoute({
     params: stringIdParamSchema
   },
   responses: {
-    [HttpStatusCodes.NO_CONTENT]: {
-      description: "Job entry deleted successfully"
-    },
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({ message: z.string() }),
+      "Job entry deleted successfully"
+    ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
       "Unauthenticated request"

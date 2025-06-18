@@ -200,5 +200,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   // Delete the housing entry
   await db.delete(jobs).where(eq(jobs.id, id));
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  return c.json(
+    { message: "Job entry deleted successfully" },
+    HttpStatusCodes.OK
+  );
 };

@@ -17,7 +17,7 @@ export const queryParamsSchema = z.object({
 
 export type QueryParamsSchema = z.infer<typeof queryParamsSchema>;
 
-export function getPaginatedSchema(data: z.ZodTypeAny) {
+export function getPaginatedSchema<T>(data: z.ZodType<T>) {
   return z.object({
     data,
     meta: z.object({

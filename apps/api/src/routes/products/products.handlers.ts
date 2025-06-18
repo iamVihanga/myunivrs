@@ -5,7 +5,7 @@ import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import type { AppRouteHandler } from "@/types";
 
 import { db } from "@/db";
-import { housing } from "@repo/database/schemas";
+import { products } from "@repo/database/schemas";
 
 import type {
   CreateRoute,
@@ -13,9 +13,9 @@ import type {
   GetOneRoute,
   ListRoute,
   UpdateRoute
-} from "./housing.routes";
+} from "./products.routes";
 
-// List housing entries route handler
+// List products route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const {
     page = "1",
@@ -30,7 +30,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const offset = (pageNum - 1) * limitNum;
 
   // Build query conditions
-  const query = db.query.housing.findMany({
+  const query = db.query.products.findMany({
     limit: limitNum,
     offset,
     where: (fields, { ilike, and, or }) => {
@@ -54,23 +54,26 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         return fields.createdAt;
       }
       return desc(fields.createdAt);
+    },
+    with: {
+      category: true
     }
   });
 
   // Get total count for pagination metadata
   const totalCountQuery = db
     .select({ count: sql<number>`count(*)` })
-    .from(housing)
+    .from(products)
     .where(
       search
         ? or(
-            ilike(housing.title, `%${search}%`),
-            ilike(housing.description, `%${search}%`)
+            ilike(products.title, `%${search}%`),
+            ilike(products.description, `%${search}%`)
           )
         : undefined
     );
 
-  const [housingEntries, _totalCount] = await Promise.all([
+  const [productEntries, _totalCount] = await Promise.all([
     query,
     totalCountQuery
   ]);
@@ -82,7 +85,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   return c.json(
     {
-      data: housingEntries,
+      data: productEntries,
       meta: {
         currentPage: pageNum,
         totalPages,
@@ -94,9 +97,9 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   );
 };
 
-// Create new housing entry route handler
+// Create new product route handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const housingEntry = c.req.valid("json");
+  const productEntry = c.req.valid("json");
   const session = c.get("session");
 
   if (!session) {
@@ -108,29 +111,39 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
-  const [inserted] = await db.insert(housing).values(housingEntry).returning();
+  const [inserted] = await db
+    .insert(products)
+    .values({
+      ...productEntry,
+      createdBy: session.userId,
+      agentProfile: session?.activeOrganizationId
+    })
+    .returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// Get single housing entry route handler
+// Get single product route handler
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
-  const housingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  const product = await db.query.products.findFirst({
+    where: eq(products.id, id),
+    with: {
+      category: true
+    }
   });
 
-  if (!housingEntry)
+  if (!product)
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
 
-  return c.json(housingEntry, HttpStatusCodes.OK);
+  return c.json(product, HttpStatusCodes.OK);
 };
 
-// Update housing entry route handler
+// Update product route handler
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const body = c.req.valid("json");
@@ -145,9 +158,9 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // Check if housing entry exists
-  const existingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  // Check if product entry exists
+  const existingEntry = await db.query.products.findFirst({
+    where: eq(products.id, id)
   });
 
   if (!existingEntry) {
@@ -157,17 +170,17 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // Update the housing entry
+  // Update the product entry
   const [updated] = await db
-    .update(housing)
+    .update(products)
     .set({ ...body, updatedAt: new Date() })
-    .where(eq(housing.id, id))
+    .where(eq(products.id, id))
     .returning();
 
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-// Delete housing entry route handler
+// Delete product route handler
 export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session");
@@ -181,9 +194,9 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     );
   }
 
-  // Check if housing entry exists
-  const existingEntry = await db.query.housing.findFirst({
-    where: eq(housing.id, id)
+  // Check if product entry exists
+  const existingEntry = await db.query.products.findFirst({
+    where: eq(products.id, id)
   });
 
   if (!existingEntry) {
@@ -193,11 +206,11 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     );
   }
 
-  // Delete the housing entry
-  await db.delete(housing).where(eq(housing.id, id));
+  // Delete the product entry
+  await db.delete(products).where(eq(products.id, id));
 
   return c.json(
-    { message: "Housing entry deleted successfully" },
+    { message: "Product deleted successfully" },
     HttpStatusCodes.OK
   );
 };

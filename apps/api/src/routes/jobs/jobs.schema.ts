@@ -17,7 +17,8 @@ export const insertJobsSchema = createInsertSchema(jobs, {
 export const updateJobsSchema = createInsertSchema(jobs)
   .omit({
     id: true,
-    createdAt: true
+    createdAt: true,
+    updatedAt: true
   })
   .partial();
 
