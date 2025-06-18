@@ -15,7 +15,9 @@ export async function getAllHousing({
   sort = "desc",
   search = ""
 }: GetHousingParams = {}) {
-  const response = await client.api.housing.$get({
+  const rpcClient = await client();
+
+  const response = await rpcClient.api.housing.$get({
     query: {
       page,
       limit,

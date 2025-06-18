@@ -4,7 +4,9 @@ import { client } from "@/lib/rpc";
 import { revalidatePath } from "next/cache";
 
 export async function deleteHousing(id: string) {
-  const response = await client.api.housing[":id"].$delete({
+  const rpcClient = await client();
+
+  const response = await rpcClient.api.housing[":id"].$delete({
     param: { id }
   });
 

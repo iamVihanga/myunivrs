@@ -4,7 +4,9 @@ import { client } from "@/lib/rpc";
 import type { InsertHousing } from "../schemas";
 
 export async function createHousing(data: InsertHousing) {
-  const response = await client.api.housing.$post({
+  const rpcClient = await client();
+
+  const response = await rpcClient.api.housing.$post({
     json: data
   });
 
