@@ -9,7 +9,9 @@ export async function addTask(data: AddTaskSchema) {
     throw new Error("Task name is required");
   }
 
-  await client.api.tasks.$post({
+  const rpcClient = await client();
+
+  await rpcClient.api.tasks.$post({
     json: {
       ...data,
       done: false

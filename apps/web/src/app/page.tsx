@@ -5,7 +5,9 @@ import { AddNewTask } from "@/features/tasks/components/add-new-task";
 import { TaskCard } from "@/features/tasks/components/task-card";
 
 export default async function Home() {
-  const res = await client.api.tasks.$get();
+  const rpcClient = await client();
+  const res = await rpcClient.api.tasks.$get();
+
   const tasks = await res.json();
 
   return (
