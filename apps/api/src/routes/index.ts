@@ -6,13 +6,15 @@ import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
 import tasks from "./tasks/tasks.index";
+import university from "./university/university.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
     .route("/", index)
     .route("/tasks", tasks)
     .route("/housing", housing)
-    .route("/jobs", jobs);
+    .route("/jobs", jobs)
+    .route("/university", university);
 }
 
 // stand alone router type used for api client
