@@ -60,7 +60,16 @@ export const auth = betterAuth({
         return true;
       }
     })
-  ]
+  ],
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true
+    },
+    defaultCookieAttributes: {
+      sameSite: "lax",
+      httpOnly: true
+    }
+  }
 });
 
 export type Session = typeof auth.$Infer.Session;

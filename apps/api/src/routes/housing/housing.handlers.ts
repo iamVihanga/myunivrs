@@ -99,6 +99,8 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const housingEntry = c.req.valid("json");
   const session = c.get("session");
 
+  console.log({ session });
+
   if (!session) {
     return c.json(
       {

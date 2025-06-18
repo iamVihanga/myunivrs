@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { type UpdateTaskSchema } from "../schemas";
 
 export async function markAsCompleted(id: number, data: UpdateTaskSchema) {
-  const res = await client.api.tasks[":id"].$patch({
+  const rpcClient = await client();
+
+  const res = await rpcClient.api.tasks[":id"].$patch({
     json: { done: data.done || false },
     param: { id }
   });
