@@ -61,6 +61,11 @@ const data = {
       name: "Housing",
       url: "/dashboard/housing",
       icon: IconBuildings
+    },
+    {
+      name: "Events",
+      url: "/dashboard/events",
+      icon: IconBuildings
     }
   ]
 };
