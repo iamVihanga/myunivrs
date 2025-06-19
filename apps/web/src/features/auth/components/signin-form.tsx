@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useId } from "react";
 
+import { Mode } from "@/features/account/components/login-template";
 import { authClient } from "@/lib/auth-client";
 import { CheckIcon } from "lucide-react";
 import { CiFacebook } from "react-icons/ci";
@@ -22,12 +23,14 @@ import { toast } from "sonner";
 import { signinSchema, type SigninSchemaT } from "../schemas";
 
 interface SigninFormProps {
-  type?: "agent" | "user";
+  mode?: "agent" | "user";
+  onAccountLayoutModalChange: React.Dispatch<React.SetStateAction<Mode>>;
 }
 
 export function SigninForm({
   className,
-  type = "user",
+  mode = "user",
+  onAccountLayoutModalChange,
   ...props
 }: React.ComponentProps<"div"> & SigninFormProps) {
   const toastId = useId();
@@ -61,7 +64,7 @@ export function SigninForm({
         },
         onSuccess(ctx) {
           toast.success("User signed in successfully!", { id: toastId });
-          router.push("/dashboard");
+          mode === "agent" ? router.push("/dashboard") : router.refresh();
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
@@ -157,10 +160,22 @@ export function SigninForm({
                 </div>
                 <div className="text-center text-sm">
                   {`Don't have an account?`}
-                  {` `}
-                  <Link href="/signup" className="underline underline-offset-4">
-                    Sign Up
-                  </Link>
+                  {mode === "agent" && (
+                    <Link
+                      href="/signup"
+                      className="underline underline-offset-4"
+                    >
+                      Sign Up
+                    </Link>
+                  )}
+                  {mode === "user" && (
+                    <span
+                      onClick={() => onAccountLayoutModalChange("register")}
+                      className="underline underline-offset-4"
+                    >
+                      Sign Up
+                    </span>
+                  )}
                 </div>
               </div>
             </form>

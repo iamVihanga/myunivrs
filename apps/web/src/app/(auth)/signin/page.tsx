@@ -8,5 +8,5 @@ export default async function SigninPage() {
   const pathname = new URL(header_url).pathname;
   const isAgent = pathname === "/signup";
 
-  return <SigninForm type={isAgent ? "agent" : "user"} />;
+  return <SigninForm mode={isAgent ? "agent" : "user"} />;
 }
