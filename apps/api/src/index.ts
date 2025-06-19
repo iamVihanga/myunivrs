@@ -1,6 +1,6 @@
-import createApp from "@/lib/create-app";
-import configureOpenAPI from "@/lib/open-api-config";
-import { registerRoutes } from "@/routes";
+import createApp from "./lib/create-app";
+import configureOpenAPI from "./lib/open-api-config";
+import { registerRoutes } from "./routes";
 
 import env from "./env";
 
@@ -12,7 +12,7 @@ export type AppType = typeof app;
 
 export default {
   port: env.PORT,
-  fetch: app.fetch
+  fetch: app.fetch,
 };
 
 // Test

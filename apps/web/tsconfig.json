@@ -3,7 +3,9 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
+      "@repo/ui/*": ["../../packages/ui/src/*"],
+      "@repo/database/*": ["../../packages/database/src/*"],
+      "@nextplate/api/routes": ["../../apps/api/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

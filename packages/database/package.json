@@ -20,9 +20,11 @@
     "@repo/typescript-config": "workspace:^",
     "drizzle-orm": "^0.44.1",
     "drizzle-zod": "^0.7.1",
+    "hono": "^4.8.0",
     "pg": "^8.16.0"
   },
   "devDependencies": {
+    "@hono/zod-openapi": "^0.19.2",
     "@types/node": "^22.15.30",
     "@types/pg": "^8.15.4",
     "tsup": "^8.0.1",
