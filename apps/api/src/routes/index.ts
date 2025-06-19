@@ -9,6 +9,7 @@ import jobs from "./jobs/jobs.index";
 import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
 import tasks from "./tasks/tasks.index";
+import university from "./university/university.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
@@ -18,7 +19,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/jobs", jobs)
     .route("/events", events)
     .route("/products", products)
-    .route("/sellswaps", sellswaps);
+    .route("/sellswaps", sellswaps)
+    .route("/university", university);
 }
 
 // stand alone router type used for api client
