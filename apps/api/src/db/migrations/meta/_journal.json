@@ -71,6 +71,13 @@
       "when": 1750412879765,
       "tag": "0009_mute_the_anarchist",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1750413671886,
+      "tag": "0010_thick_klaw",
+      "breakpoints": true
     }
   ]
 }
