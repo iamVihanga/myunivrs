@@ -27,3 +27,5 @@ export * from "./bank.schema";
 export * from "./institute.schema";
 
 export * from "./sales.schema";
+
+export * from "./vendor.schema";
