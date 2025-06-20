@@ -19,3 +19,9 @@ export * from "./sellswap.schema";
 export * from "./university.schema";
 
 export * from "./movie.schema";
+
+export * from "./customer.schema";
+
+export * from "./bank.schema";
+
+export * from "./institute.schema";
