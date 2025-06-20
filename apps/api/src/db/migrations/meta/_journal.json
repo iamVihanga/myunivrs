@@ -43,6 +43,13 @@
       "when": 1750241271013,
       "tag": "0005_long_blue_shield",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1750325153520,
+      "tag": "0006_plain_cammi",
+      "breakpoints": true
     }
   ]
 }

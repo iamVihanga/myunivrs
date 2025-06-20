@@ -17,3 +17,5 @@ export * from "./products.schema";
 export * from "./sellswap.schema";
 
 export * from "./university.schema";
+
+export * from "./movie.schema";
