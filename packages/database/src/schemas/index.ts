@@ -15,3 +15,7 @@ export * from "./feedback.schema";
 export * from "./products.schema";
 
 export * from "./sellswap.schema";
+
+export * from "./talent.schema";
+
+export * from "./test.schema";
