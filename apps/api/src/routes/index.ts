@@ -10,6 +10,7 @@ import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
 import talent from "./talent/talent.index";
 import tasks from "./tasks/tasks.index";
+import university from "./university/university.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
@@ -17,6 +18,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/tasks", tasks)
     .route("/housing", housing)
     .route("/jobs", jobs)
+    .route("/university", university)
     .route("/events", events)
     .route("/products", products)
     .route("/sellswaps", sellswaps)

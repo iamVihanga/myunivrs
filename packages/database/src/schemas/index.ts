@@ -8,6 +8,8 @@ export * from "./housing.schema";
 
 export * from "./jobs.schema";
 
+export * from "./university.schema";
+
 export * from "./events.schema";
 
 export * from "./feedback.schema";
