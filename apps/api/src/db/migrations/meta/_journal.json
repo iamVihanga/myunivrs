@@ -43,6 +43,13 @@
       "when": 1750233808521,
       "tag": "0005_pale_forgotten_one",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1750415287094,
+      "tag": "0006_equal_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

@@ -21,5 +21,5 @@ export const sellSwaps = pgTable("sell_swaps", {
 
   userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
 
-  ...timestamps
+  ...timestamps,
 });
