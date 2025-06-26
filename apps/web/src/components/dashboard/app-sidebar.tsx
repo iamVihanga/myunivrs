@@ -72,6 +72,11 @@ const data = {
       url: "/dashboard/jobs",
       icon: IconBuildings,
     },
+    {
+      name: "Products",
+      url: "/dashboard/products",
+      icon: IconBuildings,
+    },
   ],
 };
 

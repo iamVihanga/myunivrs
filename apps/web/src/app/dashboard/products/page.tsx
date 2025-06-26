@@ -1,5 +1,5 @@
-import { NewSellSwap } from "@/features/sellswaps/components/new-sellswap";
-import { SellSwapList } from "@/features/sellswaps/components/sellswap-list";
+import { NewProducts } from "@/features/products/components/new-products";
+import { ProductsList } from "@/features/products/components/products-list";
 
 interface PageProps {
   searchParams: {
@@ -8,7 +8,7 @@ interface PageProps {
   };
 }
 
-export default function SellSwapsPage({ searchParams }: PageProps) {
+export default function ProductsPage({ searchParams }: PageProps) {
   const { page = "1", search = "" } = searchParams;
 
   return (
@@ -16,16 +16,16 @@ export default function SellSwapsPage({ searchParams }: PageProps) {
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">
-            Sell/Swaps Listings
+            Product Listings
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage your property listings
+            Manage your products listings
           </p>
         </div>
-        <NewSellSwap />
+        <NewProducts />
       </div>
 
-      <SellSwapList page={page} search={search} />
+      <ProductsList page={page} search={search} />
     </div>
   );
 }
