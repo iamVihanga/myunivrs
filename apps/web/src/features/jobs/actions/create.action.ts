@@ -1,12 +1,12 @@
 "use server";
 
 import { client } from "@/lib/rpc";
-import type { InsertSellSwap } from "../schemas";
+import type { InsertJobs } from "../schemas";
 
-export async function createSellSwap(data: InsertSellSwap) {
+export async function createJob(data: InsertJobs) {
   const rpcClient = await client();
 
-  const response = await rpcClient.api.sellswaps.$post({
+  const response = await rpcClient.api.jobs.$post({
     json: data,
   });
 
@@ -17,7 +17,7 @@ export async function createSellSwap(data: InsertSellSwap) {
     throw new Error(message);
   }
 
-  const createdSellSwaps = await response.json();
+  const createdJob = await response.json();
 
-  return createdSellSwaps;
+  return createdJob;
 }
