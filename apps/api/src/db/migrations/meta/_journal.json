@@ -15,6 +15,13 @@
       "when": 1750922133941,
       "tag": "0001_demonic_speed_demon",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1750415287094,
+      "tag": "0006_equal_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

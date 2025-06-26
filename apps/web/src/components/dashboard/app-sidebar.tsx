@@ -6,7 +6,7 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconSearch,
-  IconSettings
+  IconSettings,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -22,7 +22,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@repo/ui/components/sidebar";
 import { Skeleton } from "@repo/ui/components/skeleton";
 
@@ -30,44 +30,44 @@ const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg"
+    avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard
-    }
+      icon: IconDashboard,
+    },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "#",
-      icon: IconSettings
+      icon: IconSettings,
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp
+      icon: IconHelp,
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch
-    }
+      icon: IconSearch,
+    },
   ],
   documents: [
     {
       name: "Housing",
       url: "/dashboard/housing",
-      icon: IconBuildings
+      icon: IconBuildings,
     },
     {
-      name: "Events",
-      url: "/dashboard/events",
-      icon: IconBuildings
-    }
-  ]
+      name: "Sell/Swap",
+      url: "/dashboard/sellswap",
+      icon: IconBuildings,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
