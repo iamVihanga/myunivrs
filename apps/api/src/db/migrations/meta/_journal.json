@@ -5,50 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1749580876397,
-      "tag": "0000_flawless_deadpool",
+      "when": 1751005278625,
+      "tag": "0000_harsh_spirit",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1749640810824,
-      "tag": "0001_flimsy_pretty_boy",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1749814275378,
-      "tag": "0002_conscious_wolf_cub",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1749831412548,
-      "tag": "0003_lyrical_blockbuster",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1749836077977,
-      "tag": "0004_polite_loa",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1750233808521,
-      "tag": "0005_pale_forgotten_one",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1750415287094,
-      "tag": "0006_equal_dreadnoughts",
+      "when": 1751009785170,
+      "tag": "0001_new_silver_sable",
       "breakpoints": true
     }
   ]
