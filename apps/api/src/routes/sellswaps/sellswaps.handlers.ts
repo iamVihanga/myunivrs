@@ -14,7 +14,7 @@ import type {
   GetMyListingsRoute,
   GetOneRoute,
   ListRoute,
-  UpdateRoute
+  UpdateRoute,
 } from "./sellswaps.routes";
 
 // List sell/swap items route handler
@@ -22,10 +22,8 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const {
     page = "1",
     limit = "10",
-    sort = "desc",
+    sort = "asc",
     search,
-    type,
-    categoryId
   } = c.req.valid("query");
 
   // Convert to numbers and validate
@@ -37,7 +35,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const query = db.query.sellSwaps.findMany({
     limit: limitNum,
     offset,
-    where: (fields, { ilike, and, or, eq }) => {
+    where: (fields, { ilike, and, or }) => {
       const conditions = [];
 
       // Add search condition if search parameter is provided
@@ -50,16 +48,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         );
       }
 
-      // Filter by type if provided
-      if (type) {
-        conditions.push(eq(fields.type, type));
-      }
-
-      // Filter by category if provided
-      if (categoryId) {
-        conditions.push(eq(fields.categoryId, categoryId));
-      }
-
       return conditions.length ? and(...conditions) : undefined;
     },
     orderBy: (fields) => {
@@ -69,10 +57,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       }
       return desc(fields.createdAt);
     },
-    with: {
-      category: true,
-      user: true
-    }
   });
 
   // Get total count for pagination metadata
@@ -80,21 +64,17 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     .select({ count: sql<number>`count(*)` })
     .from(sellSwaps)
     .where(
-      and(
-        search
-          ? or(
-              ilike(sellSwaps.title, `%${search}%`),
-              ilike(sellSwaps.description, `%${search}%`)
-            )
-          : undefined,
-        type ? eq(sellSwaps.type, type) : undefined,
-        categoryId ? eq(sellSwaps.categoryId, categoryId) : undefined
-      )
+      search
+        ? or(
+            ilike(sellSwaps.title, `%${search}%`),
+            ilike(sellSwaps.description, `%${search}%`)
+          )
+        : undefined
     );
 
-  const [sellSwapEntries, _totalCount] = await Promise.all([
+  const [sellSwapsEntries, _totalCount] = await Promise.all([
     query,
-    totalCountQuery
+    totalCountQuery,
   ]);
 
   const totalCount = _totalCount[0]?.count || 0;
@@ -104,13 +84,13 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
   return c.json(
     {
-      data: sellSwapEntries,
+      data: sellSwapsEntries,
       meta: {
         currentPage: pageNum,
         totalPages,
         totalCount,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     },
     HttpStatusCodes.OK
   );
@@ -124,7 +104,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   if (!session) {
     return c.json(
       {
-        message: HttpStatusPhrases.UNAUTHORIZED
+        message: HttpStatusPhrases.UNAUTHORIZED,
       },
       HttpStatusCodes.UNAUTHORIZED
     );
@@ -133,7 +113,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   // Check if category exists (if provided)
   if (sellSwapEntry.categoryId) {
     const category = await db.query.productCategories.findFirst({
-      where: eq(productCategories.id, sellSwapEntry.categoryId)
+      where: eq(productCategories.id, sellSwapEntry.categoryId),
     });
 
     if (!category) {
@@ -148,7 +128,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     .insert(sellSwaps)
     .values({
       ...sellSwapEntry,
-      userId: session.userId
+      userId: session.userId,
     })
     .returning();
 
@@ -161,10 +141,10 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 
   const sellSwapItem = await db.query.sellSwaps.findFirst({
     where: eq(sellSwaps.id, id),
-    with: {
-      category: true,
-      user: true
-    }
+    // with: {
+    //   category: true,
+    //   user: true,
+    // },
   });
 
   if (!sellSwapItem)
@@ -185,7 +165,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   if (!session) {
     return c.json(
       {
-        message: HttpStatusPhrases.UNAUTHORIZED
+        message: HttpStatusPhrases.UNAUTHORIZED,
       },
       HttpStatusCodes.UNAUTHORIZED
     );
@@ -193,7 +173,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
 
   // Check if sell/swap item exists and belongs to the user
   const existingItem = await db.query.sellSwaps.findFirst({
-    where: eq(sellSwaps.id, id)
+    where: eq(sellSwaps.id, id),
   });
 
   if (!existingItem) {
@@ -214,7 +194,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   // Check if category exists (if updating category)
   if (body.categoryId) {
     const category = await db.query.productCategories.findFirst({
-      where: eq(productCategories.id, body.categoryId)
+      where: eq(productCategories.id, body.categoryId),
     });
 
     if (!category) {
@@ -243,7 +223,7 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   if (!session) {
     return c.json(
       {
-        message: HttpStatusPhrases.UNAUTHORIZED
+        message: HttpStatusPhrases.UNAUTHORIZED,
       },
       HttpStatusCodes.UNAUTHORIZED
     );
@@ -251,7 +231,7 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
 
   // Check if sell/swap item exists and belongs to the user
   const existingItem = await db.query.sellSwaps.findFirst({
-    where: eq(sellSwaps.id, id)
+    where: eq(sellSwaps.id, id),
   });
 
   if (!existingItem) {
@@ -285,12 +265,12 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
     page = "1",
     limit = "10",
     sort = "desc",
-    search
+    search,
   } = c.req.valid("query");
 
   // Check if category exists
   const category = await db.query.productCategories.findFirst({
-    where: eq(productCategories.id, id)
+    where: eq(productCategories.id, id),
   });
 
   if (!category) {
@@ -327,8 +307,8 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
       return desc(fields.createdAt);
     },
     with: {
-      user: true
-    }
+      user: true,
+    },
   });
 
   // Get total count for pagination metadata
@@ -349,7 +329,7 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
 
   const [sellSwapEntries, _totalCount] = await Promise.all([
     query,
-    totalCountQuery
+    totalCountQuery,
   ]);
 
   const totalCount = _totalCount[0]?.count || 0;
@@ -365,8 +345,8 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
         totalPages,
         totalCount,
         limit: limitNum,
-        category
-      }
+        category,
+      },
     },
     HttpStatusCodes.OK
   );
@@ -379,7 +359,7 @@ export const getMyListings: AppRouteHandler<GetMyListingsRoute> = async (c) => {
   if (!session) {
     return c.json(
       {
-        message: HttpStatusPhrases.UNAUTHORIZED
+        message: HttpStatusPhrases.UNAUTHORIZED,
       },
       HttpStatusCodes.UNAUTHORIZED
     );
@@ -389,7 +369,7 @@ export const getMyListings: AppRouteHandler<GetMyListingsRoute> = async (c) => {
     page = "1",
     limit = "10",
     sort = "desc",
-    search
+    search,
   } = c.req.valid("query");
 
   // Convert to numbers and validate
@@ -419,8 +399,8 @@ export const getMyListings: AppRouteHandler<GetMyListingsRoute> = async (c) => {
       return desc(fields.createdAt);
     },
     with: {
-      category: true
-    }
+      category: true,
+    },
   });
 
   // Get total count for pagination metadata
@@ -441,7 +421,7 @@ export const getMyListings: AppRouteHandler<GetMyListingsRoute> = async (c) => {
 
   const [sellSwapEntries, _totalCount] = await Promise.all([
     query,
-    totalCountQuery
+    totalCountQuery,
   ]);
 
   const totalCount = _totalCount[0]?.count || 0;
@@ -456,8 +436,8 @@ export const getMyListings: AppRouteHandler<GetMyListingsRoute> = async (c) => {
         currentPage: pageNum,
         totalPages,
         totalCount,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     },
     HttpStatusCodes.OK
   );

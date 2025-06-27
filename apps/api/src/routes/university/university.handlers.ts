@@ -1,115 +1,146 @@
-import { desc, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { AppRouteHandler } from "@/types";
+import { university } from "@repo/database";
+import { desc, eq, ilike, or, sql } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
+import { CreateRoute, ListRoute, RemoveRoute } from "./university.routes";
 
-import type { AppRouteHandler } from "@/types";
-
-import { db } from "@/db";
-import { ZOD_ERROR_CODES, ZOD_ERROR_MESSAGES } from "@/lib/constants";
-import { university } from "@repo/database/schemas";
-
-import type {
-  CreateRoute,
-  GetOneRoute,
-  ListRoute,
-  PatchRoute,
-  RemoveRoute,
-} from "./university.routes";
-
-// List universities route handler
+// List Universities entries route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
-  const universities = await db.query.university.findMany({
-    orderBy(fields) {
+  const {
+    page = "1",
+    limit = "10",
+    sort = "asc",
+    search,
+  } = c.req.valid("query");
+
+  // Convert to numbers and validate
+  const pageNum = Math.max(1, parseInt(page));
+  const limitNum = Math.max(1, Math.min(100, parseInt(limit)));
+  const offset = (pageNum - 1) * limitNum;
+
+  // Build query conditions
+  const query = db.query.university.findMany({
+    limit: limitNum,
+    offset,
+    where: (fields, { ilike, and, or }) => {
+      const conditions = [];
+
+      // Add search condition if search parameter is provided
+      if (search) {
+        conditions.push(
+          or(
+            ilike(fields.name, `%${search}%`),
+            ilike(fields.countryCode, `%${search}%`)
+          )
+        );
+      }
+
+      return conditions.length ? and(...conditions) : undefined;
+    },
+    orderBy: (fields) => {
+      // Handle sorting direction
+      if (sort.toLowerCase() === "asc") {
+        return fields.createdAt;
+      }
       return desc(fields.createdAt);
     },
   });
 
-  return c.json(universities);
+  // Get total count for pagination metadata
+  const totalCountQuery = db
+    .select({ count: sql<number>`count(*)` })
+    .from(university)
+    .where(
+      search
+        ? or(
+            ilike(university.name, `%${search}%`),
+            ilike(university.countryCode, `%${search}%`)
+          )
+        : undefined
+    );
+
+  const [universities, _totalCount] = await Promise.all([
+    query,
+    totalCountQuery,
+  ]);
+
+  const totalCount = _totalCount[0]?.count || 0;
+
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limitNum);
+
+  return c.json(
+    {
+      data: universities,
+      meta: {
+        currentPage: pageNum,
+        totalPages,
+        totalCount,
+        limit: limitNum,
+      },
+    },
+    HttpStatusCodes.OK
+  );
 };
 
-// Create new university route handler
+// Create new university entry route handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const uni = c.req.valid("json");
+  const universitiEntry = c.req.valid("json");
+  const session = c.get("session");
 
-  const [inserted] = await db.insert(university).values(uni).returning();
+  // Check is user is authenticated
+  if (!session) {
+    return c.json(
+      {
+        message: "This user is unauthenticated, You need to sign in first !",
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const [inserted] = await db
+    .insert(university)
+    .values({
+      ...universitiEntry,
+    })
+    .returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// Get single university route handler
-export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-
-  const uni = await db.query.university.findFirst({
-    where: eq(university.id, String(id)),
-  });
-
-  if (!uni)
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
-
-  return c.json(uni, HttpStatusCodes.OK);
-};
-
-// Update university route handler
-export const patch: AppRouteHandler<PatchRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const updates = c.req.valid("json");
-
-  if (Object.keys(updates).length === 0) {
-    return c.json(
-      {
-        success: false,
-        error: {
-          issues: [
-            {
-              code: ZOD_ERROR_CODES.INVALID_UPDATES,
-              path: [],
-              message: ZOD_ERROR_MESSAGES.NO_UPDATES,
-            },
-          ],
-          name: "ZodError",
-        },
-      },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY
-    );
-  }
-
-  const [updatedUni] = await db
-    .update(university)
-    .set({
-      ...updates,
-      updatedAt: new Date(),
-    })
-    .where(eq(university.id, String(id)))
-    .returning();
-
-  if (!updatedUni) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
-  }
-
-  return c.json(updatedUni, HttpStatusCodes.OK);
-};
-
-// Remove university route handler
+// Delete university entry route handler
 export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const session = c.get("session");
 
-  const result = await db
-    .delete(university)
-    .where(eq(university.id, String(id)));
+  if (!session) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED,
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
-  if (result.rows.length === 0) {
+  // Check if jobs entry exists
+  const existingEntry = await db.query.university.findFirst({
+    where: eq(university.id, id),
+  });
+
+  if (!existingEntry) {
     return c.json(
       { message: HttpStatusPhrases.NOT_FOUND },
       HttpStatusCodes.NOT_FOUND
     );
   }
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  // Delete the university entry
+  await db.delete(university).where(eq(university.id, id));
+
+  return c.json(
+    { message: "University entry deleted successfully" },
+    HttpStatusCodes.OK
+  );
 };
