@@ -1,3 +1,6 @@
+CREATE TYPE "public"."condition" AS ENUM('new', 'used', 'refurbished', 'for_parts');--> statement-breakpoint
+CREATE TYPE "public"."job_type" AS ENUM('full_time', 'part_time', 'contract', 'internship', 'temporary');--> statement-breakpoint
+CREATE TYPE "public"."media_type" AS ENUM('image', 'video', 'audio', 'document');--> statement-breakpoint
 CREATE TYPE "public"."sell_swap_types" AS ENUM('sell', 'swap');--> statement-breakpoint
 CREATE TYPE "public"."status" AS ENUM('published', 'draft', 'pending_approval', 'deleted');--> statement-breakpoint
 CREATE TABLE "account" (
@@ -69,9 +72,20 @@ CREATE TABLE "housing" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"description" text,
-	"images" text[],
+	"images" text[] DEFAULT '{}',
 	"address" text NOT NULL,
+	"city" text,
+	"state" text,
+	"zip_code" text,
 	"price" text NOT NULL,
+	"bedrooms" text,
+	"bathrooms" text,
+	"parking" text,
+	"contact_number" text,
+	"housing_type" text,
+	"square_footage" text,
+	"year_built" text,
+	"is_furnished" boolean DEFAULT false NOT NULL,
 	"link" text,
 	"created_by" text,
 	"agent_id" text,
@@ -100,6 +114,21 @@ CREATE TABLE "jobs" (
 	"created_by" text,
 	"agent_id" text,
 	"status" "status" DEFAULT 'published',
+	"required_skills" text[] DEFAULT '{}',
+	"salary_range" jsonb DEFAULT '{}'::jsonb,
+	"action_url" text,
+	"job_type" "job_type" DEFAULT 'full_time' NOT NULL,
+	"cv_required" boolean DEFAULT false,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "media" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"url" text NOT NULL,
+	"type" "media_type" NOT NULL,
+	"filename" text NOT NULL,
+	"size" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );
@@ -136,6 +165,10 @@ CREATE TABLE "products" (
 	"images" text[] DEFAULT '{}',
 	"price" integer NOT NULL,
 	"discount_percentage" integer DEFAULT 0,
+	"location" text NOT NULL,
+	"condition" "condition" DEFAULT 'used' NOT NULL,
+	"stock_quantity" integer DEFAULT 1 NOT NULL,
+	"is_negotiable" boolean DEFAULT false,
 	"category_id" text,
 	"created_by" text,
 	"agent_id" text,
@@ -174,6 +207,14 @@ CREATE TABLE "tasks" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "tasks_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"done" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "university" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"countryCode" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );

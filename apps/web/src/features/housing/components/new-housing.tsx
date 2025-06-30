@@ -1,5 +1,5 @@
 "use client";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -24,6 +24,7 @@ import { InsertHousing } from "../schemas";
 export function NewHousing() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<InsertHousing>({
     title: "",
@@ -31,7 +32,7 @@ export function NewHousing() {
     images: [],
     address: "",
     price: "",
-    link: ""
+    link: "",
   });
 
   const handleChange = (
@@ -41,10 +42,24 @@ export function NewHousing() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageRemove = (idx: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== idx),
+    }));
+  };
+
+  const handleGallerySelect = (selectedFiles: { url: string }[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...selectedFiles.map((f) => f.url)],
+    }));
+    setGalleryOpen(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Form validation
     if (!formData.title || !formData.address || !formData.price) {
       toast.error("Please fill in all required fields");
       return;
@@ -53,10 +68,7 @@ export function NewHousing() {
     setIsSubmitting(true);
 
     try {
-      await createHousing({
-        ...formData,
-        images: []
-      });
+      await createHousing(formData);
 
       toast.success("Housing listing created successfully!");
       setFormData({
@@ -65,7 +77,7 @@ export function NewHousing() {
         images: [],
         address: "",
         price: "",
-        link: ""
+        link: "",
       });
       setOpen(false);
       router.refresh();
@@ -80,11 +92,8 @@ export function NewHousing() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          icon={<PlusIcon />}
-          size="sm"
-          className="bg-cyan-600 hover:bg-cyan-700"
-        >
+        <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+          <PlusIcon className="mr-2 h-4 w-4" />
           Add New Listing
         </Button>
       </DialogTrigger>
@@ -97,21 +106,47 @@ export function NewHousing() {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Example Gallery Modal view */}
-          {/*
-          - Replace "true" render condition with your actual condition
-          */}
-          {true && (
-            <GalleryView
-              modal={true}
-              activeTab="library"
-              onUseSelected={(selectedFiles) => {
-                console.log("Selected files:", selectedFiles);
-              }}
-              modalOpen={true}
-              setModalOpen={() => {}}
-            />
-          )}
+          {/* Images uploader and preview */}
+          <div className="grid gap-2">
+            <Label>Images</Label>
+            <div className="flex flex-wrap gap-2">
+              {formData.images.map((img, idx) => (
+                <div key={idx} className="relative group">
+                  <img
+                    src={img}
+                    alt={`uploaded-${idx}`}
+                    className="w-16 h-16 object-cover rounded border"
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                    onClick={() => handleImageRemove(idx)}
+                    aria-label="Remove image"
+                  >
+                    <Trash2Icon className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
+              ))}
+              {/* Add Image Button */}
+              <button
+                type="button"
+                onClick={() => setGalleryOpen(true)}
+                className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-cyan-400 rounded hover:bg-cyan-50 transition"
+                aria-label="Add image"
+              >
+                <PlusIcon className="w-6 h-6 text-cyan-600" />
+              </button>
+            </div>
+          </div>
+
+          {/* Gallery Modal */}
+          <GalleryView
+            modal={true}
+            activeTab="library"
+            onUseSelected={handleGallerySelect}
+            modalOpen={galleryOpen}
+            setModalOpen={setGalleryOpen}
+          />
 
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -184,9 +219,9 @@ export function NewHousing() {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              icon={<XIcon className="h-4 w-4" />}
               disabled={isSubmitting}
             >
+              <XIcon className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button
