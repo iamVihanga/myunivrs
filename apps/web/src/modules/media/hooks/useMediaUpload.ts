@@ -1,8 +1,8 @@
 import { useId, useState } from "react";
 import { toast } from "sonner";
 
-import { MediaFile, UploadParams } from "@/modules/media/types";
 import { MediaService } from "@/modules/media/service";
+import { Media, UploadParams } from "@/modules/media/types";
 
 export const useMediaUpload = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -11,7 +11,7 @@ export const useMediaUpload = () => {
   const uploadToastId = useId();
   const deleteToastId = useId();
 
-  const upload = async (params: UploadParams): Promise<MediaFile | null> => {
+  const upload = async (params: UploadParams): Promise<Media | null> => {
     try {
       setLoading(true);
       setError(null);
@@ -27,7 +27,7 @@ export const useMediaUpload = () => {
 
       toast.error("Failed to upload file...", {
         id: uploadToastId,
-        description: error.message,
+        description: error.message
       });
 
       return null;
@@ -36,7 +36,7 @@ export const useMediaUpload = () => {
     }
   };
 
-  const deleteFile = async (key: string): Promise<void> => {
+  const deleteFile = async (key: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -51,7 +51,7 @@ export const useMediaUpload = () => {
       setError(error);
       toast.error("Failed to delete file...", {
         id: deleteToastId,
-        description: error.message,
+        description: error.message
       });
     } finally {
       setLoading(false);
@@ -62,6 +62,6 @@ export const useMediaUpload = () => {
     upload,
     deleteFile,
     loading,
-    error,
+    error
   };
 };

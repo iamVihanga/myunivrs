@@ -18,8 +18,4 @@ export * from "./products.schema";
 
 export * from "./sellswap.schema";
 
-export * from "./aboutus.schema";
-
-export * from "./adz.schema";
-
-export * from "./images.schema";
+export * from "./media.schema";

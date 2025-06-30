@@ -1,4 +1,4 @@
-import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 
@@ -19,13 +19,14 @@ export function generateUniqueFileName(originalName: string): string {
 export function getMediaType(fileType: string): MediaType {
   if (fileType.startsWith("image/")) return "image";
   if (fileType.startsWith("video/")) return "video";
+  if (fileType.startsWith("pdf/")) return "document";
   return "document";
 }
 
 export async function generatePresignedUrl(key: string, expiresIn = 24 * 3600) {
   const command = new PutObjectCommand({
     Bucket: s3Config.bucket,
-    Key: key,
+    Key: key
   });
 
   return await getSignedUrl(s3Client, command, { expiresIn });
