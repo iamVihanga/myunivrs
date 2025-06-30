@@ -1,0 +1,12 @@
+-- ALTER TABLE "housing" ALTER COLUMN "images" SET DEFAULT '{}';--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "city" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "state" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "zip_code" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "bedrooms" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "bathrooms" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "parking" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "contact_number" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "housing_type" text NOT NULL;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "square_footage" text;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "year_built" text;--> statement-breakpoint
+-- ALTER TABLE "housing" ADD COLUMN "is_furnished" boolean DEFAULT false NOT NULL;

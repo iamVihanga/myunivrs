@@ -15,10 +15,30 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useRouter } from "next/navigation";
 import { createProducts } from "../actions/create.action";
 import { InsertProduct } from "../schemas";
+
+const CONDITION_OPTIONS = [
+  { value: "new", label: "New" },
+  { value: "used", label: "Used" },
+  { value: "refurbished", label: "Refurbished" },
+  { value: "for_parts", label: "For Parts" },
+];
+
+const STATUS_OPTIONS = [
+  { value: "published", label: "Published" },
+  { value: "draft", label: "Draft" },
+  { value: "archived", label: "Archived" },
+];
 
 export function NewProducts() {
   const router = useRouter();
@@ -34,26 +54,40 @@ export function NewProducts() {
     description: "",
     images: [],
     price: 0,
-    discount_percentage: 0, // Changed to match database schema
+    discountPercentage: 0,
+    location: "",
+    condition: "used",
+    stockQuantity: 1,
+    isNegotiable: false,
+    categoryId: "",
+    status: "published",
   });
+
+  // For images as comma-separated input
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: e.target.value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-
-    if (name === "price" || name === "discount_percentage") {
-      // Allow empty string for better UX while typing
-      if (value === "") {
-        setFormData((prev) => ({ ...prev, [name]: undefined }));
-      } else {
-        const numericValue = parseInt(value.replace(/[^0-9]/g, ""), 10);
-        if (!isNaN(numericValue)) {
-          setFormData((prev) => ({ ...prev, [name]: numericValue }));
-        }
-      }
+    const { name, value, type } = e.target;
+    if (type === "number") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value === "" ? undefined : Number(value),
+      }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
@@ -61,7 +95,7 @@ export function NewProducts() {
     e.preventDefault();
 
     // Form validation
-    if (!formData.title || !formData.description || !formData.price) {
+    if (!formData.title || !formData.price || !formData.location) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -72,7 +106,8 @@ export function NewProducts() {
       await createProducts({
         ...formData,
         images: formData.images || [],
-        discount_percentage: formData.discount_percentage || 0, // Ensure number
+        discountPercentage: formData.discountPercentage || 0,
+        stockQuantity: formData.stockQuantity || 1,
       });
 
       toast.success("Product listing created successfully!");
@@ -81,7 +116,13 @@ export function NewProducts() {
         description: "",
         images: [],
         price: 0,
-        discount_percentage: 0,
+        discountPercentage: 0,
+        location: "",
+        condition: "used",
+        stockQuantity: 1,
+        isNegotiable: false,
+        categoryId: "",
+        status: "published",
       });
       setOpen(false);
       router.refresh();
@@ -112,7 +153,7 @@ export function NewProducts() {
               Fill out the form below to add a new product listing.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto">
             <div className="grid gap-2">
               <Label htmlFor="title">
                 Title <span className="text-red-500">*</span>
@@ -137,7 +178,7 @@ export function NewProducts() {
                 type="number"
                 min="0"
                 step="1"
-                placeholder="Enter property price"
+                placeholder="Enter product price"
                 value={formData.price || ""}
                 onChange={handleChange}
                 required
@@ -145,24 +186,161 @@ export function NewProducts() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="discount_percentage">Discount Percentage</Label>
+              <Label htmlFor="discountPercentage">Discount Percentage</Label>
               <Input
-                id="discount_percentage"
-                name="discount_percentage"
+                id="discountPercentage"
+                name="discountPercentage"
                 type="number"
                 min="0"
                 max="100"
                 step="1"
                 placeholder="Enter Discount Percentage"
-                value={formData.discount_percentage || ""}
+                value={formData.discountPercentage || ""}
                 onChange={handleChange}
                 onKeyDown={(e) => {
-                  // Prevent entering decimal points
                   if (["e", "E", "+", "-", "."].includes(e.key)) {
                     e.preventDefault();
                   }
                 }}
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="location">
+                Location <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="location"
+                name="location"
+                placeholder="Enter location"
+                value={formData.location}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="condition">Condition</Label>
+              <Select
+                value={formData.condition}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    condition: value as InsertProduct["condition"],
+                  }))
+                }
+                name="condition"
+              >
+                <SelectTrigger id="condition">
+                  <SelectValue placeholder="Select condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONDITION_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="stockQuantity">Stock Quantity</Label>
+              <Input
+                id="stockQuantity"
+                name="stockQuantity"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Enter stock quantity"
+                value={formData.stockQuantity || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="isNegotiable">Is Negotiable?</Label>
+              <Select
+                value={formData.isNegotiable ? "yes" : "no"}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isNegotiable: value === "yes",
+                  }))
+                }
+                name="isNegotiable"
+              >
+                <SelectTrigger id="isNegotiable">
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="categoryId">Category</Label>
+              <Select
+              value={formData.categoryId}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                ...prev,
+                categoryId: value,
+                }))
+              }
+              name="categoryId"
+              >
+              <SelectTrigger id="categoryId">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fashion">Fashion</SelectItem>
+                <SelectItem value="electronics">Electronics</SelectItem>
+                <SelectItem value="stationary">Stationary</SelectItem>
+                <SelectItem value="foods">Foods</SelectItem>
+              </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="images">Images</Label>
+              <Input
+                id="images"
+                name="images"
+                placeholder="Comma separated URLs"
+                value={formData.images.join(", ")}
+                onChange={handleImagesChange}
+              />
+              <span className="text-xs text-muted-foreground">
+                Add image URLs separated by commas.
+              </span>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: value as InsertProduct["status"],
+                  }))
+                }
+                name="status"
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">

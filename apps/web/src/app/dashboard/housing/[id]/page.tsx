@@ -7,14 +7,14 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@repo/ui/components/card";
 import { Separator } from "@repo/ui/components/separator";
 import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger
+  TabsTrigger,
 } from "@repo/ui/components/tabs";
 import { format } from "date-fns";
 import {
@@ -24,7 +24,7 @@ import {
   ExternalLink,
   LinkIcon,
   MapPin,
-  Tag
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -38,7 +38,7 @@ export default async function SingleHousingPage({ params }: Props) {
 
   try {
     const housingRes = await rpcClient.api.housing[":id"].$get({
-      param: { id: params.id }
+      param: { id: params.id },
     });
 
     if (housingRes.status !== 200) {

@@ -92,43 +92,77 @@ export function ProductCard({ products }: Props) {
 
             {/* Info with separators */}
             <div className="flex flex-wrap items-center gap-2 text-sm mt-2">
-              {products.title && (
+              {/* Location */}
+              {products.location && (
                 <div className="flex items-center gap-1">
                   <MapPinIcon className="h-3.5 w-3.5 text-cyan-500" />
-                  <span className="text-sm truncate max-w-[180px]">
-                    {products.title}
+                  <span className="truncate max-w-[120px]">
+                    {products.location}
                   </span>
                 </div>
               )}
 
-              {products.price && products.discountPrecentage && (
-                <div className="text-gray-300 text-sm px-1">|</div>
+              {/* Condition */}
+              {products.condition && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <Badge variant="secondary" className="capitalize">
+                    {products.condition.replace("_", " ")}
+                  </Badge>
+                </>
               )}
 
-              {products.price && (
-                <div className="flex items-center gap-1">
-                  <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
-                  <span className="text-sm font-medium">{products.price}</span>
-                </div>
+              {/* Price */}
+              {typeof products.price === "number" && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <div className="flex items-center gap-1">
+                    <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="font-medium">{products.price}</span>
+                  </div>
+                </>
               )}
 
-              {products.price && products.title && (
-                <div className="text-gray-300 text-sm px-1">|</div>
+              {/* Discount */}
+              {typeof products.discountPercentage === "number" &&
+                products.discountPercentage > 0 && (
+                  <>
+                    <div className="text-gray-300 text-sm px-1">|</div>
+                    <Badge
+                      variant="outline"
+                      className="text-green-700 border-green-200"
+                    >
+                      -{products.discountPercentage}%
+                    </Badge>
+                  </>
+                )}
+
+              {/* Stock */}
+              {typeof products.stockQuantity === "number" && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span className="text-xs text-muted-foreground">
+                    Stock: {products.stockQuantity}
+                  </span>
+                </>
               )}
 
-              {/* {housing.link && (
-                <div className="flex items-center gap-1">
-                  <LinkIcon className="h-3.5 w-3.5 text-teal-500" />
-                  <a
-                    href={housing.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-teal-600 hover:underline truncate max-w-[180px] text-sm"
+              {/* Negotiable */}
+              {typeof products.isNegotiable === "boolean" && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <Badge
+                    variant={products.isNegotiable ? "default" : "outline"}
+                    className={
+                      products.isNegotiable
+                        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                        : ""
+                    }
                   >
-                    {housing.link}
-                  </a>
-                </div>
-              )} */}
+                    {products.isNegotiable ? "Negotiable" : "Fixed Price"}
+                  </Badge>
+                </>
+              )}
             </div>
           </div>
 
@@ -151,7 +185,7 @@ export function ProductCard({ products }: Props) {
               <TrashIcon className="h-4 w-4" />
             </Button>
             <Button size="sm" variant="outline" asChild className="h-8 px-2">
-              <Link href={`/dashboard/housing/${products.id}`}>
+              <Link href={`/dashboard/products/${products.id}`}>
                 <ExternalLinkIcon className="h-4 w-4" />
               </Link>
             </Button>

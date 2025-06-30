@@ -78,11 +78,8 @@ export function NewSellSwap() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          icon={<PlusIcon />}
-          size="sm"
-          className="bg-green-600 hover:bg-green-700"
-        >
+        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+          <PlusIcon className="mr-2 h-4 w-4 inline" />
           Add Sell/Swap Listing
         </Button>
       </DialogTrigger>
@@ -157,9 +154,9 @@ export function NewSellSwap() {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              icon={<XIcon className="h-4 w-4" />}
               disabled={isSubmitting}
             >
+              <XIcon className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button

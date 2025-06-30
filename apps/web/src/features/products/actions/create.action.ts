@@ -11,10 +11,13 @@ export async function createProducts(data: InsertProduct) {
   });
 
   if (!response.ok) {
-    const { message } = await response.json();
-    console.log({ message });
+    const errorData = await response.json();
+    console.error("API Error Response:", errorData);
 
-    throw new Error(message);
+    // Throw an error with full info (stringify if you want)
+    throw new Error(
+      errorData.message || JSON.stringify(errorData) || "Unknown error"
+    );
   }
 
   const createProducts = await response.json();

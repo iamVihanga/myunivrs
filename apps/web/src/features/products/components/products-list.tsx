@@ -18,15 +18,21 @@ export async function ProductsList({
   // Get housing data with pagination
   const response = await getAllProducts({ page, limit, search });
 
-  // Convert string dates to Date objects
-  const products = response.data.map((product: any) => ({
-    ...product,
-    createdAt: new Date(product.createdAt),
-    updatedAt: product.updatedAt ? new Date(product.updatedAt) : null,
-  }));
+  // Convert string dates to Date objects, handle missing data property
+  const products =
+    response && Array.isArray((response as any).data)
+      ? (response as any).data.map((product: any) => ({
+          ...product,
+          createdAt: new Date(product.createdAt),
+          updatedAt: product.updatedAt ? new Date(product.updatedAt) : null,
+        }))
+      : [];
 
-  // Get pagination metadata
-  const { currentPage, totalPages, totalCount } = response.meta;
+  // Get pagination metadata, handle missing meta property
+  const meta = (response as any).meta ?? {};
+  const currentPage = meta.currentPage ?? 1;
+  const totalPages = meta.totalPages ?? 1;
+  const totalCount = meta.totalCount ?? 0;
 
   return (
     <div className="space-y-6">

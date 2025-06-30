@@ -15,6 +15,13 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useRouter } from "next/navigation";
 import { createJob } from "../actions/create.action";
@@ -29,13 +36,55 @@ export function NewJob() {
     description: "",
     images: [],
     company: "",
+    isFeatured: false,
+    status: "published",
+    requiredSkills: [],
+    salaryRange: {},
+    actionUrl: "",
+    jobType: "full_time",
+    cvRequired: false,
   });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const { name, value, type } = e.target;
+    const checked =
+      type === "checkbox" && "checked" in e.target
+        ? (e.target as HTMLInputElement).checked
+        : undefined;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  // For requiredSkills as comma-separated input
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      requiredSkills: e.target.value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    }));
+  };
+
+  // For salaryRange
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      salaryRange: {
+        ...prev.salaryRange,
+        [name]:
+          value === ""
+            ? undefined
+            : isNaN(Number(value))
+              ? value
+              : Number(value),
+      },
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +110,13 @@ export function NewJob() {
         description: "",
         images: [],
         company: "",
+        isFeatured: false,
+        status: "published",
+        requiredSkills: [],
+        salaryRange: {},
+        actionUrl: "",
+        jobType: "full_time",
+        cvRequired: false,
       });
       setOpen(false);
       router.refresh();
@@ -76,14 +132,14 @@ export function NewJob() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          icon={<PlusIcon />}
           size="sm"
-          className="bg-cyan-600 hover:bg-cyan-700"
+          className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"
         >
+          <PlusIcon className="w-4 h-4" />
           Add New Listing
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Job Listing</DialogTitle>
@@ -91,7 +147,8 @@ export function NewJob() {
               Fill out the form below to add a new job listing.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto">
+            {/* Title */}
             <div className="grid gap-2">
               <Label htmlFor="title">
                 Title <span className="text-red-500">*</span>
@@ -105,7 +162,7 @@ export function NewJob() {
                 required
               />
             </div>
-
+            {/* Description */}
             <div className="grid gap-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -117,9 +174,9 @@ export function NewJob() {
                 rows={4}
               />
             </div>
-
+            {/* Company */}
             <div className="grid gap-2">
-              <Label htmlFor="price">
+              <Label htmlFor="company">
                 Company <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -131,26 +188,161 @@ export function NewJob() {
                 required
               />
             </div>
-
-            {/* <div className="grid gap-2">
-              <Label htmlFor="link">Features</Label>
+            {/* Job Type */}
+            <div className="grid gap-2">
+              <Label htmlFor="jobType">Job Type</Label>
+              <Select
+                value={formData.jobType}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    jobType: value as InsertJobs["jobType"],
+                  }))
+                }
+                name="jobType"
+              >
+                <SelectTrigger id="jobType">
+                  <SelectValue placeholder="Select job type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full_time">Full Time</SelectItem>
+                  <SelectItem value="part_time">Part Time</SelectItem>
+                  <SelectItem value="contract">Contract</SelectItem>
+                  <SelectItem value="internship">Internship</SelectItem>
+                  <SelectItem value="temporary">Temporary</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Required Skills */}
+            <div className="grid gap-2">
+              <Label htmlFor="requiredSkills">Required Skills</Label>
               <Input
-                id="features"
-                name="features"
-                placeholder="Enter Yes or No"
-                value={formData.isFeatured || ""}
-                onChange={handleChange}
+                id="requiredSkills"
+                name="requiredSkills"
+                placeholder="e.g. React, Node.js, SQL"
+                value={formData.requiredSkills.join(", ")}
+                onChange={handleSkillsChange}
               />
-            </div> */}
+              <span className="text-xs text-muted-foreground">
+                Separate skills with commas
+              </span>
+            </div>
+            {/* Salary Range */}
+            <div className="grid gap-2">
+              <Label>Salary Range</Label>
+              <div className="flex gap-2">
+                <Input
+                  name="min"
+                  type="number"
+                  placeholder="Min"
+                  value={formData.salaryRange.min ?? ""}
+                  onChange={handleSalaryChange}
+                  min={0}
+                />
+                <Input
+                  name="max"
+                  type="number"
+                  placeholder="Max"
+                  value={formData.salaryRange.max ?? ""}
+                  onChange={handleSalaryChange}
+                  min={0}
+                />
+                <Input
+                  name="currency"
+                  placeholder="Currency"
+                  value={formData.salaryRange.currency ?? ""}
+                  onChange={handleSalaryChange}
+                />
+              </div>
+            </div>
+            {/* Action URL */}
+            <div className="grid gap-2">
+              <Label htmlFor="actionUrl">Application Link</Label>
+              <Input
+                id="actionUrl"
+                name="actionUrl"
+                placeholder="https://company.com/apply"
+                value={formData.actionUrl || ""}
+                onChange={handleChange}
+                type="url"
+              />
+            </div>
+            {/* CV Required */}
+            <div className="grid gap-2">
+              <Label htmlFor="cvRequired">CV Required?</Label>
+              <Select
+                value={formData.cvRequired ? "yes" : "no"}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    cvRequired: value === "yes",
+                  }))
+                }
+                name="cvRequired"
+              >
+                <SelectTrigger id="cvRequired">
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Is Featured */}
+            <div className="grid gap-2">
+              <Label htmlFor="isFeatured">Featured?</Label>
+              <Select
+                value={formData.isFeatured ? "yes" : "no"}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isFeatured: value === "yes",
+                  }))
+                }
+                name="isFeatured"
+              >
+                <SelectTrigger id="isFeatured">
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Status */}
+            <div className="grid gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: value as InsertJobs["status"],
+                  }))
+                }
+                name="status"
+              >
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="archived">Archived</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              icon={<XIcon className="h-4 w-4" />}
               disabled={isSubmitting}
             >
+              <XIcon className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button

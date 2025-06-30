@@ -12,7 +12,7 @@ import type {
   DeleteRoute,
   GetOneRoute,
   ListRoute,
-  UpdateRoute
+  UpdateRoute,
 } from "./products.routes";
 
 // List products route handler
@@ -21,7 +21,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     page = "1",
     limit = "10",
     sort = "asc",
-    search
+    search,
   } = c.req.valid("query");
 
   // Convert to numbers and validate
@@ -41,7 +41,11 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         conditions.push(
           or(
             ilike(fields.title, `%${search}%`),
-            ilike(fields.description, `%${search}%`)
+            ilike(fields.description, `%${search}%`),
+            ilike(fields.location, `%${search}%`),
+            ilike(fields.condition, `%${search}%`),
+            ilike(fields.status, `%${search}%`),
+            ilike(fields.categoryId, `%${search}%`)
           )
         );
       }
@@ -56,8 +60,8 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       return desc(fields.createdAt);
     },
     with: {
-      category: true
-    }
+      category: true,
+    },
   });
 
   // Get total count for pagination metadata
@@ -68,14 +72,18 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       search
         ? or(
             ilike(products.title, `%${search}%`),
-            ilike(products.description, `%${search}%`)
+            ilike(products.description, `%${search}%`),
+            ilike(products.location, `%${search}%`),
+            ilike(products.condition, `%${search}%`),
+            ilike(products.status, `%${search}%`),
+            ilike(products.categoryId, `%${search}%`)
           )
         : undefined
     );
 
   const [productEntries, _totalCount] = await Promise.all([
     query,
-    totalCountQuery
+    totalCountQuery,
   ]);
 
   const totalCount = _totalCount[0]?.count || 0;
@@ -83,15 +91,55 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   // Calculate pagination metadata
   const totalPages = Math.ceil(totalCount / limitNum);
 
+  const allowedStatuses = ["published", "draft", "pending_approval", "deleted"];
+  const allowedConditions = ["new", "used", "refurbished", "for_parts"];
+
+  // Map product entries to match the expected response type
+  const mappedEntries = productEntries.map((product) => ({
+    ...product,
+    createdAt:
+      product.createdAt instanceof Date
+        ? product.createdAt.toISOString()
+        : product.createdAt,
+    updatedAt:
+      product.updatedAt instanceof Date
+        ? product.updatedAt.toISOString()
+        : product.updatedAt === null
+          ? null
+          : product.updatedAt,
+    status: allowedStatuses.includes(product.status ?? "")
+      ? product.status
+      : "draft",
+    // Ensure images is always an array or undefined
+    images: Array.isArray(product.images)
+      ? product.images
+      : product.images === null || product.images === undefined
+        ? []
+        : [product.images],
+    condition: allowedConditions.includes(product.condition)
+      ? product.condition
+      : "used",
+    discountPercentage:
+      typeof product.discountPercentage === "number"
+        ? product.discountPercentage
+        : 0,
+    stockQuantity:
+      typeof product.stockQuantity === "number" ? product.stockQuantity : 1,
+    isNegotiable:
+      typeof product.isNegotiable === "boolean" ? product.isNegotiable : false,
+    category: product.category ?? null,
+    agentProfile: product.agentProfile ?? null,
+  }));
+
   return c.json(
     {
-      data: productEntries,
+      data: mappedEntries,
       meta: {
         currentPage: pageNum,
         totalPages,
         totalCount,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     },
     HttpStatusCodes.OK
   );
@@ -104,19 +152,41 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 
   if (!session) {
     return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
+      { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
+  const allowedStatuses = ["published", "draft", "pending_approval", "deleted"];
+  const allowedConditions = ["new", "used", "refurbished", "for_parts"];
+
+  // Ensure status is valid and not "archived"
+  // Map "archived" or any invalid status to "draft"
+  let status:
+    | "published"
+    | "draft"
+    | "pending_approval"
+    | "deleted"
+    | null
+    | undefined =
+    productEntry.status === "archived"
+      ? "draft"
+      : allowedStatuses.includes(productEntry.status ?? "")
+        ? (productEntry.status as
+            | "published"
+            | "draft"
+            | "pending_approval"
+            | "deleted")
+        : "draft";
   const [inserted] = await db
     .insert(products)
     .values({
       ...productEntry,
-      createdBy: session.userId,
-      agentProfile: session?.activeOrganizationId
+      status,
+      condition: allowedConditions.includes(productEntry.condition)
+        ? productEntry.condition
+        : "used",
+      agentProfile: session?.activeOrganizationId,
     })
     .returning();
 
@@ -129,9 +199,7 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 
   const product = await db.query.products.findFirst({
     where: eq(products.id, id),
-    with: {
-      category: true
-    }
+    with: { category: true },
   });
 
   if (!product)
@@ -140,7 +208,47 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
       HttpStatusCodes.NOT_FOUND
     );
 
-  return c.json(product, HttpStatusCodes.OK);
+  const allowedStatuses = ["published", "draft", "pending_approval", "deleted"];
+  const allowedConditions = ["new", "used", "refurbished", "for_parts"];
+
+  // Map product fields to match the expected response type
+  const mappedProduct = {
+    ...product,
+    createdAt:
+      product.createdAt instanceof Date
+        ? product.createdAt.toISOString()
+        : product.createdAt,
+    updatedAt:
+      product.updatedAt instanceof Date || product.updatedAt === null
+        ? product.updatedAt
+          ? product.updatedAt.toISOString()
+          : null
+        : product.updatedAt,
+    status: allowedStatuses.includes(product.status ?? "")
+      ? product.status
+      : "draft",
+    // Ensure images is always an array
+    images: Array.isArray(product.images)
+      ? product.images
+      : product.images === null || product.images === undefined
+        ? []
+        : [product.images],
+    condition: allowedConditions.includes(product.condition)
+      ? product.condition
+      : "used",
+    discountPercentage:
+      typeof product.discountPercentage === "number"
+        ? product.discountPercentage
+        : 0,
+    stockQuantity:
+      typeof product.stockQuantity === "number" ? product.stockQuantity : 1,
+    isNegotiable:
+      typeof product.isNegotiable === "boolean" ? product.isNegotiable : false,
+    category: product.category ?? null,
+    agentProfile: product.agentProfile ?? null,
+  };
+
+  return c.json(mappedProduct, HttpStatusCodes.OK);
 };
 
 // Update product route handler
@@ -151,16 +259,14 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
 
   if (!session) {
     return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
+      { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
   // Check if product entry exists
   const existingEntry = await db.query.products.findFirst({
-    where: eq(products.id, id)
+    where: eq(products.id, id),
   });
 
   if (!existingEntry) {
@@ -170,10 +276,24 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     );
   }
 
-  // Update the product entry
+  const allowedStatuses = ["published", "draft", "pending_approval", "deleted"];
+  const allowedConditions = ["new", "used", "refurbished", "for_parts"];
+
+  const updateData: Record<string, any> = {
+    ...body,
+    updatedAt: new Date(),
+  };
+
+  if (body.status && allowedStatuses.includes(body.status)) {
+    updateData.status = body.status;
+  }
+  if (body.condition && allowedConditions.includes(body.condition)) {
+    updateData.condition = body.condition;
+  }
+
   const [updated] = await db
     .update(products)
-    .set({ ...body, updatedAt: new Date() })
+    .set(updateData)
     .where(eq(products.id, id))
     .returning();
 
@@ -187,16 +307,14 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
 
   if (!session) {
     return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
+      { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
   // Check if product entry exists
   const existingEntry = await db.query.products.findFirst({
-    where: eq(products.id, id)
+    where: eq(products.id, id),
   });
 
   if (!existingEntry) {

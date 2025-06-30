@@ -6,7 +6,7 @@ import {
   HomeIcon,
   LinkIcon,
   MapPinIcon,
-  TrashIcon
+  TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,12 +19,12 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle
+  AlertDialogTitle,
 } from "@repo/ui/components/alert-dialog";
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage
+  AvatarImage,
 } from "@repo/ui/components/avatar";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
@@ -101,36 +101,93 @@ export function HousingCard({ housing }: Props) {
                   </span>
                 </div>
               )}
-
-              {housing.address && housing.price && (
-                <div className="text-gray-300 text-sm px-1">|</div>
+              {housing.city && (
+                <span className="text-xs text-muted-foreground">
+                  | {housing.city}
+                </span>
               )}
-
+              {housing.state && (
+                <span className="text-xs text-muted-foreground">
+                  | {housing.state}
+                </span>
+              )}
+              {housing.zipCode && (
+                <span className="text-xs text-muted-foreground">
+                  | {housing.zipCode}
+                </span>
+              )}
               {housing.price && (
-                <div className="flex items-center gap-1">
-                  <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
-                  <span className="text-sm font-medium">
-                    {parseInt(housing.price).toFixed(2)}
-                  </span>
-                </div>
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <div className="flex items-center gap-1">
+                    <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="text-sm font-medium">{housing.price}</span>
+                  </div>
+                </>
               )}
-
-              {housing.price && housing.link && (
-                <div className="text-gray-300 text-sm px-1">|</div>
+              {housing.bedrooms && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>{housing.bedrooms} bed</span>
+                </>
               )}
-
+              {housing.bathrooms && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>{housing.bathrooms} bath</span>
+                </>
+              )}
+              {housing.parking && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>{housing.parking} parking</span>
+                </>
+              )}
+              {housing.squareFootage && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>{housing.squareFootage} sqft</span>
+                </>
+              )}
+              {housing.yearBuilt && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>Built {housing.yearBuilt}</span>
+                </>
+              )}
+              {housing.isFurnished && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <Badge variant="secondary">Furnished</Badge>
+                </>
+              )}
+              {housing.housingType && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>{housing.housingType}</span>
+                </>
+              )}
+              {housing.contactNumber && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <span>Contact: {housing.contactNumber}</span>
+                </>
+              )}
               {housing.link && (
-                <div className="flex items-center gap-1">
-                  <LinkIcon className="h-3.5 w-3.5 text-teal-500" />
-                  <a
-                    href={housing.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-teal-600 hover:underline truncate max-w-[180px] text-sm"
-                  >
-                    {housing.link}
-                  </a>
-                </div>
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <div className="flex items-center gap-1">
+                    <LinkIcon className="h-3.5 w-3.5 text-teal-500" />
+                    <a
+                      href={housing.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-600 hover:underline truncate max-w-[180px] text-sm"
+                    >
+                      {housing.link}
+                    </a>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -143,7 +200,6 @@ export function HousingCard({ housing }: Props) {
             >
               {housing.status || "Published"}
             </Badge>
-
             <Button
               variant="destructive"
               size="sm"

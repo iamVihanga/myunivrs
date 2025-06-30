@@ -8,12 +8,12 @@ import {
   errorMessageSchema,
   getPaginatedSchema,
   queryParamsSchema,
-  stringIdParamSchema
+  stringIdParamSchema,
 } from "@/lib/helpers";
 import {
   insertProductSchema,
   selectProductSchema,
-  updateProductSchema
+  updateProductSchema,
 } from "./products.schema";
 
 const tags: string[] = ["Products"];
@@ -25,7 +25,7 @@ export const list = createRoute({
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema
+    query: queryParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -35,8 +35,8 @@ export const list = createRoute({
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
       "An error occurred while fetching the product entries"
-    )
-  }
+    ),
+  },
 });
 
 // Create route definition
@@ -46,7 +46,7 @@ export const create = createRoute({
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(insertProductSchema, "The product to create")
+    body: jsonContentRequired(insertProductSchema, "The product to create"),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
@@ -60,8 +60,8 @@ export const create = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"
-    )
-  }
+    ),
+  },
 });
 
 export const getOne = createRoute({
@@ -70,7 +70,7 @@ export const getOne = createRoute({
   method: "get",
   path: "/{id}",
   request: {
-    params: stringIdParamSchema
+    params: stringIdParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(selectProductSchema, "Requested product"),
@@ -81,8 +81,8 @@ export const getOne = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    )
-  }
+    ),
+  },
 });
 
 // Update route definition
@@ -93,7 +93,7 @@ export const update = createRoute({
   method: "put",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(updateProductSchema, "The product to update")
+    body: jsonContentRequired(updateProductSchema, "The product to update"),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -111,8 +111,8 @@ export const update = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
       "The validation error(s)"
-    )
-  }
+    ),
+  },
 });
 
 // Delete route definition
@@ -122,7 +122,7 @@ export const remove = createRoute({
   path: "/{id}",
   method: "delete",
   request: {
-    params: stringIdParamSchema
+    params: stringIdParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -140,8 +140,8 @@ export const remove = createRoute({
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    )
-  }
+    ),
+  },
 });
 
 export type ListRoute = typeof list;
