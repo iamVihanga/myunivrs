@@ -1,3 +1,4 @@
+import { Providers } from "@/components/providers";
 import "@repo/ui/globals.css";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
@@ -18,8 +19,10 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontHeading.variable} font-sans antialiased`}
       >
-        {children}
-        <Toaster position="bottom-left" />
+        <Providers>
+          {children}
+          <Toaster position="bottom-left" />
+        </Providers>
       </body>
     </html>
   );

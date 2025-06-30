@@ -6,6 +6,7 @@ import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
+import media from "./media/media.index";
 import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
 import tasks from "./tasks/tasks.index";
@@ -20,7 +21,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/university", university)
     .route("/events", events)
     .route("/products", products)
-    .route("/sellswaps", sellswaps);
+    .route("/sellswaps", sellswaps)
+    .route("/media", media);
 }
 
 // stand alone router type used for api client

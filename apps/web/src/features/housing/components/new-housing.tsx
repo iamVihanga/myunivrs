@@ -3,6 +3,7 @@ import { PlusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import GalleryView from "@/modules/media/components/gallery-view";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -95,6 +96,23 @@ export function NewHousing() {
               Fill out the form below to add a new housing listing.
             </DialogDescription>
           </DialogHeader>
+
+          {/* Example Gallery Modal view */}
+          {/*
+          - Replace "true" render condition with your actual condition
+          */}
+          {true && (
+            <GalleryView
+              modal={true}
+              activeTab="library"
+              onUseSelected={(selectedFiles) => {
+                console.log("Selected files:", selectedFiles);
+              }}
+              modalOpen={true}
+              setModalOpen={() => {}}
+            />
+          )}
+
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="title">
