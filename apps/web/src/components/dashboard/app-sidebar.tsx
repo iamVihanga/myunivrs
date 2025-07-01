@@ -60,7 +60,6 @@ const data = {
     {
       name: "Housing",
       url: "/dashboard/housing",
-<<<<<<< HEAD
       icon: IconBuildings,
     },
     {
@@ -84,16 +83,6 @@ const data = {
       icon: IconBuildings,
     },
   ],
-=======
-      icon: IconBuildings
-    },
-    {
-      name: "Events",
-      url: "/dashboard/events",
-      icon: IconBuildings
-    }
-  ]
->>>>>>> dev
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
