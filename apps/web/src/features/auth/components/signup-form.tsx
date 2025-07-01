@@ -18,16 +18,19 @@ import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
 import { cn } from "@repo/ui/lib/utils";
 
+import { Mode } from "@/features/account/components/login-template";
 import { authClient } from "@/lib/auth-client";
 import { signupSchema, type SignupSchema } from "../schemas";
 
 interface SignupFormProps {
   type?: "agent" | "user";
+  onAccountLayoutModalChange: React.Dispatch<React.SetStateAction<Mode>>;
 }
 
 export function SignupForm({
   className,
   type = "user",
+  onAccountLayoutModalChange,
   ...props
 }: React.ComponentProps<"div"> & SignupFormProps) {
   const toastId = useId();
@@ -63,7 +66,9 @@ export function SignupForm({
         },
         onSuccess(ctx) {
           toast.success("User registered successfully !", { id: toastId });
-          router.push(type === "agent" ? "/setup" : "/signin");
+          type === "agent"
+            ? router.push("/setup")
+            : onAccountLayoutModalChange("login");
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
@@ -169,9 +174,22 @@ export function SignupForm({
                 </div>
                 <div className="text-center text-sm">
                   {`Aleady have an account? `}
-                  <Link href="/signin" className="underline underline-offset-4">
-                    Sign In
-                  </Link>
+                  {type === "agent" && (
+                    <Link
+                      href="/signin"
+                      className="underline underline-offset-4"
+                    >
+                      Sign In
+                    </Link>
+                  )}
+                  {type === "user" && (
+                    <span
+                      onClick={() => onAccountLayoutModalChange("login")}
+                      className="underline underline-offset-4"
+                    >
+                      Sign In
+                    </span>
+                  )}
                 </div>
               </div>
             </form>

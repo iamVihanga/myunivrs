@@ -8,7 +8,8 @@ export default async function Home() {
   const rpcClient = await client();
   const res = await rpcClient.api.tasks.$get();
 
-  const tasks = await res.json();
+  const tasksData = await res.json();
+  const tasks = Array.isArray(tasksData) ? tasksData : [];
 
   return (
     <div className="container mx-auto py-8 max-w-2xl">
