@@ -19,3 +19,7 @@ export * from "./products.schema";
 export * from "./sellswap.schema";
 
 export * from "./aboutus.schema";
+
+export * from "./adzPaymentPlan.schema";
+
+export * from "./siteSettings.schema";
