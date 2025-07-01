@@ -2,6 +2,7 @@ import { createRouter } from "@/lib/create-app";
 import { AppOpenAPI } from "@/types";
 
 import { BASE_PATH } from "../lib/constants";
+import ads from "./ads/ads.index";
 import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
@@ -22,7 +23,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/events", events)
     .route("/products", products)
     .route("/sellswaps", sellswaps)
-    .route("/media", media);
+    .route("/media", media)
+    .route("/ads", ads);
 }
 
 // stand alone router type used for api client

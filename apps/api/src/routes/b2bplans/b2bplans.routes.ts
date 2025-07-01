@@ -8,149 +8,137 @@ import {
   errorMessageSchema,
   getPaginatedSchema,
   queryParamsSchema,
-  stringIdParamSchema
+  stringIdParamSchema,
 } from "@/lib/helpers";
-import { insertAdzSchema, selectAdzSchema } from "./adz.schema";
+import {
+  insertB2BPlanSchema,
+  selectB2BPlanSchema,
+  updateB2BPlanSchema,
+} from "./b2bplans.schema";
 
-const tags: string[] = ["Adz"];
+const tags = ["B2B Plans"];
 
-// List route definition
+// List all B2B plans
 export const list = createRoute({
   tags,
-  summary: "List all adz entries",
+  summary: "List all B2B plans",
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema
+    query: queryParamsSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectAdzSchema)),
-      "The list of adz entries"
+      getPaginatedSchema(z.array(selectB2BPlanSchema)),
+      "List of B2B plans"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the adz entries"
-    )
-  }
+      "Error while fetching B2B plans"
+    ),
+  },
 });
 
-// Create route definition
+// Create a new B2B plan
 export const create = createRoute({
   tags,
-  summary: "Create a new adz entry",
+  summary: "Create a new B2B plan",
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(
-      insertAdzSchema,
-      "The adz entry to create"
-    )
+    body: jsonContentRequired(insertB2BPlanSchema, "B2B plan to create"),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectAdzSchema,
-      "The created adz entry"
+      selectB2BPlanSchema,
+      "Created B2B plan"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
-      "Unauthenticated request"
+      "Unauthorized request"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
-      "The validation error(s)"
-    )
-  }
+      "Validation error"
+    ),
+  },
 });
 
+// Get a single B2B plan by ID
 export const getOne = createRoute({
   tags,
-  summary: "Get a single adz entry by ID",
+  summary: "Get a B2B plan by ID",
   method: "get",
   path: "/{id}",
   request: {
-    params: stringIdParamSchema
+    params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      selectAdzSchema,
-      "Requested adz entry"
-    ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      notFoundSchema,
-      "Adz entry not found"
-    ),
+    [HttpStatusCodes.OK]: jsonContent(selectB2BPlanSchema, "B2B plan details"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Plan not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    )
-  }
+    ),
+  },
 });
 
-// Update route definition
+// Update an existing B2B plan
 export const update = createRoute({
   tags,
-  summary: "Update an existing adz entry",
+  summary: "Update an existing B2B plan",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(
-      insertAdzSchema,
-      "The adz entry to update"
-    )
+    body: jsonContentRequired(updateB2BPlanSchema, "B2B plan to update"),
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(
-      selectAdzSchema,
-      "The updated adz entry"
-    ),
+    [HttpStatusCodes.OK]: jsonContent(selectB2BPlanSchema, "Updated B2B plan"),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
-      "Unauthenticated request"
+      "Unauthorized request"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Adz entry not found"
+      "Plan not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
-      "The validation error(s)"
-    )
-  }
+      "Validation error"
+    ),
+  },
 });
 
-// Delete route definition
+// Delete a B2B plan
 export const remove = createRoute({
   tags,
-  summary: "Delete a adz entry",
+  summary: "Delete a B2B plan",
   path: "/{id}",
   method: "delete",
   request: {
-    params: stringIdParamSchema
+    params: stringIdParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Adz entry deleted successfully"
+      "B2B plan deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
-      "Unauthenticated request"
+      "Unauthorized request"
     ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(
-      notFoundSchema,
-      "Adz entry not found"
-    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Plan not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
       "Invalid ID format"
-    )
-  }
+    ),
+  },
 });
 
-export type ListRoute = typeof list;
-export type CreateRoute = typeof create;
-export type GetOneRoute = typeof getOne;
-export type UpdateRoute = typeof update;
-export type DeleteRoute = typeof remove;
+// Route types
+export type ListB2BPlanRoute = typeof list;
+export type CreateB2BPlanRoute = typeof create;
+export type GetOneB2BPlanRoute = typeof getOne;
+export type UpdateB2BPlanRoute = typeof update;
+export type DeleteB2BPlanRoute = typeof remove;

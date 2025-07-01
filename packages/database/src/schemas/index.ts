@@ -19,3 +19,7 @@ export * from "./products.schema";
 export * from "./sellswap.schema";
 
 export * from "./media.schema";
+
+export * from "./ads.schema";
+
+export * from "./b2bplans.schema";

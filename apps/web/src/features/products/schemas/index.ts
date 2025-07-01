@@ -1,37 +1,3 @@
-// import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-// import { z } from "zod";
-
-// import { products } from "@repo/database";
-
-// export const selectProductSchema = createSelectSchema(products);
-
-// export const insertProductSchema = createInsertSchema(products, {
-//   title: (val) => val.min(1).max(500),
-//   price: (val) => val.min(0),
-// }).omit({
-//   id: true,
-//   createdAt: true,
-//   createdBy: true,
-//   agentProfile: true,
-//   updatedAt: true,
-// });
-
-// export const updateProductSchema = createInsertSchema(products)
-//   .omit({
-//     id: true,
-//     createdAt: true,
-//     createdBy: true,
-//     updatedAt: true,
-//   })
-//   .partial();
-
-// // Type Definitions
-// export type Product = z.infer<typeof selectProductSchema>;
-
-// export type InsertProduct = z.infer<typeof insertProductSchema>;
-
-// export type UpdateProduct = z.infer<typeof updateProductSchema>;
-
 import { products } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -40,11 +6,7 @@ import { z } from "zod";
 const conditionEnum = z.enum(["new", "used", "refurbished", "for_parts"]);
 const statusEnum = z.enum(["published", "draft", "archived"]); // adjust if your statusEnum differs
 
-export const selectProductSchema = createSelectSchema(products, {
-  images: z.array(z.string()).default([]),
-  condition: conditionEnum,
-  status: statusEnum.default("published"),
-});
+export const selectProductSchema = createSelectSchema(products);
 
 export const insertProductSchema = createInsertSchema(products, {
   title: z.string().min(1).max(500),

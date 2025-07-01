@@ -4,27 +4,21 @@ import { Button } from "@repo/ui/components/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import { Separator } from "@repo/ui/components/separator";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/tabs";
 import { format } from "date-fns";
 import {
   ArrowLeft,
-  Calendar,
   DollarSign,
   ExternalLink,
+  HomeIcon,
+  ImageIcon,
+  InfoIcon,
   LinkIcon,
-  MapPin,
-  Tag,
+  MapPinIcon,
+  Settings2Icon,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -72,11 +66,12 @@ export default async function SingleHousingPage({ params }: Props) {
           {/* Header section */}
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2">
+              <h1 className="text-3xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <HomeIcon className="w-7 h-7 text-cyan-600" />
                 {housing.title}
               </h1>
               <div className="flex items-center text-muted-foreground">
-                <MapPin className="h-4 w-4 mr-1" />
+                <MapPinIcon className="h-4 w-4 mr-1" />
                 <span>{housing.address}</span>
               </div>
             </div>
@@ -91,204 +86,193 @@ export default async function SingleHousingPage({ params }: Props) {
                   {housing.status}
                 </Badge>
               </div>
-              <div className="text-2xl font-bold text-right">
-                ${Number(housing.price).toLocaleString()}
+              <div className="text-2xl font-bold text-right flex items-center gap-1">
+                <DollarSign className="h-5 w-5 text-emerald-600" />
+                {Number(housing.price).toLocaleString()}
               </div>
             </div>
           </div>
 
-          {/* Main content area */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Modern Sectioned Content */}
+          <div className="flex flex-col gap-6">
             {/* Main info card */}
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Property Details</CardTitle>
-                <CardDescription>
-                  Listing information and description
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="prose max-w-none">
-                  <p>{housing.description || "No description provided."}</p>
-                </div>
-
-                <Separator />
-
-                <Tabs defaultValue="details" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="media">Media</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="details" className="pt-4">
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Property ID
-                        </dt>
-                        <dd className="mt-1 text-sm">{housing.id}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Price
-                        </dt>
-                        <dd className="mt-1 text-sm flex items-center">
-                          <DollarSign className="h-4 w-4 mr-1 text-muted-foreground" />
-                          {Number(housing.price).toLocaleString()}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Status
-                        </dt>
-                        <dd className="mt-1 text-sm">
-                          <Badge
-                            variant={
-                              housing.status === "published"
-                                ? "default"
-                                : "outline"
-                            }
-                            className="capitalize"
-                          >
-                            {housing.status}
-                          </Badge>
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          External Link
-                        </dt>
-                        <dd className="mt-1 text-sm">
-                          {housing.link ? (
-                            <a
-                              href={housing.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline flex items-center"
-                            >
-                              View listing{" "}
-                              <ExternalLink className="h-3 w-3 ml-1" />
-                            </a>
-                          ) : (
-                            "No link available"
-                          )}
-                        </dd>
-                      </div>
-                    </dl>
-                  </TabsContent>
-                  <TabsContent value="media" className="pt-4">
-                    {housing.images && housing.images.length > 0 ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {housing.images.map((image: string, index: number) => (
-                          <div
-                            key={index}
-                            className="aspect-square rounded-md bg-slate-100 overflow-hidden"
-                          >
-                            <img
-                              src={image}
-                              alt={`Property image ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No images available for this property
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-
-            {/* Side info cards */}
-            <div className="space-y-6">
-              {/* Listing info card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Listing Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Created on</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formattedCreatedDate}
-                      </p>
-                    </div>
+            <Card className="min-w-0">
+              <CardContent className="space-y-6 pt-6">
+                {/* 1. Images */}
+                <section className="mb-6 p-4 rounded-lg border bg-muted/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <ImageIcon className="w-5 h-5 text-cyan-600" />
+                    <h2 className="font-semibold text-lg">Images</h2>
                   </div>
-
-                  {formattedUpdatedDate && (
-                    <div className="flex items-start gap-2">
-                      <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Last updated</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formattedUpdatedDate}
-                        </p>
-                      </div>
+                  {housing.images && housing.images.length > 0 ? (
+                    <div className="flex flex-nowrap gap-2 overflow-x-auto pb-2">
+                      {housing.images.map((image: string, index: number) => (
+                        <div
+                          key={index}
+                          className="aspect-square w-24 h-24 rounded-md bg-slate-100 overflow-hidden flex-shrink-0"
+                        >
+                          <img
+                            src={image}
+                            alt={`Property image ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No images available for this property
                     </div>
                   )}
+                </section>
 
-                  {housing.link && (
-                    <div className="flex items-start gap-2">
-                      <LinkIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">External listing</p>
+                {/* 2. Basic Info */}
+                <section className="mb-6 p-4 rounded-lg border bg-muted/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <InfoIcon className="w-5 h-5 text-cyan-600" />
+                    <h2 className="font-semibold text-lg">Basic Information</h2>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="font-medium">Title:</span>{" "}
+                      <span>{housing.title}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Description:</span>{" "}
+                      <span>
+                        {housing.description || "No description provided."}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 3. Location */}
+                <section className="mb-6 p-4 rounded-lg border bg-muted/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPinIcon className="w-5 h-5 text-cyan-600" />
+                    <h2 className="font-semibold text-lg">Location</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium">Address:</span>{" "}
+                      <span>{housing.address}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">City:</span>{" "}
+                      <span>{housing.city || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">State:</span>{" "}
+                      <span>{housing.state || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Zip Code:</span>{" "}
+                      <span>{housing.zipCode || "-"}</span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 4. Property Details */}
+                <section className="mb-6 p-4 rounded-lg border bg-muted/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <HomeIcon className="w-5 h-5 text-cyan-600" />
+                    <h2 className="font-semibold text-lg">Property Details</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="font-medium">Bedrooms:</span>{" "}
+                      <span>{housing.bedrooms || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Bathrooms:</span>{" "}
+                      <span>{housing.bathrooms || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Parking:</span>{" "}
+                      <span>{housing.parking || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Square Footage:</span>{" "}
+                      <span>{housing.squareFootage || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Year Built:</span>{" "}
+                      <span>{housing.yearBuilt || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Housing Type:</span>{" "}
+                      <span>{housing.housingType || "-"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Contact Number:</span>{" "}
+                      <span>{housing.contactNumber || "-"}</span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 5. Preferences & Status */}
+                <section className="mb-6 p-4 rounded-lg border bg-muted/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Settings2Icon className="w-5 h-5 text-cyan-600" />
+                    <h2 className="font-semibold text-lg">
+                      Preferences & Status
+                    </h2>
+                  </div>
+                  <div className="flex flex-col md:flex-row md:items-center md:gap-8 gap-2">
+                    <div>
+                      <span className="font-medium">Furnished:</span>{" "}
+                      <span>{housing.isFurnished ? "Yes" : "No"}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium flex items-center gap-1">
+                        <LinkIcon className="w-4 h-4" />
+                        Website Link:
+                      </span>{" "}
+                      {housing.link ? (
                         <a
                           href={housing.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline"
+                          className="text-blue-600 hover:underline flex items-center"
                         >
-                          View original listing
+                          View listing <ExternalLink className="h-3 w-3 ml-1" />
                         </a>
-                      </div>
+                      ) : (
+                        <span>No link available</span>
+                      )}
                     </div>
-                  )}
+                    <div>
+                      <span className="font-medium">Status:</span>{" "}
+                      <Badge
+                        variant={
+                          housing.status === "published" ? "default" : "outline"
+                        }
+                        className="capitalize"
+                      >
+                        {housing.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </section>
+              </CardContent>
+            </Card>
 
-                  {housing.agentProfile && (
-                    <div className="flex items-start gap-2">
-                      <Tag className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Listed by</p>
-                        <p className="text-sm text-muted-foreground">
-                          {housing.agentProfile || "Unknown Agent"}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+            {/* Other information (Contact card, etc.) shown full width below */}
+            {housing.agentProfile && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Agent</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-3"></div>
                 </CardContent>
                 <CardFooter>
-                  <div className="flex gap-3 w-full">
-                    <Button variant="outline" className="w-full">
-                      Edit
-                    </Button>
-                    <Button variant="destructive" className="w-full">
-                      Delete
-                    </Button>
-                  </div>
+                  <Button variant="default" className="w-full">
+                    Contact Agent
+                  </Button>
                 </CardFooter>
               </Card>
-
-              {/* Contact card (if agent info available) */}
-              {housing.agentProfile && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Contact Agent</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3"></div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="default" className="w-full">
-                      Contact Agent
-                    </Button>
-                  </CardFooter>
-                </Card>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
