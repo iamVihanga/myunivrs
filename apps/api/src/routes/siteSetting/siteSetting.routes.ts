@@ -11,16 +11,16 @@ import {
   stringIdParamSchema,
 } from "@/lib/helpers";
 import {
-  insertAdzPaymentPlanSchema,
-  selectAdzPaymentPlanSchema,
-} from "./adzPaymentPlan.schema";
+  insertSiteSettingsSchema,
+  selectSiteSettingsSchema,
+} from "./siteSetting.schema";
 
-const tags: string[] = ["Ads Payment Plan"];
+const tags: string[] = ["Site Setting"];
 
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all Adz Payment Plan entries",
+  summary: "List all siteSetting entries",
   path: "/",
   method: "get",
   request: {
@@ -28,12 +28,12 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectAdzPaymentPlanSchema)),
-      "The list of Adz Payment Plan entries"
+      getPaginatedSchema(z.array(selectSiteSettingsSchema)),
+      "The list of Site Setting entries"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the Adz Payment Plan entries"
+      "An error occurred while fetching the Site Setting entries"
     ),
   },
 });
@@ -41,19 +41,19 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new Adz Payment Plan entry",
+  summary: "Create a new Site Setting entry",
   path: "/",
   method: "post",
   request: {
     body: jsonContentRequired(
-      insertAdzPaymentPlanSchema,
-      "The Adz Payment Plan entry to create"
+      insertSiteSettingsSchema,
+      "The SiteSetting entry to create"
     ),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectAdzPaymentPlanSchema,
-      "The created Adz Payment Plan entry"
+      selectSiteSettingsSchema,
+      "The created SiteSetting entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -68,7 +68,7 @@ export const create = createRoute({
 
 export const getOne = createRoute({
   tags,
-  summary: "Get a single Adz Payment Plan entry by ID",
+  summary: "Get a single SiteSetting entry by ID",
   method: "get",
   path: "/{id}",
   request: {
@@ -76,12 +76,12 @@ export const getOne = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectAdzPaymentPlanSchema,
-      "Requested Adz Payment Plan entry"
+      selectSiteSettingsSchema,
+      "Requested Site Setting entry"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "AdzPaymentPlan entry not found"
+      "Site Setting entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -93,20 +93,20 @@ export const getOne = createRoute({
 // Update route definition
 export const update = createRoute({
   tags,
-  summary: "Update an existing Adz Payment Plan entry",
+  summary: "Update an existing SiteSetting entry",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
     body: jsonContentRequired(
-      insertAdzPaymentPlanSchema,
-      "The AdzPaymentPlan entry to update"
+      insertSiteSettingsSchema,
+      "The SiteSetting entry to update"
     ),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectAdzPaymentPlanSchema,
-      "The updated Adz Payment Plan entry"
+      selectSiteSettingsSchema,
+      "The updated SiteSetting entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -114,7 +114,7 @@ export const update = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "AdzPaymentPlan entry not found"
+      "SiteSetting entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
@@ -126,7 +126,7 @@ export const update = createRoute({
 // Delete route definition
 export const remove = createRoute({
   tags,
-  summary: "Delete a AdzPaymentPlan entry",
+  summary: "Delete a SiteSetting entry",
   path: "/{id}",
   method: "delete",
   request: {
@@ -135,7 +135,7 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Adz Payment Plan entry deleted successfully"
+      "SiteSetting entry deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -143,7 +143,7 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "AdzPaymentPlan entry not found"
+      "SiteSetting entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),

@@ -10,6 +10,7 @@ import index from "./index.route";
 import jobs from "./jobs/jobs.index";
 import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
+import siteSettings from "./siteSetting/siteSetting.index";
 import tasks from "./tasks/tasks.index";
 import university from "./university/university.index";
 
@@ -24,7 +25,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/products", products)
     .route("/sellswaps", sellswaps)
     .route("/about-us", aboutUs)
-    .route("/ads-payment-plan", adzPaymentPlan);
+    .route("/ads-payment-plan", adzPaymentPlan)
+    .route("/site-settings", siteSettings);
 }
 
 // stand alone router type used for api client
