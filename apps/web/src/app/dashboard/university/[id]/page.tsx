@@ -7,7 +7,7 @@ type Props = {
 export default async function SingleUniversityPage({ params }: Props) {
   const rpcClient = await client();
 
-  const universityRes = await rpcClient.api.university[":id"].$get({
+  const universityRes = await rpcClient.api.university[":id"].$delete({
     param: { id: params.id },
   });
 

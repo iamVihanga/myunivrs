@@ -15,6 +15,13 @@
       "when": 1751009785170,
       "tag": "0001_new_silver_sable",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751257146115,
+      "tag": "0002_burly_santa_claus",
+      "breakpoints": true
     }
   ]
 }
