@@ -116,7 +116,7 @@ export function UniversityCard({ university }: Props) {
               variant="outline"
               className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit"
             >
-              {/* {university.status || "Published"} */}
+              {university.status || "Published"}
             </Badge>
 
             <Button

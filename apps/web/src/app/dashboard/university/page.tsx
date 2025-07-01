@@ -1,5 +1,5 @@
-import { HousingsList } from "@/features/housing/components/housings-list";
-import { NewHousing } from "@/features/housing/components/new-housing";
+import { UniversitiesList } from "@/features/university/components/universities-list";
+import { NewUniversity } from "../../../features/university/components/new-university";
 
 interface PageProps {
   searchParams: {
@@ -22,10 +22,10 @@ export default function UniversityPage({ searchParams }: PageProps) {
             Manage University listings
           </p>
         </div>
-        <NewHousing />
+        <NewUniversity />
       </div>
 
-      <HousingsList page={page} search={search} />
+      <UniversitiesList page={page} search={search} />
     </div>
   );
 }
