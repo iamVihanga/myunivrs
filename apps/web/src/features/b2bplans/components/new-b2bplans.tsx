@@ -1,9 +1,6 @@
 "use client";
 import GalleryView from "@/modules/media/components/gallery-view";
 import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
-import { Textarea } from "@repo/ui/components/textarea";
 import {
   Dialog,
   DialogContent,
@@ -13,13 +10,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components/dialog";
+import { Input } from "@repo/ui/components/input";
+import { Label } from "@repo/ui/components/label";
+import { Textarea } from "@repo/ui/components/textarea";
 import { PackageIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { createB2bplans } from "../actions/create.action";
 import { InsertB2bplan, insertB2bplanSchema } from "../schemas";
-import { z } from "zod";
 
 export function NewB2bplans() {
   const router = useRouter();
@@ -88,8 +88,8 @@ export function NewB2bplans() {
         error instanceof z.ZodError
           ? `Validation failed: ${onmessage}`
           : error instanceof Error
-          ? error.message
-          : "Failed to create B2B plan listing. Please try again."
+            ? error.message
+            : "Failed to create B2B plan listing. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -107,7 +107,7 @@ export function NewB2bplans() {
           Add New B2B Plan
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create New B2B Plan Listing</DialogTitle>

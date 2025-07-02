@@ -17,7 +17,7 @@ export async function getAllProducts({
 }: GetProductsParams = {}) {
   const rpcClient = await client();
 
-  const response = await rpcClient.api.$get({
+  const response = await rpcClient.api.products.$get({
     query: {
       page,
       limit,

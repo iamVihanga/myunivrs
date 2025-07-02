@@ -1,88 +1,57 @@
-// import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-// import { z } from "zod";
-
-// import { products } from "@repo/database";
-
-// export const selectProductSchema = createSelectSchema(products);
-
-// export const insertProductSchema = createInsertSchema(products, {
-//   title: (val) => val.min(1).max(500),
-//   price: (val) => val.min(0)
-// }).omit({
-//   id: true,
-//   createdAt: true,
-//   createdBy: true,
-//   agentProfile: true,
-//   updatedAt: true
-// });
-
-// export const updateProductSchema = createInsertSchema(products)
-//   .omit({
-//     id: true,
-//     createdAt: true,
-//     createdBy: true,
-//     updatedAt: true
-//   })
-//   .partial();
-
-// // Type Definitions
-// export type Product = z.infer<typeof selectProductSchema>;
-
-// export type InsertProduct = z.infer<typeof insertProductSchema>;
-
-// export type UpdateProduct = z.infer<typeof updateProductSchema>;
-
 import { products } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Match the enum from your schema
-const conditionEnum = z.enum(["new", "used", "refurbished", "for_parts"]);
-const statusEnum = z.enum(["published", "draft", "archived"]); // adjust if your statusEnum differs
-
+// Select schema
 export const selectProductSchema = createSelectSchema(products);
 
+// Insert schema (for creating new products)
 export const insertProductSchema = createInsertSchema(products, {
-  title: z.string().min(1).max(500),
-  description: z.string().optional(),
-  images: z.array(z.string()).optional().default([]),
-  price: z.number().min(0),
-  discountPercentage: z.number().min(0).max(100).optional().default(0),
-  location: z.string().min(1, "Location is required"),
-  condition: conditionEnum.default("used"),
-  stockQuantity: z.number().min(1).default(1),
-  isNegotiable: z.boolean().default(false),
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(200, "Title must be 200 characters or less"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(9999, "Description must be 9999 characters or less"),
+  images: z
+    .array(z.string().url("Image must be a valid URL"))
+    .optional()
+    .default([]),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid number"),
+  discountPercentage: z
+    .string()
+    .regex(/^\d+$/, "Discount percentage must be a valid number")
+    .optional()
+    .default("0"),
+  location: z.string(),
+  condition: z
+    .enum(["new", "used", "refurbished", "for_parts"])
+    .default("used"),
+  stockQuantity: z
+    .string()
+    .regex(/^\d+$/, "Stock quantity must be a valid number")
+    .default("1"),
+  isNegotiable: z.boolean().optional().default(false),
   categoryId: z.string().optional(),
-  status: statusEnum.default("published"),
+  brand: z.string().max(100, "Brand must be 100 characters or less").optional(),
+  link: z.string().optional(),
+  shipping: z.string().optional(),
+  status: z
+    .enum(["published", "draft", "deleted"])
+    .optional()
+    .default("published"),
 }).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
   createdBy: true,
   agentProfile: true,
-  updatedAt: true,
 });
 
-export const updateProductSchema = createInsertSchema(products, {
-  title: z.string().min(1).max(500),
-  description: z.string().optional(),
-  images: z.array(z.string()).optional(),
-  price: z.number().min(0).optional(),
-  discountPercentage: z.number().min(0).max(100).optional(),
-  location: z.string().optional(),
-  condition: conditionEnum.optional(),
-  stockQuantity: z.number().min(1).optional(),
-  isNegotiable: z.boolean().optional(),
-  categoryId: z.string().optional(),
-  status: statusEnum.optional(),
-})
-  .omit({
-    id: true,
-    createdAt: true,
-    createdBy: true,
-    agentProfile: true,
-    updatedAt: true,
-  })
-  .partial();
+// Update schema (for updating existing products)
+export const updateProductSchema = insertProductSchema.partial();
 
 // Type Definitions
 export type Product = z.infer<typeof selectProductSchema>;

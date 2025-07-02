@@ -142,7 +142,7 @@ export function NewHousing() {
           Add New Listing
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create New Housing Listing</DialogTitle>
@@ -152,7 +152,7 @@ export function NewHousing() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-grow overflow-y-auto px-4">
+          <div className="flex-grow overflow-y-auto px-8">
             {/* Section: Basic Information */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -417,7 +417,7 @@ export function NewHousing() {
             </div>
           </div>
 
-          <DialogFooter className="flex-shrink-0 mt-6 px-4">
+          <DialogFooter className="flex-shrink-0 mt-6 px-8">
             <Button
               type="button"
               variant="outline"

@@ -138,7 +138,7 @@ export function NewAds() {
           Add New Ad
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[1000px] h-[80vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create New Ads Listing</DialogTitle>
@@ -195,7 +195,7 @@ export function NewAds() {
                       <SelectValue placeholder="Select post type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="sale">Sale</SelectItem>
+                      <SelectItem value="Banner">Banner</SelectItem>
                       <SelectItem value="rent">Rent</SelectItem>
                       <SelectItem value="lease">Lease</SelectItem>
                     </SelectContent>

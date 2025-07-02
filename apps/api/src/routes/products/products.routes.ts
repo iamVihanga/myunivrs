@@ -21,7 +21,7 @@ const tags: string[] = ["Products"];
 // List route definition
 export const list = createRoute({
   tags,
-  summary: "List all products",
+  summary: "List all product entries",
   path: "/",
   method: "get",
   request: {
@@ -42,16 +42,19 @@ export const list = createRoute({
 // Create route definition
 export const create = createRoute({
   tags,
-  summary: "Create a new product",
+  summary: "Create a new product entry",
   path: "/",
   method: "post",
   request: {
-    body: jsonContentRequired(insertProductSchema, "The product to create"),
+    body: jsonContentRequired(
+      insertProductSchema,
+      "The product entry to create"
+    ),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
       selectProductSchema,
-      "The created product"
+      "The created product entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -64,19 +67,23 @@ export const create = createRoute({
   },
 });
 
+// Get one route definition
 export const getOne = createRoute({
   tags,
-  summary: "Get a single product by ID",
+  summary: "Get a single product entry by ID",
   method: "get",
   path: "/{id}",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectProductSchema, "Requested product"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectProductSchema,
+      "Requested product entry"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Product not found"
+      "Product entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -88,17 +95,20 @@ export const getOne = createRoute({
 // Update route definition
 export const update = createRoute({
   tags,
-  summary: "Update an existing product",
+  summary: "Update an existing product entry",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
-    body: jsonContentRequired(updateProductSchema, "The product to update"),
+    body: jsonContentRequired(
+      updateProductSchema,
+      "The product entry to update"
+    ),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       selectProductSchema,
-      "The updated product"
+      "The updated product entry"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -106,7 +116,7 @@ export const update = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Product not found"
+      "Product entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
@@ -118,7 +128,7 @@ export const update = createRoute({
 // Delete route definition
 export const remove = createRoute({
   tags,
-  summary: "Delete a product",
+  summary: "Delete a product entry",
   path: "/{id}",
   method: "delete",
   request: {
@@ -127,7 +137,7 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Product deleted successfully"
+      "Product entry deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -135,7 +145,7 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Product not found"
+      "Product entry not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),

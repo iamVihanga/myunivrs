@@ -1,46 +1,36 @@
 "use server";
 
 import { client } from "@/lib/rpc";
-import { z } from "zod";
 import type { InsertProduct } from "../schemas";
-import { insertProductSchema } from "../schemas";
 
 export async function createProducts(data: InsertProduct) {
-  // Validate data against the schema
-  try {
-    const validatedData = insertProductSchema.parse({
-      ...data,
-      description: data.description || undefined, // Convert empty string to undefined
-      categoryId: data.categoryId || undefined, // Convert empty string to undefined
-    });
+  const rpcClient = await client();
 
-    const rpcClient = await client();
+  const cleanData: InsertProduct = {
+    ...data,
+    price: data.price.trim(),
+    discountPercentage: data.discountPercentage?.trim() || "0",
+    stockQuantity: data.stockQuantity?.trim() || "1",
+    brand: data.brand?.trim() || undefined,
+    link: data.link?.trim() || undefined,
+    shipping: data.shipping?.trim() || undefined,
+    categoryId: data.categoryId?.trim() || undefined,
+    images: Array.isArray(data.images) ? data.images : [],
+  };
 
-    const response = await rpcClient.api.products.$post({
-      json: validatedData,
-    });
+  const response = await rpcClient.api.products.$post({
+    json: cleanData,
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("API Error Response:", errorData);
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("API Error Response:", errorData);
 
-      // Provide more specific error messages based on the response
-      throw new Error(
-        errorData.message ||
-          `Failed to create product: ${JSON.stringify(errorData)}`
-      );
-    }
-
-    const createdProduct = await response.json();
-    return createdProduct;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation Error:", error.errors);
-      throw new Error(`Validation failed: ${error.message}`);
-    }
-    console.error("Create Product Error:", error);
     throw new Error(
-      error instanceof Error ? error.message : "Unknown error occurred"
+      errorData.message || JSON.stringify(errorData) || "Unknown error"
     );
   }
+
+  const createdProduct = await response.json();
+  return createdProduct;
 }

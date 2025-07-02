@@ -153,7 +153,7 @@ export function NewJob() {
           Add New Listing
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create New Job Listing</DialogTitle>
