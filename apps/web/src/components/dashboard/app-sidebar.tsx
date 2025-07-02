@@ -82,6 +82,11 @@ const data = {
       url: "/dashboard/ads",
       icon: IconBuildings,
     },
+    {
+      name: "b2bplans",
+      url: "/dashboard/b2bplans",
+      icon: IconBuildings,
+    },
   ],
 };
 

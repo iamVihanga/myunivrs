@@ -3,6 +3,7 @@ import { AppOpenAPI } from "@/types";
 
 import { BASE_PATH } from "../lib/constants";
 import ads from "./ads/ads.index";
+import b2bplans from "./b2bplans/b2bplans.index";
 import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
@@ -24,7 +25,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/products", products)
     .route("/sellswaps", sellswaps)
     .route("/media", media)
-    .route("/ads", ads);
+    .route("/ads", ads)
+    .route("/b2bplans", b2bplans);
 }
 
 // stand alone router type used for api client

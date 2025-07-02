@@ -1,28 +1,28 @@
 import { Card, CardContent } from "@repo/ui/components/card";
-import { getAllHousing } from "../actions/getAll.action";
-import { HousingCard } from "./housing-card";
-import { HousingPagination } from "./housing-pagination";
+import { getAllB2bplans } from "../actions/getAll.action";
+import { B2bplansCard } from "./b2bplans-card";
+import { B2bplansPagination } from "./b2bplans-pagination";
 import { SearchBar } from "./search-bar";
 
-interface HousingsListProps {
+interface B2bplanssListProps {
   page?: string;
   limit?: string;
   search?: string;
 }
 
-export async function HousingsList({
+export async function B2bplanssList({
   page = "1",
   limit = "8",
-  search = ""
-}: HousingsListProps) {
-  // Get housing data with pagination
-  const response = await getAllHousing({ page, limit, search });
+  search = "",
+}: B2bplanssListProps) {
+  // Get b2bplans data with pagination
+  const response = await getAllB2bplans({ page, limit, search });
 
   // Convert string dates to Date objects
-  const housings = response.data.map((housing: any) => ({
-    ...housing,
-    createdAt: new Date(housing.createdAt),
-    updatedAt: housing.updatedAt ? new Date(housing.updatedAt) : null
+  const b2bplanss = response.data.map((b2bplans: any) => ({
+    ...b2bplans,
+    createdAt: new Date(b2bplans.createdAt),
+    updatedAt: b2bplans.updatedAt ? new Date(b2bplans.updatedAt) : null,
   }));
 
   // Get pagination metadata
@@ -38,8 +38,8 @@ export async function HousingsList({
         </div>
       </div>
 
-      {/* Housing List */}
-      {housings.length === 0 ? (
+      {/* B2bplans List */}
+      {b2bplanss.length === 0 ? (
         <Card className="bg-cyan-50 border-none">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-cyan-100 p-3 mb-4">
@@ -71,14 +71,14 @@ export async function HousingsList({
         </Card>
       ) : (
         <div className="space-y-4">
-          {housings.map((housing: any) => (
-            <HousingCard key={housing.id} housing={housing} />
+          {b2bplanss.map((b2bplans: any) => (
+            <B2bplansCard key={b2bplans.id} b2bplan={b2bplans} />
           ))}
         </div>
       )}
 
       {/* Pagination */}
-      <HousingPagination currentPage={currentPage} totalPages={totalPages} />
+      <B2bplansPagination currentPage={currentPage} totalPages={totalPages} />
     </div>
   );
 }

@@ -12,15 +12,15 @@ import {
   PaginationPrevious
 } from "@repo/ui/components/pagination";
 
-interface HousingPaginationProps {
+interface B2bplansPaginationProps {
   currentPage: number;
   totalPages: number;
 }
 
-export function HousingPagination({
+export function B2bplansPagination({
   currentPage,
   totalPages
-}: HousingPaginationProps) {
+}: B2bplansPaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
