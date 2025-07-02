@@ -82,6 +82,16 @@ const data = {
       url: "/dashboard/university",
       icon: IconBuildings,
     },
+    {
+      name: "Ads Payment Plan",
+      url: "/dashboard/ads-payment-plan",
+      icon: IconBuildings,
+    },
+    {
+      name: "Site Settings",
+      url: "/dashboard/site-settings",
+      icon: IconBuildings,
+    },
   ],
 };
 
