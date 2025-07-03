@@ -15,6 +15,13 @@
       "when": 1751384655919,
       "tag": "0001_loud_giant_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751271541768,
+      "tag": "0001_ordinary_pyro",
+      "breakpoints": true
     }
   ]
 }
