@@ -84,12 +84,12 @@ const data = {
     },
     {
       name: "Ads Payment Plan",
-      url: "/dashboard/ads-payment-plan",
+      url: "/dashboard/adzPaymentPlan",
       icon: IconBuildings,
     },
     {
       name: "Site Settings",
-      url: "/dashboard/site-settings",
+      url: "/dashboard/siteSettings",
       icon: IconBuildings,
     },
   ],

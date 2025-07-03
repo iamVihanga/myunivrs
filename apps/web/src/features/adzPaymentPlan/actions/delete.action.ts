@@ -13,7 +13,7 @@ export async function deleteAdsPaymentPlan(id: string) {
   const result = await response.json();
 
   // Revalidate the page to show the updated adsPaymentPlan list
-  revalidatePath("/dashboard/ads-payment-plan");
+  revalidatePath("/dashboard/adzPaymentPlan");
 
   return result;
 }

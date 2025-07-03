@@ -13,7 +13,7 @@ export async function deleteSiteSetting(id: string) {
   const result = await response.json();
 
   // Revalidate the page to show the updated site setting list
-  revalidatePath("/dashboard/site-settings");
+  revalidatePath("/dashboard/siteSettings");
 
   return result;
 }

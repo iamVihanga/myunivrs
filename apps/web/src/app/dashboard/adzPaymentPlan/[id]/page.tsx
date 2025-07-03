@@ -10,22 +10,8 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import { Separator } from "@repo/ui/components/separator";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/tabs";
 import { format } from "date-fns";
-import {
-  ArrowLeft,
-  Calendar,
-  DollarSign,
-  ExternalLink,
-  LinkIcon,
-  MapPin,
-  Tag,
-} from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -51,16 +37,23 @@ export default async function SingleAdsPaymentPlanPage({ params }: Props) {
       );
     }
 
-    const adsPaymentPlan = await adsPaymentPlanRes.json();
+    const plan = await adsPaymentPlanRes.json();
 
     // Format dates for display
-    const formattedCreatedDate = format(
-      new Date(adsPaymentPlan.createdAt),
-      "PPP"
-    );
-    const formattedUpdatedDate = adsPaymentPlan.updatedAt
-      ? format(new Date(adsPaymentPlan.updatedAt), "PPP")
+    const formattedCreatedDate = format(new Date(plan.createdAt), "PPP");
+    const formattedUpdatedDate = plan.updatedAt
+      ? format(new Date(plan.updatedAt), "PPP")
       : null;
+
+    // Format features JSON for display
+    let featuresDisplay: React.ReactNode = "No features";
+    if (plan.features && Object.keys(plan.features).length > 0) {
+      featuresDisplay = (
+        <pre className="bg-slate-50 rounded p-2 text-xs overflow-x-auto">
+          {JSON.stringify(plan.features, null, 2)}
+        </pre>
+      );
+    }
 
     return (
       <div className="container mx-auto py-8 px-3 max-w-5xl">
@@ -78,28 +71,23 @@ export default async function SingleAdsPaymentPlanPage({ params }: Props) {
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                {adsPaymentPlan.title}
+                {plan.planName}
               </h1>
               <div className="flex items-center text-muted-foreground">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>{adsPaymentPlan.address}</span>
+                <span>{plan.currency}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-end">
                 <Badge
-                  variant={
-                    adsPaymentPlan.status === "published"
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={plan.status === "published" ? "default" : "outline"}
                   className="capitalize"
                 >
-                  {adsPaymentPlan.status}
+                  {plan.status}
                 </Badge>
               </div>
               <div className="text-2xl font-bold text-right">
-                ${Number(adsPaymentPlan.price).toLocaleString()}
+                ${Number(plan.price).toLocaleString()}
               </div>
             </div>
           </div>
@@ -109,107 +97,74 @@ export default async function SingleAdsPaymentPlanPage({ params }: Props) {
             {/* Main info card */}
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Property Details</CardTitle>
+                <CardTitle>Plan Details</CardTitle>
                 <CardDescription>
-                  Listing information and description
+                  Payment plan information and description
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="prose max-w-none">
-                  <p>
-                    {adsPaymentPlan.description || "No description provided."}
-                  </p>
+                  <p>{plan.description || "No description provided."}</p>
                 </div>
 
                 <Separator />
 
-                <Tabs defaultValue="details" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="media">Media</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="details" className="pt-4">
-                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Property ID
-                        </dt>
-                        <dd className="mt-1 text-sm">{adsPaymentPlan.id}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Price
-                        </dt>
-                        <dd className="mt-1 text-sm flex items-center">
-                          <DollarSign className="h-4 w-4 mr-1 text-muted-foreground" />
-                          {Number(adsPaymentPlan.price).toLocaleString()}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          Status
-                        </dt>
-                        <dd className="mt-1 text-sm">
-                          <Badge
-                            variant={
-                              adsPaymentPlan.status === "published"
-                                ? "default"
-                                : "outline"
-                            }
-                            className="capitalize"
-                          >
-                            {adsPaymentPlan.status}
-                          </Badge>
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-medium text-muted-foreground">
-                          External Link
-                        </dt>
-                        <dd className="mt-1 text-sm">
-                          {adsPaymentPlan.link ? (
-                            <a
-                              href={adsPaymentPlan.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline flex items-center"
-                            >
-                              View listing{" "}
-                              <ExternalLink className="h-3 w-3 ml-1" />
-                            </a>
-                          ) : (
-                            "No link available"
-                          )}
-                        </dd>
-                      </div>
-                    </dl>
-                  </TabsContent>
-                  <TabsContent value="media" className="pt-4">
-                    {adsPaymentPlan.images &&
-                    adsPaymentPlan.images.length > 0 ? (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {adsPaymentPlan.images.map(
-                          (image: string, index: number) => (
-                            <div
-                              key={index}
-                              className="aspect-square rounded-md bg-slate-100 overflow-hidden"
-                            >
-                              <img
-                                src={image}
-                                alt={`Property image ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          )
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No images available for this property
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Plan ID
+                    </dt>
+                    <dd className="mt-1 text-sm">{plan.id}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Price
+                    </dt>
+                    <dd className="mt-1 text-sm flex items-center">
+                      <DollarSign className="h-4 w-4 mr-1 text-muted-foreground" />
+                      {Number(plan.price).toLocaleString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Status
+                    </dt>
+                    <dd className="mt-1 text-sm">
+                      <Badge
+                        variant={
+                          plan.status === "published" ? "default" : "outline"
+                        }
+                        className="capitalize"
+                      >
+                        {plan.status}
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Currency
+                    </dt>
+                    <dd className="mt-1 text-sm">{plan.currency}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Duration (days)
+                    </dt>
+                    <dd className="mt-1 text-sm">{plan.durationDays}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Max Ads
+                    </dt>
+                    <dd className="mt-1 text-sm">{plan.maxAds}</dd>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Features
+                    </dt>
+                    <dd className="mt-1 text-sm">{featuresDisplay}</dd>
+                  </div>
+                </dl>
               </CardContent>
             </Card>
 
@@ -242,35 +197,6 @@ export default async function SingleAdsPaymentPlanPage({ params }: Props) {
                       </div>
                     </div>
                   )}
-
-                  {adsPaymentPlan.link && (
-                    <div className="flex items-start gap-2">
-                      <LinkIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">External listing</p>
-                        <a
-                          href={adsPaymentPlan.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          View original listing
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {adsPaymentPlan.agentProfile && (
-                    <div className="flex items-start gap-2">
-                      <Tag className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Listed by</p>
-                        <p className="text-sm text-muted-foreground">
-                          {adsPaymentPlan.agentProfile || "Unknown Agent"}
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
                 <CardFooter>
                   <div className="flex gap-3 w-full">
@@ -283,23 +209,6 @@ export default async function SingleAdsPaymentPlanPage({ params }: Props) {
                   </div>
                 </CardFooter>
               </Card>
-
-              {/* Contact card (if agent info available) */}
-              {adsPaymentPlan.agentProfile && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Contact Agent</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-3"></div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="default" className="w-full">
-                      Contact Agent
-                    </Button>
-                  </CardFooter>
-                </Card>
-              )}
             </div>
           </div>
         </div>

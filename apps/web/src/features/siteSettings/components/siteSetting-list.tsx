@@ -10,7 +10,7 @@ interface siteSettingsListProps {
   search?: string;
 }
 
-export async function siteSettingsList({
+export async function SiteSettingsList({
   page = "1",
   limit = "8",
   search = "",

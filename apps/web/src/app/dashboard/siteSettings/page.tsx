@@ -1,5 +1,5 @@
-import { AdsPaymentPlanList } from "@/features/adzPaymentPlan/components/adzPaymentPlan-list";
-import { NewAdsPaymentPlan } from "@/features/adzPaymentPlan/components/new-adzPaymentPlan";
+import { NewSiteSetting } from "@/features/siteSettings/components/new-siteSetting";
+import { SiteSettingsList } from "@/features/siteSettings/components/siteSetting-list";
 
 interface PageProps {
   searchParams: {
@@ -8,7 +8,7 @@ interface PageProps {
   };
 }
 
-export default function AdzPaymentPlanPage({ searchParams }: PageProps) {
+export default function SiteSettingPage({ searchParams }: PageProps) {
   const { page = "1", search = "" } = searchParams;
 
   return (
@@ -16,16 +16,16 @@ export default function AdzPaymentPlanPage({ searchParams }: PageProps) {
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">
-            Ads Payment Plan Listings
+            Site Setting Listings
           </h1>
           <p className="text-muted-foreground mt-1">
             Manage your property listings
           </p>
         </div>
-        <NewAdsPaymentPlan />
+        <NewSiteSetting />
       </div>
 
-      <AdsPaymentPlanList page={page} search={search} />
+      <SiteSettingsList page={page} search={search} />
     </div>
   );
 }
