@@ -18,12 +18,10 @@ export * from "./products.schema";
 
 export * from "./sellswap.schema";
 
-<<<<<<< HEAD
 export * from "./aboutus.schema";
 
 export * from "./adzPaymentPlan.schema";
 
 export * from "./siteSettings.schema";
-=======
+
 export * from "./media.schema";
->>>>>>> dev
