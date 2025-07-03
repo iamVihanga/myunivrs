@@ -24,7 +24,6 @@ const CONDITION_OPTIONS = ["new", "used", "refurbished", "damaged"];
 const TYPE_OPTIONS = ["sell", "swap"];
 const STATUS_OPTIONS = ["draft", "published", "archived"];
 
-
 export function NewSellSwap() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -45,7 +44,6 @@ export function NewSellSwap() {
     contactNumber: "",
     quantity: 1,
     tags: [],
-
   });
 
   const handleChange = (
@@ -53,7 +51,6 @@ export function NewSellSwap() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -81,7 +78,6 @@ export function NewSellSwap() {
         .map((tag) => tag.trim())
         .filter(Boolean),
     }));
-
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,7 +96,6 @@ export function NewSellSwap() {
       return;
     }
 
-
     setIsSubmitting(true);
 
     try {
@@ -111,7 +106,6 @@ export function NewSellSwap() {
           formData.price === "" || formData.price === null
             ? null
             : String(formData.price),
-
       });
 
       toast.success("Sell/Swap listing created successfully!");
@@ -132,7 +126,6 @@ export function NewSellSwap() {
         contactNumber: "",
         quantity: 1,
         tags: [],
-
       });
       setOpen(false);
       router.refresh();
@@ -147,7 +140,6 @@ export function NewSellSwap() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-
         <Button
           icon={<PlusIcon />}
           size="sm"
@@ -157,7 +149,6 @@ export function NewSellSwap() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create Sell/Swap Listing</DialogTitle>
@@ -188,9 +179,7 @@ export function NewSellSwap() {
                 id="categoryId"
                 name="categoryId"
                 placeholder="Enter category ID"
-
                 value={formData.categoryId ?? ""}
-
                 onChange={handleChange}
                 required
               />
@@ -208,7 +197,6 @@ export function NewSellSwap() {
                 className="border rounded-md px-3 py-2"
                 required
               >
-
                 {TYPE_OPTIONS.map((type) => (
                   <option key={type} value={type}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -305,12 +293,10 @@ export function NewSellSwap() {
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </option>
                 ))}
-
               </select>
             </div>
 
             <div className="grid gap-2">
-
               <Label htmlFor="swapPreferences">Swap Preferences</Label>
               <Textarea
                 id="swapPreferences"
@@ -357,15 +343,12 @@ export function NewSellSwap() {
             </div>
 
             <div className="grid gap-2">
-
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 name="description"
                 placeholder="Enter item description"
-
                 value={formData.description ?? ""}
-
                 onChange={handleChange}
                 rows={4}
               />
@@ -376,11 +359,9 @@ export function NewSellSwap() {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-
               icon={<XIcon className="h-4 w-4" />}
               disabled={isSubmitting}
             >
-
               Cancel
             </Button>
             <Button

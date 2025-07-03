@@ -1,7 +1,5 @@
 {
-
-  "id": "4cbf3939-3361-4fea-9d37-7b3069eec1ab",
-
+  "id": "4e8aea8b-973e-4c53-a669-2f949350ba5c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -179,13 +177,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-
-    "public.ads_payment_plan": {
-      "name": "ads_payment_plan",
-
     "public.ads": {
       "name": "ads",
-
       "schema": "",
       "columns": {
         "id": {
@@ -195,18 +188,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-
-        "plan_name": {
-          "name": "plan_name",
-
         "title": {
           "name": "title",
-
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-
         "post_type": {
           "name": "post_type",
           "type": "text",
@@ -220,14 +207,103 @@
           "notNull": false,
           "default": "'{}'"
         },
-
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-
+        "contact_information": {
+          "name": "contact_information",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_featured": {
+          "name": "is_featured",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "occurrence": {
+          "name": "occurrence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ads_created_by_organization_id_fk": {
+          "name": "ads_created_by_organization_id_fk",
+          "tableFrom": "ads",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ads_payment_plan": {
+      "name": "ads_payment_plan",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "plan_name": {
+          "name": "plan_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "price": {
           "name": "price",
           "type": "numeric(10, 2)",
@@ -268,38 +344,6 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'published'"
-
-        "contact_information": {
-          "name": "contact_information",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_featured": {
-          "name": "is_featured",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "company_name": {
-          "name": "company_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "occurrence": {
-          "name": "occurrence",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-
         },
         "created_at": {
           "name": "created_at",
@@ -317,25 +361,7 @@
         }
       },
       "indexes": {},
-
       "foreignKeys": {},
-
-      "foreignKeys": {
-        "ads_created_by_organization_id_fk": {
-          "name": "ads_created_by_organization_id_fk",
-          "tableFrom": "ads",
-          "tableTo": "organization",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -2028,7 +2054,6 @@
           "primaryKey": false,
           "notNull": true
         },
-
         "status": {
           "name": "status",
           "type": "status",
@@ -2037,7 +2062,6 @@
           "notNull": false,
           "default": "'published'"
         },
-
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2206,9 +2230,6 @@
         "new",
         "used",
         "refurbished",
-
-        "damaged"
-
         "for_parts"
       ]
     },
@@ -2221,7 +2242,6 @@
         "contract",
         "internship",
         "temporary"
-
       ]
     },
     "public.media_type": {
