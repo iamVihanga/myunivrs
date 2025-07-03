@@ -12,6 +12,7 @@ export const b2bplans = pgTable("b2bplans", {
   images: text("images").array().default([]),
   description: text("description"),
   prize: text("price").notNull(),
+  type: text("type").notNull(), // e.g., "basic", "premium", "enterprise"
 
   createdBy: text("created_by").references(() => organization.id, {
     onDelete: "cascade",

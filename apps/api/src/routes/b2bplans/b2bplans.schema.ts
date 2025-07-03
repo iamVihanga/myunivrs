@@ -11,6 +11,7 @@ export const insertB2BPlanSchema = createInsertSchema(b2bplans, {
   images: z.array(z.string()).optional().default([]),
   description: z.string().optional(),
   prize: z.string().min(1),
+  type: z.string().optional(), // e.g., "basic", "premium", "enterprise"
 }).omit({
   id: true,
   createdBy: true,
@@ -24,6 +25,7 @@ export const updateB2BPlanSchema = createInsertSchema(b2bplans, {
   images: z.array(z.string()).optional(),
   description: z.string().optional(),
   prize: z.string().optional(),
+  type: z.string().optional(),
 })
   .omit({
     id: true,

@@ -196,8 +196,8 @@ export function NewAds() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Banner">Banner</SelectItem>
-                      <SelectItem value="rent">Rent</SelectItem>
-                      <SelectItem value="lease">Lease</SelectItem>
+                      <SelectItem value="Carousel">Carousel</SelectItem>
+                      <SelectItem value="Story">Story</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

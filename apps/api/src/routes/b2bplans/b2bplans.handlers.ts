@@ -107,6 +107,7 @@ export const create: AppRouteHandler<CreateB2BPlanRoute> = async (c) => {
     images: payload.images ?? [],
     description: payload.description ?? null,
     prize: payload.prize,
+    type: payload.type ?? "yearly", // Default to "basic" if not provided
     createdAt: new Date(),
     updatedAt: new Date(),
   };

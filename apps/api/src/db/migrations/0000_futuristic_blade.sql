@@ -64,6 +64,7 @@ CREATE TABLE "b2bplans" (
 	"images" text[] DEFAULT '{}',
 	"description" text,
 	"price" text NOT NULL,
+	"type" text NOT NULL,
 	"created_by" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
