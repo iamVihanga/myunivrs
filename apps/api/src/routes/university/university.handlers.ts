@@ -139,5 +139,8 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
   // Delete the university entry
   await db.delete(university).where(eq(university.id, id));
 
-  return c.body(null, HttpStatusCodes.NO_CONTENT);
+  return c.json(
+    { message: "University entry deleted successfully" },
+    HttpStatusCodes.OK
+  );
 };
