@@ -1,6 +1,7 @@
 "use server";
 
 import { client } from "@/lib/rpc";
+
 import type { InsertUniversity } from "../schemas";
 
 export async function createUniversity(data: InsertUniversity) {
@@ -20,4 +21,5 @@ export async function createUniversity(data: InsertUniversity) {
   const createdUni = await response.json();
 
   return createdUni;
+
 }

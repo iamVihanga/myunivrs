@@ -28,6 +28,7 @@ export const sellSwaps = pgTable("sell_swaps", {
   type: sellSwapTypes("type"),
   userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
 
+
   price: numeric("price", { precision: 10, scale: 2 }),
 
   condition: conditionEnum("condition").notNull().default("used"),
@@ -48,6 +49,7 @@ export const sellSwaps = pgTable("sell_swaps", {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
+
 
   ...timestamps,
 });

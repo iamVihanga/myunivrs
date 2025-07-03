@@ -2,12 +2,15 @@
 
 import { client } from "@/lib/rpc";
 
+
 type GetUniversityParams = {
+
   page?: string;
   limit?: string;
   sort?: "asc" | "desc";
   search?: string;
 };
+
 
 export async function getAllUniversity({
   page = "1",
@@ -18,12 +21,15 @@ export async function getAllUniversity({
   const rpcClient = await client();
 
   const response = await rpcClient.api.university.$get({
+
     query: {
       page,
       limit,
       sort,
+
       search,
     },
+
   });
 
   if (!response.ok) {

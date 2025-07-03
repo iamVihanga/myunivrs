@@ -71,12 +71,9 @@ const data = {
       name: "Jobs",
       url: "/dashboard/jobs",
       icon: IconBuildings,
+
     },
-    {
-      name: "Products",
-      url: "/dashboard/products",
-      icon: IconBuildings,
-    },
+    
     {
       name: "University",
       url: "/dashboard/university",
@@ -90,6 +87,22 @@ const data = {
     {
       name: "Site Settings",
       url: "/dashboard/siteSettings",
+      icon: IconBuildings,
+    },
+    {
+      name: "Products",
+      url: "/dashboard/products",
+      icon: IconBuildings,
+    },
+    {
+      name: "Ads",
+      url: "/dashboard/ads",
+      icon: IconBuildings,
+    },
+    {
+      name: "b2bplans",
+      url: "/dashboard/b2bplans",
+
       icon: IconBuildings,
     },
   ],
