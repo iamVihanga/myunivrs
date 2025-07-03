@@ -1,3 +1,4 @@
+
 // "use client";
 // import { Card, CardContent } from "@repo/ui/components/card";
 // import { getAllProduct } from "../actions/getAll.action";
@@ -132,10 +133,12 @@ import { ProductsPagination } from "./products-pagination";
 import { SearchBar } from "./search-bar";
 
 interface ProductssListProps {
+
   page?: string;
   limit?: string;
   search?: string;
 }
+
 
 export async function ProductssList({
   page = "1",
@@ -150,6 +153,7 @@ export async function ProductssList({
     ...products,
     createdAt: new Date(products.createdAt),
     updatedAt: products.updatedAt ? new Date(products.updatedAt) : null,
+
   }));
 
   // Get pagination metadata
@@ -165,8 +169,10 @@ export async function ProductssList({
         </div>
       </div>
 
+
       {/* Products List */}
       {productss.length === 0 ? (
+
         <Card className="bg-cyan-50 border-none">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-cyan-100 p-3 mb-4">
@@ -198,8 +204,10 @@ export async function ProductssList({
         </Card>
       ) : (
         <div className="space-y-4">
+
           {productss.map((products: any) => (
             <ProductsCard key={products.id} products={products} />
+
           ))}
         </div>
       )}

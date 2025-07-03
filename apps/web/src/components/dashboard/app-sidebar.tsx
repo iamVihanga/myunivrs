@@ -71,6 +71,23 @@ const data = {
       name: "Jobs",
       url: "/dashboard/jobs",
       icon: IconBuildings,
+
+    },
+    
+    {
+      name: "University",
+      url: "/dashboard/university",
+      icon: IconBuildings,
+    },
+    {
+      name: "Ads Payment Plan",
+      url: "/dashboard/adzPaymentPlan",
+      icon: IconBuildings,
+    },
+    {
+      name: "Site Settings",
+      url: "/dashboard/siteSettings",
+      icon: IconBuildings,
     },
     {
       name: "Products",
@@ -85,6 +102,7 @@ const data = {
     {
       name: "b2bplans",
       url: "/dashboard/b2bplans",
+
       icon: IconBuildings,
     },
   ],

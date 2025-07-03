@@ -1,5 +1,7 @@
 import { NewProducts } from "@/features/products/components/new-products";
+
 import { ProductssList } from "@/features/products/components/products-list";
+
 
 interface PageProps {
   searchParams: {
@@ -25,7 +27,9 @@ export default function ProductsPage({ searchParams }: PageProps) {
         <NewProducts />
       </div>
 
+
       <ProductssList page={page} search={search} />
+
     </div>
   );
 }

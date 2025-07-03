@@ -1,3 +1,4 @@
+
 // "use client";
 // import GalleryView from "@/modules/media/components/gallery-view";
 // import { Button } from "@repo/ui/components/button";
@@ -382,6 +383,7 @@
 import GalleryView from "@/modules/media/components/gallery-view";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
+
 import {
   Dialog,
   DialogContent,
@@ -393,6 +395,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+
 import {
   Select,
   SelectContent,
@@ -412,12 +415,14 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
 import { createProducts } from "../actions/create.action";
 import { InsertProduct } from "../schemas";
 
 export function NewProducts() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<InsertProduct>({
@@ -465,10 +470,12 @@ export function NewProducts() {
         : [...selectedFiles.map((f) => f.url)],
     }));
     setGalleryOpen(false);
+
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     if (
       !formData.title.trim() ||
@@ -480,18 +487,22 @@ export function NewProducts() {
       toast.error(
         "Please fill in all required fields (Title, Description, Location, Price)"
       );
+
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+
       await createProducts(formData);
+
       toast.success("Product listing created successfully!");
       setFormData({
         title: "",
         description: "",
         images: [],
+
         price: "0",
         discountPercentage: "0",
         location: "",
@@ -500,6 +511,7 @@ export function NewProducts() {
         isNegotiable: false,
         categoryId: "",
         status: "published",
+
       });
       setOpen(false);
       router.refresh();
@@ -514,6 +526,7 @@ export function NewProducts() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
+
         <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
           <PlusIcon className="mr-2 h-4 w-4" />
           Add New Listing
@@ -756,20 +769,25 @@ export function NewProducts() {
           </div>
 
           <DialogFooter className="flex-shrink-0 mt-4 px-8 py-6">
+
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+
               disabled={isSubmitting}
               className="h-12 text-lg px-6"
             >
               <XIcon className="h-5 w-5 mr-2" />
+
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
+
               className="h-12 text-lg px-6 bg-cyan-600 hover:bg-cyan-700"
+
             >
               {isSubmitting ? "Creating..." : "Create Listing"}
             </Button>

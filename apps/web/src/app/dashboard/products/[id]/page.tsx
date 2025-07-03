@@ -1,4 +1,5 @@
 import { client } from "@/lib/rpc";
+
 import { Badge } from "@repo/ui/components/badge";
 import { Card, CardContent } from "@repo/ui/components/card";
 import { format } from "date-fns";
@@ -13,12 +14,14 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+
 type Props = {
   params: { id: string };
 };
 
 export default async function SingleProductPage({ params }: Props) {
   const rpcClient = await client();
+
 
   try {
     const productRes = await rpcClient.api.products[":id"].$get({
@@ -180,4 +183,5 @@ export default async function SingleProductPage({ params }: Props) {
   } catch (error) {
     return notFound();
   }
+
 }

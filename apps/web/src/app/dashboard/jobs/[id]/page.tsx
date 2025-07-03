@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+
 type Props = {
   params: { id: string };
 };
@@ -361,4 +362,5 @@ export default async function SingleJobsPage({ params }: Props) {
   } catch (error) {
     return notFound();
   }
+
 }

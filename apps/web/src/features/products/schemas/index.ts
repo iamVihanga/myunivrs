@@ -1,3 +1,4 @@
+
 import { products } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -56,4 +57,5 @@ export const updateProductSchema = insertProductSchema.partial();
 // Type Definitions
 export type Product = z.infer<typeof selectProductSchema>;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
+
 export type UpdateProduct = z.infer<typeof updateProductSchema>;

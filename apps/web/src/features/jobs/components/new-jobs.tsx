@@ -1,5 +1,7 @@
 "use client";
+
 import GalleryView from "@/modules/media/components/gallery-view";
+
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -12,6 +14,7 @@ import {
 } from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
+
 import {
   Select,
   SelectContent,
@@ -33,19 +36,23 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
 import { createJob } from "../actions/create.action";
 import { InsertJobs } from "../schemas";
 
 export function NewJob() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+
   const [galleryOpen, setGalleryOpen] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<InsertJobs>({
     title: "",
     description: "",
     images: [],
     company: "",
+
     isFeatured: false,
     status: "published",
     requiredSkills: [],
@@ -53,12 +60,14 @@ export function NewJob() {
     actionUrl: "",
     jobType: "full_time",
     cvRequired: false,
+
   });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -104,10 +113,12 @@ export function NewJob() {
       images: [...prev.images, ...selectedFiles.map((f) => f.url)],
     }));
     setGalleryOpen(false);
+
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     if (!formData.title || !formData.company) {
       toast.error("Please fill in all required fields");
@@ -117,13 +128,16 @@ export function NewJob() {
     setIsSubmitting(true);
 
     try {
+
       await createJob(formData);
+
       toast.success("Job listing created successfully!");
       setFormData({
         title: "",
         description: "",
         images: [],
         company: "",
+
         isFeatured: false,
         status: "published",
         requiredSkills: [],
@@ -131,12 +145,15 @@ export function NewJob() {
         actionUrl: "",
         jobType: "full_time",
         cvRequired: false,
+
       });
       setOpen(false);
       router.refresh();
     } catch (error) {
       console.error(error);
+
       toast.error("Failed to create job listing. Please try again.");
+
     } finally {
       setIsSubmitting(false);
     }
@@ -430,13 +447,16 @@ export function NewJob() {
           </div>
 
           <DialogFooter className="flex-shrink-0 mt-6 px-4">
+
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+
               disabled={isSubmitting}
             >
               <XIcon className="h-4 w-4 mr-2" />
+
               Cancel
             </Button>
             <Button

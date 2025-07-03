@@ -6,6 +6,7 @@ import type { InsertProduct } from "../schemas";
 export async function createProducts(data: InsertProduct) {
   const rpcClient = await client();
 
+
   const cleanData: InsertProduct = {
     ...data,
     price: data.price.trim(),
@@ -33,4 +34,5 @@ export async function createProducts(data: InsertProduct) {
 
   const createdProduct = await response.json();
   return createdProduct;
+
 }

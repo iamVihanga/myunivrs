@@ -2,28 +2,34 @@
 
 import { client } from "@/lib/rpc";
 
-type GetHousingParams = {
+
+type GetUniversityParams = {
+
   page?: string;
   limit?: string;
   sort?: "asc" | "desc";
   search?: string;
 };
 
-export async function getAllHousing({
+
+export async function getAllUniversity({
   page = "1",
   limit = "8",
   sort = "desc",
-  search = ""
-}: GetHousingParams = {}) {
+  search = "",
+}: GetUniversityParams = {}) {
   const rpcClient = await client();
 
-  const response = await rpcClient.api.housing.$get({
+  const response = await rpcClient.api.university.$get({
+
     query: {
       page,
       limit,
       sort,
-      search
-    }
+
+      search,
+    },
+
   });
 
   if (!response.ok) {

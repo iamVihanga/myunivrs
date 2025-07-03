@@ -1,36 +1,42 @@
 "use client";
 
+
+import { formatDistanceToNow } from "date-fns";
+import {
+  DollarSignIcon,
+  ExternalLinkIcon,
+  HomeIcon,
+  MapPinIcon,
+  TagIcon,
+  TrashIcon,
+} from "lucide-react";
+import { useId, useState } from "react";
+import { toast } from "sonner";
+
+
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogTitle,
-} from "@radix-ui/react-alert-dialog";
-import {
+
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogTitle,
+
 } from "@repo/ui/components/alert-dialog";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@repo/ui/components/avatar";
+
+import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Card } from "@repo/ui/components/card";
-import { formatDistanceToNow } from "date-fns";
-import {
-  Badge,
-  DollarSignIcon,
-  ExternalLinkIcon,
-  HomeIcon,
-  Link,
-  MapPinIcon,
-  TrashIcon,
-} from "lucide-react";
-import { useId, useState } from "react";
-import { toast } from "sonner";
+import Link from "next/link";
+
 import { deleteSellSwaps } from "../actions/delete.sellswaps";
 import { SellSwap } from "../schemas";
 
@@ -51,10 +57,12 @@ export function SellSwapCard({ sellSwaps }: Props) {
     try {
       setIsDeleting(true);
       await deleteSellSwaps(sellSwaps.id);
-      toast.success("Sell-Swaps listing deleted successfully");
+
+      toast.success("Sell/Swap listing deleted successfully");
     } catch (error) {
-      console.error("Failed to delete Sell-Swaps:", error);
-      toast.error("Failed to delete Sell-Swaps listing");
+      console.error("Failed to delete listing:", error);
+      toast.error("Failed to delete Sell/Swap listing");
+
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -65,7 +73,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
     <>
       <Card
         key={id}
-        className="transition-all hover:shadow-lg border-l-4 border-l-cyan-500 p-4"
+
+        className="transition-all hover:shadow-lg border-l-4 border-l-green-500 p-4"
+
       >
         <div className="flex items-center gap-4">
           {/* Avatar section */}
@@ -75,7 +85,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
               alt={sellSwaps.title}
               className="size-16"
             />
-            <AvatarFallback className="bg-cyan-50 text-cyan-700">
+
+            <AvatarFallback className="bg-green-50 text-green-700">
+
               <HomeIcon className="h-6 w-6" />
             </AvatarFallback>
           </Avatar>
@@ -95,55 +107,106 @@ export function SellSwapCard({ sellSwaps }: Props) {
 
             {/* Info with separators */}
             <div className="flex flex-wrap items-center gap-2 text-sm mt-2">
-              {sellSwaps.type && (
+
+              {sellSwaps.city && (
                 <div className="flex items-center gap-1">
-                  <MapPinIcon className="h-3.5 w-3.5 text-cyan-500" />
+                  <MapPinIcon className="h-3.5 w-3.5 text-green-500" />
                   <span className="text-sm truncate max-w-[180px]">
-                    {sellSwaps.type}
+                    {sellSwaps.city}
+
                   </span>
                 </div>
               )}
 
-              {sellSwaps.type && sellSwaps.id && (
+
+              {sellSwaps.city && sellSwaps.price && (
                 <div className="text-gray-300 text-sm px-1">|</div>
               )}
 
-              {sellSwaps.type && (
+              {sellSwaps.price && (
                 <div className="flex items-center gap-1">
                   <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
                   <span className="text-sm font-medium">
-                    {parseInt(sellSwaps.type).toFixed(2)}
+                    {Number(sellSwaps.price).toFixed(2)}
+
                   </span>
                 </div>
               )}
 
-              {sellSwaps.type && sellSwaps.title && (
+
+              {sellSwaps.price && sellSwaps.status && (
                 <div className="text-gray-300 text-sm px-1">|</div>
               )}
 
-              {/* {housing.link && (
-                <div className="flex items-center gap-1">
-                  <LinkIcon className="h-3.5 w-3.5 text-teal-500" />
-                  <a
-                    href={housing.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-teal-600 hover:underline truncate max-w-[180px] text-sm"
-                  >
-                    {housing.link}
-                  </a>
-                </div>
-              )} */}
+              {sellSwaps.status && (
+                <Badge
+                  variant="outline"
+                  className="bg-green-50 text-green-700 border-green-200 text-xs w-fit"
+                >
+                  {sellSwaps.status}
+                </Badge>
+              )}
+
+              {sellSwaps.status && sellSwaps.type && (
+                <div className="text-gray-300 text-sm px-1">|</div>
+              )}
+
+              {sellSwaps.type && (
+                <Badge
+                  variant="outline"
+                  className="bg-green-100 text-green-700 border-green-200 text-xs w-fit"
+                >
+                  {sellSwaps.type.charAt(0).toUpperCase() +
+                    sellSwaps.type.slice(1)}
+                </Badge>
+              )}
+
+              {sellSwaps.type && sellSwaps.condition && (
+                <div className="text-gray-300 text-sm px-1">|</div>
+              )}
+
+              {sellSwaps.condition && (
+                <Badge
+                  variant="outline"
+                  className="bg-gray-100 text-gray-700 border-gray-200 text-xs w-fit"
+                >
+                  {sellSwaps.condition}
+                </Badge>
+              )}
+
+              {sellSwaps.tags && sellSwaps.tags.length > 0 && (
+                <>
+                  <div className="text-gray-300 text-sm px-1">|</div>
+                  <div className="flex items-center gap-1">
+                    <TagIcon className="h-3.5 w-3.5 text-gray-400" />
+                    {sellSwaps.tags.map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="bg-gray-200 text-gray-700 rounded px-2 py-0.5 text-xs mr-1"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
+            {sellSwaps.description && (
+              <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                {sellSwaps.description}
+              </p>
+            )}
+
           </div>
 
           {/* Actions section */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
             <Badge
-              fontVariant="outline"
-              className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit"
+
+              variant="outline"
+              className="bg-green-50 text-green-700 border-green-200 text-xs w-fit"
             >
-              {sellSwaps.type || "Published"}
+              {sellSwaps.status || "Draft"}
             </Badge>
 
             <Button
@@ -156,7 +219,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
               <TrashIcon className="h-4 w-4" />
             </Button>
             <Button size="sm" variant="outline" asChild className="h-8 px-2">
-              <Link href={`/dashboard/housing/${sellSwaps.id}`}>
+
+              <Link href={`/dashboard/sellswaps/${sellSwaps.id}`}>
+
                 <ExternalLinkIcon className="h-4 w-4" />
               </Link>
             </Button>
@@ -169,7 +234,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the housing listing "
+
+              This will permanently delete the sell/swap listing "
+
               {sellSwaps.title}
               ". This action cannot be undone.
             </AlertDialogDescription>

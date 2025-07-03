@@ -1,3 +1,4 @@
+
 // import { jobs } from "@repo/database";
 // import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 // import { z } from "zod";
@@ -61,6 +62,7 @@
 // export type InsertJobs = z.infer<typeof insertJobsSchema>;
 
 // export type UpdateJobs = z.infer<typeof updateJobsSchema>;
+
 
 import { jobs } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -138,6 +140,7 @@ export const updateJobsSchema = createInsertSchema(jobs, {
   jobType: jobTypeEnum,
   cvRequired: z.boolean().default(false),
 })
+
   .omit({
     id: true,
     createdAt: true,
@@ -145,7 +148,9 @@ export const updateJobsSchema = createInsertSchema(jobs, {
   })
   .partial();
 
+
 // Export type definitions
 export type Jobs = z.infer<typeof selectJobSchema>;
 export type InsertJobs = z.infer<typeof insertJobsSchema>;
+
 export type UpdateJobs = z.infer<typeof updateJobsSchema>;
