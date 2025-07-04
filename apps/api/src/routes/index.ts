@@ -30,16 +30,12 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/events", events)
     .route("/products", products)
     .route("/sellswaps", sellswaps)
-
     .route("/about-us", aboutUs)
     .route("/ads-payment-plan", adzPaymentPlan)
     .route("/site-settings", siteSettings)
-    .route("/media", media);
-
     .route("/media", media)
     .route("/ads", ads)
     .route("/b2bplans", b2bplans);
-
 }
 
 // stand alone router type used for api client

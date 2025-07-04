@@ -7,9 +7,9 @@ export const selectSiteSettingsSchema = createSelectSchema(siteSettings);
 export const insertSiteSettingsSchema = createInsertSchema(siteSettings, {
   siteName: (val) => val.min(1).max(100),
   siteDescription: (val) => val.max(1000).optional(),
-  logoUrl: (val) => val.url().optional(),
-  faviconUrl: (val) => val.url().optional(),
-  primaryEmail: (val) => val.email().optional(),
+  logoUrl: () => z.any().optional(),
+  faviconUrl: () => z.any().optional(),
+  primaryEmail: () => z.string().email().optional(),
 }).omit({
   id: true,
   createdAt: true,
@@ -20,6 +20,10 @@ export const updateSiteSettingsSchema = createInsertSchema(siteSettings)
   .omit({
     id: true,
     createdAt: true,
+  })
+  .extend({
+    logoUrl: z.any().optional(),
+    faviconUrl: z.any().optional(),
   })
   .partial();
 

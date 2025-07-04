@@ -1,7 +1,5 @@
 {
-
-  "id": "4cbf3939-3361-4fea-9d37-7b3069eec1ab",
-
+  "id": "9dc7ecf7-5a21-4232-b8ee-2e8bb0084d75",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -179,13 +177,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-
-    "public.ads_payment_plan": {
-      "name": "ads_payment_plan",
-
     "public.ads": {
       "name": "ads",
-
       "schema": "",
       "columns": {
         "id": {
@@ -195,18 +188,12 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-
-        "plan_name": {
-          "name": "plan_name",
-
         "title": {
           "name": "title",
-
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-
         "post_type": {
           "name": "post_type",
           "type": "text",
@@ -220,55 +207,12 @@
           "notNull": false,
           "default": "'{}'"
         },
-
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-
-        "price": {
-          "name": "price",
-          "type": "numeric(10, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "currency": {
-          "name": "currency",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'USD'"
-        },
-        "duration_days": {
-          "name": "duration_days",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "features": {
-          "name": "features",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb"
-        },
-        "max_ads": {
-          "name": "max_ads",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 1
-        },
-        "status": {
-          "name": "status",
-          "type": "status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'published'"
-
         "contact_information": {
           "name": "contact_information",
           "type": "text",
@@ -299,7 +243,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-
         },
         "created_at": {
           "name": "created_at",
@@ -317,9 +260,6 @@
         }
       },
       "indexes": {},
-
-      "foreignKeys": {},
-
       "foreignKeys": {
         "ads_created_by_organization_id_fk": {
           "name": "ads_created_by_organization_id_fk",
@@ -335,7 +275,93 @@
           "onUpdate": "no action"
         }
       },
-
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ads_payment_plan": {
+      "name": "ads_payment_plan",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "plan_name": {
+          "name": "plan_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'USD'"
+        },
+        "duration_days": {
+          "name": "duration_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "features": {
+          "name": "features",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "max_ads": {
+          "name": "max_ads",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'published'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1912,10 +1938,10 @@
         },
         "meta_tags": {
           "name": "meta_tags",
-          "type": "jsonb",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'::jsonb"
+          "default": "''"
         },
         "status": {
           "name": "status",
@@ -2028,7 +2054,6 @@
           "primaryKey": false,
           "notNull": true
         },
-
         "status": {
           "name": "status",
           "type": "status",
@@ -2037,7 +2062,6 @@
           "notNull": false,
           "default": "'published'"
         },
-
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2206,10 +2230,8 @@
         "new",
         "used",
         "refurbished",
-
+        "for_parts",
         "damaged"
-
-        "for_parts"
       ]
     },
     "public.job_type": {
@@ -2221,7 +2243,6 @@
         "contract",
         "internship",
         "temporary"
-
       ]
     },
     "public.media_type": {

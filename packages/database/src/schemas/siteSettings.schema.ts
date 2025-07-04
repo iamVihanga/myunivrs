@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { statusEnum } from "./shared.schema";
 
@@ -13,7 +13,7 @@ export const siteSettings = pgTable("site_settings", {
   faviconUrl: text("favicon_url"),
   primaryEmail: text("primary_email"),
   maintenanceMode: boolean("maintenance_mode").default(false),
-  metaTags: jsonb("meta_tags").default({}),
+  metaTags: text("meta_tags").default(""),
   status: statusEnum().default("published"),
   ...timestamps,
 });

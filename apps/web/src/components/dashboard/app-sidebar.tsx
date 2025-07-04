@@ -42,7 +42,7 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/siteSettings",
       icon: IconSettings,
     },
     {
@@ -71,9 +71,8 @@ const data = {
       name: "Jobs",
       url: "/dashboard/jobs",
       icon: IconBuildings,
-
     },
-    
+
     {
       name: "University",
       url: "/dashboard/university",
@@ -82,11 +81,6 @@ const data = {
     {
       name: "Ads Payment Plan",
       url: "/dashboard/adzPaymentPlan",
-      icon: IconBuildings,
-    },
-    {
-      name: "Site Settings",
-      url: "/dashboard/siteSettings",
       icon: IconBuildings,
     },
     {

@@ -46,15 +46,15 @@ export function NewAdsPaymentPlan() {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "number" ? (value === "" ? "" : Number(value)) : value,
-    }));
-  };
-
-  // Features as JSON string
-  const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: e.target.value,
+      [name]:
+        type === "number" ||
+        name === "price" ||
+        name === "durationDays" ||
+        name === "maxAds"
+          ? value === ""
+            ? 0
+            : Number(value)
+          : value,
     }));
   };
 
@@ -83,27 +83,16 @@ export function NewAdsPaymentPlan() {
       return;
     }
 
-    // Validate features as JSON if provided
-    let featuresObj = {};
-    if (formData.features && String(formData.features).trim() !== "") {
-      try {
-        featuresObj = JSON.parse(formData.features as string);
-      } catch {
-        toast.error("Features must be valid JSON");
-        return;
-      }
-    }
-
     setIsSubmitting(true);
 
     try {
       await createAdsPaymentPlan({
         planName: formData.planName,
         description: formData.description,
-        price: formData.price,
+        price: String(formData.price),
         currency: formData.currency,
         durationDays: Number(formData.durationDays),
-        features: featuresObj,
+        features: formData.features,
         maxAds: Number(formData.maxAds),
         status: formData.status,
       });
@@ -140,7 +129,7 @@ export function NewAdsPaymentPlan() {
           Add New Payment Plan
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Ads Payment Plan</DialogTitle>
@@ -243,13 +232,13 @@ export function NewAdsPaymentPlan() {
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="features">Features (JSON)</Label>
+              <Label htmlFor="features">Features</Label>
               <Textarea
                 id="features"
                 name="features"
-                placeholder='e.g. {"highlighted": true, "support": "24/7"}'
+                placeholder='e.g. "highlighted", "24/7 support"}'
                 value={formData.features as string}
-                onChange={handleFeaturesChange}
+                onChange={handleChange}
                 rows={3}
               />
             </div>

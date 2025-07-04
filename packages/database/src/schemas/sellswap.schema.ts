@@ -4,16 +4,9 @@ import { integer, numeric, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { user } from "./auth.schema";
 import { productCategories } from "./products.schema";
-import { statusEnum } from "./shared.schema";
+import { conditionEnum, statusEnum } from "./shared.schema";
 
 export const sellSwapTypes = pgEnum("sell_swap_types", ["sell", "swap"]);
-
-export const conditionEnum = pgEnum("condition", [
-  "new",
-  "used",
-  "refurbished",
-  "damaged",
-]);
 
 export const sellSwaps = pgTable("sell_swaps", {
   // Primary key with UUID (unchanged)
@@ -27,7 +20,6 @@ export const sellSwaps = pgTable("sell_swaps", {
   categoryId: text("category_id").references(() => productCategories.id),
   type: sellSwapTypes("type"),
   userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
-
 
   price: numeric("price", { precision: 10, scale: 2 }),
 
@@ -49,7 +41,6 @@ export const sellSwaps = pgTable("sell_swaps", {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
-
 
   ...timestamps,
 });
