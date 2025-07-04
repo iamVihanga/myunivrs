@@ -50,7 +50,6 @@ export function NewAdsPaymentPlan() {
     }));
   };
 
-  // Features as JSON string
   const handleFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -61,7 +60,6 @@ export function NewAdsPaymentPlan() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (
       !formData.planName ||
       formData.price === undefined ||
@@ -73,7 +71,6 @@ export function NewAdsPaymentPlan() {
       return;
     }
 
-    // Validate price, durationDays, maxAds as numbers
     if (
       isNaN(Number(formData.price)) ||
       isNaN(Number(formData.durationDays)) ||
@@ -83,7 +80,6 @@ export function NewAdsPaymentPlan() {
       return;
     }
 
-    // Validate features as JSON if provided
     let featuresObj = {};
     if (formData.features && String(formData.features).trim() !== "") {
       try {
@@ -140,7 +136,7 @@ export function NewAdsPaymentPlan() {
           Add New Payment Plan
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New Ads Payment Plan</DialogTitle>
