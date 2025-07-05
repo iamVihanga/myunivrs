@@ -6,7 +6,7 @@ import {
   IconHelp,
   IconInnerShadowTop,
   IconSearch,
-  IconSettings,
+  IconSettings
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -22,89 +22,102 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem
 } from "@repo/ui/components/sidebar";
 import { Skeleton } from "@repo/ui/components/skeleton";
+import { NavUserManagement } from "./nav-user-management";
 
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/avatars/shadcn.jpg"
   },
   navMain: [
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard,
-    },
+      icon: IconDashboard
+    }
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "#",
-      icon: IconSettings,
+      icon: IconSettings
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp,
+      icon: IconHelp
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch,
-    },
+      icon: IconSearch
+    }
   ],
   documents: [
     {
       name: "Housing",
       url: "/dashboard/housing",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Sell/Swap",
       url: "/dashboard/sellswap",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Jobs",
       url: "/dashboard/jobs",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
 
     {
       name: "University",
       url: "/dashboard/university",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Ads Payment Plan",
       url: "/dashboard/adzPaymentPlan",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Site Settings",
       url: "/dashboard/siteSettings",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Products",
       url: "/dashboard/products",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "Ads",
       url: "/dashboard/ads",
-      icon: IconBuildings,
+      icon: IconBuildings
     },
     {
       name: "b2bplans",
       url: "/dashboard/b2bplans",
 
-      icon: IconBuildings,
-    },
+      icon: IconBuildings
+    }
   ],
+  userManagement: [
+    {
+      name: "All Users",
+      url: "/dashboard/users",
+      icon: IconBuildings
+    },
+    {
+      name: "Organizations",
+      url: "/dashboard/organizations",
+      icon: IconBuildings
+    }
+  ]
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -138,6 +151,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
+        <NavUserManagement items={data.userManagement} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
