@@ -3,214 +3,153 @@ import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
 import type { AppRouteHandler } from "@/types";
-
 import { db } from "@/db";
-import { products } from "@repo/database/schemas";
-
+import { products } from "@repo/database";
 import type {
   CreateRoute,
   DeleteRoute,
   GetOneRoute,
   ListRoute,
-  UpdateRoute
+  UpdateRoute,
 } from "./products.routes";
+import { InsertProduct, UpdateProduct } from "./products.schema";
 
-// List products route handler
+// List products
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const {
     page = "1",
     limit = "10",
-    sort = "asc",
-    search
+    sort = "desc",
+    search,
   } = c.req.valid("query");
 
-  // Convert to numbers and validate
   const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.max(1, Math.min(100, parseInt(limit))); // Cap at 100 items
+  const limitNum = Math.max(1, Math.min(100, parseInt(limit)));
   const offset = (pageNum - 1) * limitNum;
 
-  // Build query conditions
-  const query = db.query.products.findMany({
-    limit: limitNum,
-    offset,
-    where: (fields, { ilike, and, or }) => {
-      const conditions = [];
+  const conditions = search
+    ? or(
+        ilike(products.title, `%${search}%`),
+        ilike(products.description, `%${search}%`),
+        ilike(products.location, `%${search}%`),
+        ilike(products.brand, `%${search}%`)
+      )
+    : undefined;
 
-      // Add search condition if search parameter is provided
-      if (search) {
-        conditions.push(
-          or(
-            ilike(fields.title, `%${search}%`),
-            ilike(fields.description, `%${search}%`)
-          )
-        );
-      }
-
-      return conditions.length ? and(...conditions) : undefined;
-    },
-    orderBy: (fields) => {
-      // Handle sorting direction
-      if (sort.toLowerCase() === "asc") {
-        return fields.createdAt;
-      }
-      return desc(fields.createdAt);
-    },
-    with: {
-      category: true
-    }
-  });
-
-  // Get total count for pagination metadata
-  const totalCountQuery = db
-    .select({ count: sql<number>`count(*)` })
-    .from(products)
-    .where(
-      search
-        ? or(
-            ilike(products.title, `%${search}%`),
-            ilike(products.description, `%${search}%`)
-          )
-        : undefined
-    );
-
-  const [productEntries, _totalCount] = await Promise.all([
-    query,
-    totalCountQuery
+  const [items, total] = await Promise.all([
+    db.query.products.findMany({
+      where: conditions,
+      limit: limitNum,
+      offset,
+      orderBy: sort === "asc" ? products.createdAt : desc(products.createdAt),
+    }),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(products)
+      .where(conditions),
   ]);
 
-  const totalCount = _totalCount[0]?.count || 0;
-
-  // Calculate pagination metadata
-  const totalPages = Math.ceil(totalCount / limitNum);
+  const totalCount = total[0]?.count ?? 0;
 
   return c.json(
     {
-      data: productEntries,
+      data: items,
       meta: {
         currentPage: pageNum,
-        totalPages,
+        totalPages: Math.ceil(totalCount / limitNum),
         totalCount,
-        limit: limitNum
-      }
+        limit: limitNum,
+      },
     },
     HttpStatusCodes.OK
   );
 };
 
-// Create new product route handler
+// Create product
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
-  const productEntry = c.req.valid("json");
+  const input = c.req.valid("json") as InsertProduct;
   const session = c.get("session");
 
   if (!session) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
-      HttpStatusCodes.UNAUTHORIZED
-    );
+    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
   }
 
-  const [inserted] = await db
-    .insert(products)
-    .values({
-      ...productEntry,
-      createdBy: session.userId,
-      agentProfile: session?.activeOrganizationId
-    })
-    .returning();
+  const now = new Date();
+
+  const [inserted] = await db.insert(products).values({
+    ...input,
+    createdBy: session.userId,
+    agentProfile: session.userId,
+    createdAt: now,
+    updatedAt: now,
+  }).returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// Get single product route handler
+// Get product by ID
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   const { id } = c.req.valid("param");
 
   const product = await db.query.products.findFirst({
     where: eq(products.id, id),
-    with: {
-      category: true
-    }
   });
 
-  if (!product)
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+  if (!product) {
+    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
+  }
 
   return c.json(product, HttpStatusCodes.OK);
 };
 
-// Update product route handler
+// Update product
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const body = c.req.valid("json");
+  const input = c.req.valid("json") as UpdateProduct;
   const session = c.get("session");
 
   if (!session) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
-      HttpStatusCodes.UNAUTHORIZED
-    );
+    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
   }
 
-  // Check if product entry exists
-  const existingEntry = await db.query.products.findFirst({
-    where: eq(products.id, id)
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
   });
 
-  if (!existingEntry) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+  if (!existing) {
+    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
   }
 
-  // Update the product entry
   const [updated] = await db
     .update(products)
-    .set({ ...body, updatedAt: new Date() })
+    .set({
+      ...input,
+      updatedAt: new Date(),
+    })
     .where(eq(products.id, id))
     .returning();
 
   return c.json(updated, HttpStatusCodes.OK);
 };
 
-// Delete product route handler
+// Delete product
 export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session");
 
   if (!session) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED
-      },
-      HttpStatusCodes.UNAUTHORIZED
-    );
+    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
   }
 
-  // Check if product entry exists
-  const existingEntry = await db.query.products.findFirst({
-    where: eq(products.id, id)
+  const existing = await db.query.products.findFirst({
+    where: eq(products.id, id),
   });
 
-  if (!existingEntry) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+  if (!existing) {
+    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
   }
 
-  // Delete the product entry
   await db.delete(products).where(eq(products.id, id));
 
-  return c.json(
-    { message: "Product deleted successfully" },
-    HttpStatusCodes.OK
-  );
+  return c.json({ message: "Product entry deleted successfully" }, HttpStatusCodes.OK);
 };

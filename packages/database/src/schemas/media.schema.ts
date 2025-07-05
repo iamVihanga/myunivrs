@@ -6,7 +6,7 @@ export const mediaTypeEnum = pgEnum("media_type", [
   "image",
   "video",
   "audio",
-  "document"
+  "document",
 ]);
 
 export const media = pgTable("media", {
@@ -18,5 +18,5 @@ export const media = pgTable("media", {
   filename: text("filename").notNull(),
   size: integer("size").notNull(),
 
-  ...timestamps
+  ...timestamps,
 });

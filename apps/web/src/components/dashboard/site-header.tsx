@@ -1,6 +1,6 @@
-import { Button } from "@repo/ui/components/button"
-import { Separator } from "@repo/ui/components/separator"
-import { SidebarTrigger } from "@repo/ui/components/sidebar"
+import { Button } from "@repo/ui/components/button";
+import { Separator } from "@repo/ui/components/separator";
+import { SidebarTrigger } from "@repo/ui/components/sidebar";
 
 export function SiteHeader() {
   return (
@@ -15,6 +15,15 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
             <a
+              href="/about"
+              rel="noopener noreferrer"
+              className="dark:text-foreground"
+            >
+              About
+            </a>
+          </Button>
+          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
+            <a
               href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
               rel="noopener noreferrer"
               target="_blank"
@@ -26,5 +35,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

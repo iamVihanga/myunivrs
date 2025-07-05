@@ -1,5 +1,17 @@
+CREATE TYPE "public"."condition" AS ENUM('new', 'used', 'refurbished', 'for_parts');--> statement-breakpoint
+CREATE TYPE "public"."job_type" AS ENUM('full_time', 'part_time', 'contract', 'internship', 'temporary');--> statement-breakpoint
+CREATE TYPE "public"."media_type" AS ENUM('image', 'video', 'audio', 'document');--> statement-breakpoint
 CREATE TYPE "public"."sell_swap_types" AS ENUM('sell', 'swap');--> statement-breakpoint
-CREATE TYPE "public"."status" AS ENUM('published', 'draft', 'pending_approval', 'deleted');--> statement-breakpoint
+CREATE TYPE "public"."status" AS ENUM('published', 'draft', 'pending_approval', 'deleted', 'active', 'sold', 'swapped', 'expired');--> statement-breakpoint
+CREATE TABLE "about_us" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"content" text,
+	"created_agent_id" text,
+	"status" "status" DEFAULT 'published',
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -14,6 +26,35 @@ CREATE TABLE "account" (
 	"password" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "ads" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" text NOT NULL,
+	"post_type" text NOT NULL,
+	"images" text[] DEFAULT '{}',
+	"description" text,
+	"contact_information" text,
+	"is_featured" boolean DEFAULT false NOT NULL,
+	"company_name" text,
+	"occurrence" text,
+	"created_by" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "ads_payment_plan" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"plan_name" text NOT NULL,
+	"description" text,
+	"price" numeric(10, 2) NOT NULL,
+	"currency" text DEFAULT 'USD' NOT NULL,
+	"duration_days" integer NOT NULL,
+	"features" jsonb DEFAULT '{}'::jsonb,
+	"max_ads" integer DEFAULT 1 NOT NULL,
+	"status" "status" DEFAULT 'published',
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "apikey" (
@@ -38,6 +79,18 @@ CREATE TABLE "apikey" (
 	"updated_at" timestamp NOT NULL,
 	"permissions" text,
 	"metadata" text
+);
+--> statement-breakpoint
+CREATE TABLE "b2bplans" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" text NOT NULL,
+	"images" text[] DEFAULT '{}',
+	"description" text,
+	"price" text NOT NULL,
+	"type" text NOT NULL,
+	"created_by" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "events" (
@@ -69,9 +122,20 @@ CREATE TABLE "housing" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" text NOT NULL,
 	"description" text,
-	"images" text[],
+	"images" text[] DEFAULT '{}',
 	"address" text NOT NULL,
+	"city" text,
+	"state" text,
+	"zip_code" text,
 	"price" text NOT NULL,
+	"bedrooms" text,
+	"bathrooms" text,
+	"parking" text,
+	"contact_number" text,
+	"housing_type" text,
+	"square_footage" text,
+	"year_built" text,
+	"is_furnished" boolean DEFAULT false NOT NULL,
 	"link" text,
 	"created_by" text,
 	"agent_id" text,
@@ -100,6 +164,21 @@ CREATE TABLE "jobs" (
 	"created_by" text,
 	"agent_id" text,
 	"status" "status" DEFAULT 'published',
+	"required_skills" text[] DEFAULT '{}',
+	"salary_range" jsonb DEFAULT '{}'::jsonb,
+	"action_url" text,
+	"job_type" "job_type" DEFAULT 'full_time' NOT NULL,
+	"cv_required" boolean DEFAULT false,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "media" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"url" text NOT NULL,
+	"type" "media_type" NOT NULL,
+	"filename" text NOT NULL,
+	"size" integer NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );
@@ -125,6 +204,7 @@ CREATE TABLE "organization" (
 CREATE TABLE "product_categories" (
 	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"description" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );
@@ -134,9 +214,16 @@ CREATE TABLE "products" (
 	"title" text NOT NULL,
 	"description" text,
 	"images" text[] DEFAULT '{}',
-	"price" integer NOT NULL,
-	"discount_percentage" integer DEFAULT 0,
+	"price" text NOT NULL,
+	"discount_percentage" text DEFAULT '0',
+	"location" text NOT NULL,
+	"condition" "condition" DEFAULT 'used' NOT NULL,
+	"stock_quantity" text DEFAULT '1' NOT NULL,
+	"is_negotiable" boolean DEFAULT false NOT NULL,
 	"category_id" text,
+	"brand" text,
+	"link" text,
+	"shipping" text,
 	"created_by" text,
 	"agent_id" text,
 	"status" "status" DEFAULT 'published',
@@ -152,6 +239,16 @@ CREATE TABLE "sell_swaps" (
 	"category_id" text,
 	"type" "sell_swap_types",
 	"user_id" text,
+	"price" numeric(10, 2),
+	"condition" "condition" DEFAULT 'used' NOT NULL,
+	"city" text,
+	"state" text,
+	"zip_code" text,
+	"status" "status" DEFAULT 'draft' NOT NULL,
+	"swap_preferences" text,
+	"contact_number" text,
+	"quantity" integer DEFAULT 1 NOT NULL,
+	"tags" text[] DEFAULT '{}'::text[] NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );
@@ -170,10 +267,33 @@ CREATE TABLE "session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
+CREATE TABLE "site_settings" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"site_name" text NOT NULL,
+	"site_description" text,
+	"logo_url" text,
+	"favicon_url" text,
+	"primary_email" text,
+	"maintenance_mode" boolean DEFAULT false,
+	"meta_tags" jsonb DEFAULT '{}'::jsonb,
+	"status" "status" DEFAULT 'published',
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "tasks" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "tasks_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" text NOT NULL,
 	"done" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "university" (
+	"id" text PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"countryCode" text NOT NULL,
+	"status" "status" DEFAULT 'published',
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
 );
@@ -202,8 +322,11 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp
 );
 --> statement-breakpoint
+ALTER TABLE "about_us" ADD CONSTRAINT "about_us_created_agent_id_organization_id_fk" FOREIGN KEY ("created_agent_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ads" ADD CONSTRAINT "ads_created_by_organization_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "apikey" ADD CONSTRAINT "apikey_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "b2bplans" ADD CONSTRAINT "b2bplans_created_by_organization_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "events" ADD CONSTRAINT "events_created_agent_id_organization_id_fk" FOREIGN KEY ("created_agent_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_targetted_agent_id_organization_id_fk" FOREIGN KEY ("targetted_agent_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -215,9 +338,9 @@ ALTER TABLE "jobs" ADD CONSTRAINT "jobs_created_by_user_id_fk" FOREIGN KEY ("cre
 ALTER TABLE "jobs" ADD CONSTRAINT "jobs_agent_id_organization_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "products" ADD CONSTRAINT "products_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "products" ADD CONSTRAINT "products_agent_id_organization_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_agent_id_user_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sell_swaps" ADD CONSTRAINT "sell_swaps_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sell_swaps" ADD CONSTRAINT "sell_swaps_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
