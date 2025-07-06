@@ -13,6 +13,7 @@ import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
 import media from "./media/media.index";
+import notifications from "./notifications/notifications.index";
 import categories from "./products/categories/categories.index";
 import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
@@ -37,6 +38,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/media", media)
     .route("/ads", ads)
     .route("/b2bplans", b2bplans)
+    .route("/notifications", notifications)
     .route("/categories", categories);
 }
 

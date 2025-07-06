@@ -3,10 +3,8 @@ import { formatDistanceToNow } from "date-fns";
 import {
   DollarSignIcon,
   ExternalLinkIcon,
-
   MapPinIcon,
   PackageIcon,
-
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -34,14 +32,13 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteProducts } from "../actions/delete.action";
 import type { Product } from "../schemas";
+import { EditProductDialog } from "./edit-product-dialog";
 
 type Props = {
   products: Product;
 };
 
-
 export function ProductsCard({ products }: Props) {
-
   const id = useId();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -56,7 +53,6 @@ export function ProductsCard({ products }: Props) {
     discountNum > 0
       ? (priceNum * (1 - discountNum / 100)).toFixed(2)
       : priceNum.toFixed(2);
-
 
   const handleDelete = async () => {
     try {
@@ -79,7 +75,6 @@ export function ProductsCard({ products }: Props) {
         className="transition-all hover:shadow-lg border-l-4 border-l-cyan-500 p-4"
       >
         <div className="flex items-center gap-4">
-
           {/* Avatar */}
 
           <Avatar className="h-16 w-16 rounded-full border">
@@ -89,7 +84,6 @@ export function ProductsCard({ products }: Props) {
               className="size-16"
             />
             <AvatarFallback className="bg-cyan-50 text-cyan-700">
-
               <PackageIcon className="h-6 w-6" />
             </AvatarFallback>
           </Avatar>
@@ -105,7 +99,6 @@ export function ProductsCard({ products }: Props) {
                 </p>
               </div>
             </div>
-
 
             {/* Meta Info */}
             <div className="flex flex-wrap items-center gap-2 text-sm mt-2">
@@ -175,6 +168,9 @@ export function ProductsCard({ products }: Props) {
               {products.status}
             </Badge>
 
+            {/* Add Edit button */}
+            <EditProductDialog product={products} />
+
             <Button
               variant="destructive"
               size="sm"
@@ -184,10 +180,9 @@ export function ProductsCard({ products }: Props) {
             >
               <TrashIcon className="h-4 w-4" />
             </Button>
+
             <Button size="sm" variant="outline" asChild className="h-8 px-2">
-
               <Link href={`/dashboard/products/${products.id}`}>
-
                 <ExternalLinkIcon className="h-4 w-4" />
               </Link>
             </Button>
@@ -200,9 +195,7 @@ export function ProductsCard({ products }: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-
               This will permanently delete the product listing "{products.title}
-
               ". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

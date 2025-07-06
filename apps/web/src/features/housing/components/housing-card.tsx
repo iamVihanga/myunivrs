@@ -33,6 +33,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteHousing } from "../actions/delete.action";
 import type { Housing } from "../schemas";
+import { EditHousingDialog } from "./edit-housing-dialog";
 
 type Props = {
   housing: Housing;
@@ -200,6 +201,10 @@ export function HousingCard({ housing }: Props) {
             >
               {housing.status || "Published"}
             </Badge>
+
+            {/* Add Edit button */}
+            <EditHousingDialog housing={housing} />
+
             <Button
               variant="destructive"
               size="sm"

@@ -1,158 +1,3 @@
-// "use client";
-// import { formatDistanceToNow } from "date-fns";
-// import { ExternalLinkIcon, PackageIcon, TrashIcon } from "lucide-react";
-// import { useState } from "react";
-// import { toast } from "sonner";
-
-// import {
-//   AlertDialog,
-//   AlertDialogAction,
-//   AlertDialogCancel,
-//   AlertDialogContent,
-//   AlertDialogDescription,
-//   AlertDialogFooter,
-//   AlertDialogHeader,
-//   AlertDialogTitle,
-// } from "@repo/ui/components/alert-dialog";
-// import {
-//   Avatar,
-//   AvatarFallback,
-//   AvatarImage,
-// } from "@repo/ui/components/avatar";
-// import { Button } from "@repo/ui/components/button";
-// import { Card } from "@repo/ui/components/card";
-// import Link from "next/link";
-// import { useId } from "react";
-// import { deleteB2bplans } from "../actions/delete.action";
-// import type { B2bplan } from "../schemas";
-
-// type Props = {
-//   b2bplan: B2bplan;
-// };
-
-// export function B2bplansCard({ b2bplan }: Props) {
-//   const id = useId();
-//   const [isDeleting, setIsDeleting] = useState(false);
-//   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-//   // Default image if none provided
-//   const displayImage =
-//     b2bplan.images && b2bplan.images.length > 0 ? b2bplan.images[0] : "";
-
-//   const handleDelete = async () => {
-//     try {
-//       setIsDeleting(true);
-//       await deleteB2bplans(b2bplan.id);
-//       toast.success("B2B plan listing deleted successfully");
-//     } catch (error) {
-//       console.error("Failed to delete B2B plan:", error);
-//       toast.error("Failed to delete B2B plan listing");
-//     } finally {
-//       setIsDeleting(false);
-//       setShowDeleteDialog(false);
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Card
-//         key={id}
-//         className="transition-all hover:shadow-lg border-l-4 border-l-cyan-500 p-4"
-//       >
-//         <div className="flex items-center gap-4">
-//           {/* Avatar section */}
-//           <Avatar className="h-16 w-16 rounded-full border">
-//             <AvatarImage
-//               src={displayImage}
-//               alt={b2bplan.title}
-//               className="size-16"
-//             />
-//             <AvatarFallback className="bg-cyan-50 text-cyan-700">
-//               <PackageIcon className="h-6 w-6" />
-//             </AvatarFallback>
-//           </Avatar>
-
-//           {/* Main content section */}
-//           <div className="flex-grow">
-//             <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-//               <div>
-//                 <h3 className="font-semibold line-clamp-1">{b2bplan.title}</h3>
-//                 <p className="text-xs text-muted-foreground">
-//                   Added {formatDistanceToNow(b2bplan.createdAt)} ago
-//                 </p>
-//               </div>
-//             </div>
-
-//             {/* Info with separators */}
-//             <div className="flex flex-wrap items-center gap-2 text-sm mt-2">
-//               {b2bplan.prize && (
-//                 <div className="flex items-center gap-1">
-//                   <PackageIcon className="h-3.5 w-3.5 text-cyan-500" />
-//                   <span className="text-sm font-medium">{b2bplan.prize}</span>
-//                 </div>
-//               )}
-//               {b2bplan.description && (
-//                 <>
-//                   <div className="text-gray-300 text-sm px-1">|</div>
-//                   <span className="text-sm line-clamp-1">
-//                     {b2bplan.description}
-//                   </span>
-//                 </>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* Actions section */}
-//           <div className="flex items-center gap-2 ml-2 shrink-0">
-//             {/* <Badge
-//               variant="outline"
-//               className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit"
-//             >
-//               {b2bplan.status || "Active"}
-//             </Badge> */}
-//             <Button
-//               variant="destructive"
-//               size="sm"
-//               onClick={() => setShowDeleteDialog(true)}
-//               disabled={isDeleting}
-//               className="h-8 px-2"
-//             >
-//               <TrashIcon className="h-4 w-4" />
-//             </Button>
-//             <Button size="sm" variant="outline" asChild className="h-8 px-2">
-//               <Link href={`/dashboard/b2bplans/${b2bplan.id}`}>
-//                 <ExternalLinkIcon className="h-4 w-4" />
-//               </Link>
-//             </Button>
-//           </div>
-//         </div>
-//       </Card>
-
-//       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-//         <AlertDialogContent>
-//           <AlertDialogHeader>
-//             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-//             <AlertDialogDescription>
-//               This will permanently delete the B2B plan listing "{b2bplan.title}
-//               ". This action cannot be undone.
-//             </AlertDialogDescription>
-//           </AlertDialogHeader>
-//           <AlertDialogFooter>
-//             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-//             <AlertDialogAction
-//               onClick={handleDelete}
-//               disabled={isDeleting}
-//               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-//             >
-//               {isDeleting ? "Deleting..." : "Delete Listing"}
-//             </AlertDialogAction>
-//           </AlertDialogFooter>
-//         </AlertDialogContent>
-//       </AlertDialog>
-//     </>
-//   );
-// }
-
 "use client";
 import { formatDistanceToNow } from "date-fns";
 import { ExternalLinkIcon, PackageIcon, TrashIcon } from "lucide-react";
@@ -181,6 +26,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteB2bplans } from "../actions/delete.action";
 import type { B2bplan } from "../schemas";
+import { EditB2bplanDialog } from "./edit-b2bplan-dialog";
 
 type Props = {
   b2bplan: B2bplan;
@@ -267,6 +113,9 @@ export function B2bplansCard({ b2bplan }: Props) {
 
           {/* Actions */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
+            {/* Add Edit button */}
+            <EditB2bplanDialog b2bplan={b2bplan} />
+
             <Button
               variant="destructive"
               size="sm"

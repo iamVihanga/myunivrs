@@ -455,14 +455,14 @@ export function NewSellSwap() {
   const handleImageRemove = (idx: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== idx),
+      images: (prev.images ?? []).filter((_, i) => i !== idx),
     }));
   };
 
   const handleGallerySelect = (selectedFiles: { url: string }[]) => {
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...selectedFiles.map((f) => f.url)],
+      images: [...(prev.images ?? []), ...selectedFiles.map((f) => f.url)],
     }));
     setGalleryOpen(false);
   };
@@ -625,7 +625,7 @@ export function NewSellSwap() {
             <div className="grid gap-2">
               <Label>Images</Label>
               <div className="flex flex-wrap gap-2">
-                {formData.images.map((img, idx) => (
+                {(formData.images ?? []).map((img, idx) => (
                   <div key={idx} className="relative group">
                     <img
                       src={img}
