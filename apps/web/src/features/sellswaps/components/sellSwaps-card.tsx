@@ -1,6 +1,5 @@
 "use client";
 
-
 import { formatDistanceToNow } from "date-fns";
 import {
   DollarSignIcon,
@@ -13,18 +12,15 @@ import {
 import { useId, useState } from "react";
 import { toast } from "sonner";
 
-
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-
 } from "@repo/ui/components/alert-dialog";
 import {
   Avatar,
@@ -62,7 +58,6 @@ export function SellSwapCard({ sellSwaps }: Props) {
     } catch (error) {
       console.error("Failed to delete listing:", error);
       toast.error("Failed to delete Sell/Swap listing");
-
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -73,9 +68,7 @@ export function SellSwapCard({ sellSwaps }: Props) {
     <>
       <Card
         key={id}
-
         className="transition-all hover:shadow-lg border-l-4 border-l-green-500 p-4"
-
       >
         <div className="flex items-center gap-4">
           {/* Avatar section */}
@@ -87,7 +80,6 @@ export function SellSwapCard({ sellSwaps }: Props) {
             />
 
             <AvatarFallback className="bg-green-50 text-green-700">
-
               <HomeIcon className="h-6 w-6" />
             </AvatarFallback>
           </Avatar>
@@ -107,17 +99,14 @@ export function SellSwapCard({ sellSwaps }: Props) {
 
             {/* Info with separators */}
             <div className="flex flex-wrap items-center gap-2 text-sm mt-2">
-
               {sellSwaps.city && (
                 <div className="flex items-center gap-1">
                   <MapPinIcon className="h-3.5 w-3.5 text-green-500" />
                   <span className="text-sm truncate max-w-[180px]">
                     {sellSwaps.city}
-
                   </span>
                 </div>
               )}
-
 
               {sellSwaps.city && sellSwaps.price && (
                 <div className="text-gray-300 text-sm px-1">|</div>
@@ -128,11 +117,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
                   <DollarSignIcon className="h-3.5 w-3.5 text-emerald-500" />
                   <span className="text-sm font-medium">
                     {Number(sellSwaps.price).toFixed(2)}
-
                   </span>
                 </div>
               )}
-
 
               {sellSwaps.price && sellSwaps.status && (
                 <div className="text-gray-300 text-sm px-1">|</div>
@@ -196,13 +183,11 @@ export function SellSwapCard({ sellSwaps }: Props) {
                 {sellSwaps.description}
               </p>
             )}
-
           </div>
 
           {/* Actions section */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
             <Badge
-
               variant="outline"
               className="bg-green-50 text-green-700 border-green-200 text-xs w-fit"
             >
@@ -219,9 +204,7 @@ export function SellSwapCard({ sellSwaps }: Props) {
               <TrashIcon className="h-4 w-4" />
             </Button>
             <Button size="sm" variant="outline" asChild className="h-8 px-2">
-
-              <Link href={`/dashboard/sellswaps/${sellSwaps.id}`}>
-
+              <Link href={`/dashboard/sellswap/${sellSwaps.id}`}>
                 <ExternalLinkIcon className="h-4 w-4" />
               </Link>
             </Button>
@@ -234,9 +217,7 @@ export function SellSwapCard({ sellSwaps }: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-
               This will permanently delete the sell/swap listing "
-
               {sellSwaps.title}
               ". This action cannot be undone.
             </AlertDialogDescription>

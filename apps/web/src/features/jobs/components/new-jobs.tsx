@@ -60,7 +60,6 @@ export function NewJob() {
     actionUrl: "",
     jobType: "full_time",
     cvRequired: false,
-
   });
 
   const handleChange = (
@@ -113,12 +112,10 @@ export function NewJob() {
       images: [...prev.images, ...selectedFiles.map((f) => f.url)],
     }));
     setGalleryOpen(false);
-
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (!formData.title || !formData.company) {
       toast.error("Please fill in all required fields");
@@ -128,7 +125,6 @@ export function NewJob() {
     setIsSubmitting(true);
 
     try {
-
       await createJob(formData);
 
       toast.success("Job listing created successfully!");
@@ -145,7 +141,6 @@ export function NewJob() {
         actionUrl: "",
         jobType: "full_time",
         cvRequired: false,
-
       });
       setOpen(false);
       router.refresh();
@@ -153,7 +148,6 @@ export function NewJob() {
       console.error(error);
 
       toast.error("Failed to create job listing. Please try again.");
-
     } finally {
       setIsSubmitting(false);
     }
@@ -387,7 +381,7 @@ export function NewJob() {
                   modalOpen={galleryOpen}
                   setModalOpen={setGalleryOpen}
                 />
-                Fal
+``
                 <div className="grid gap-2">
                   <Label htmlFor="actionUrl">Application Link</Label>
                   <Input
@@ -447,16 +441,13 @@ export function NewJob() {
           </div>
 
           <DialogFooter className="flex-shrink-0 mt-6 px-4">
-
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-
               disabled={isSubmitting}
             >
               <XIcon className="h-4 w-4 mr-2" />
-
               Cancel
             </Button>
             <Button

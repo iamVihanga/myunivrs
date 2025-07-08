@@ -46,6 +46,7 @@ export function NewAdsPaymentPlan() {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
+
       [name]:
         type === "number" ||
         name === "price" ||
@@ -55,13 +56,13 @@ export function NewAdsPaymentPlan() {
             ? 0
             : Number(value)
           : value,
+
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (
       !formData.planName ||
       formData.price === undefined ||
@@ -73,7 +74,6 @@ export function NewAdsPaymentPlan() {
       return;
     }
 
-    // Validate price, durationDays, maxAds as numbers
     if (
       isNaN(Number(formData.price)) ||
       isNaN(Number(formData.durationDays)) ||
@@ -82,6 +82,18 @@ export function NewAdsPaymentPlan() {
       toast.error("Price, Duration (days), and Max Ads must be numbers");
       return;
     }
+
+
+    let featuresObj = {};
+    if (formData.features && String(formData.features).trim() !== "") {
+      try {
+        featuresObj = JSON.parse(formData.features as string);
+      } catch {
+        toast.error("Features must be valid JSON");
+        return;
+      }
+    }
+
 
     setIsSubmitting(true);
 
