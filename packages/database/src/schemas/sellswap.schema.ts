@@ -7,7 +7,6 @@ import { user } from "./auth.schema";
 import { conditionEnum, productCategories } from "./products.schema";
 import { statusEnum } from "./shared.schema";
 
-
 export const sellSwapTypes = pgEnum("sell_swap_types", ["sell", "swap"]);
 
 export const sellSwaps = pgTable("sell_swaps", {

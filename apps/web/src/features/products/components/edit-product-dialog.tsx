@@ -92,13 +92,22 @@ export function EditProductDialog({ product }: Props) {
     setIsSubmitting(true);
 
     try {
-      // Only allow valid status values for updateProduct
+      // Only allow valid status and condition values for updateProduct
       const allowedStatus = ["published", "draft", "deleted"] as const;
+      const allowedCondition = [
+        "new",
+        "used",
+        "refurbished",
+        "for_parts",
+      ] as const;
       const safeFormData = {
         ...formData,
         status: allowedStatus.includes(formData.status as any)
           ? (formData.status as "published" | "draft" | "deleted")
           : "published",
+        condition: allowedCondition.includes(formData.condition as any)
+          ? (formData.condition as "new" | "used" | "refurbished" | "for_parts")
+          : "used",
       };
       await updateProduct(product.id, safeFormData);
       toast.success("Product updated successfully!");

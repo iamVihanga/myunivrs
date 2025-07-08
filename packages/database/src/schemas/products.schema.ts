@@ -42,3 +42,5 @@ export const products = pgTable("products", {
   status: statusEnum().default("published"),
   ...timestamps,
 });
+
+export { conditionEnum };
