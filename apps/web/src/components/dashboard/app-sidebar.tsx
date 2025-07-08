@@ -105,6 +105,12 @@ const data = {
 
       icon: IconBuildings,
     },
+    {
+      name: "Forum",
+      url: "/dashboard/forum",
+
+      icon: IconBuildings,
+    },
   ],
 };
 

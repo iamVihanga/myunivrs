@@ -31,3 +31,5 @@ export * from "./ads.schema";
 export * from "./b2bplans.schema";
 
 export * from "./notifications.schema";
+
+export * from "./forum.schema";
