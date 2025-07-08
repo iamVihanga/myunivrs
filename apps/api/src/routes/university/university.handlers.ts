@@ -2,14 +2,18 @@ import { desc, eq, ilike, or, sql } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
-import type { AppRouteHandler } from "@/types";
-
 import { db } from "@/db";
+import type { AppRouteHandler } from "@/types";
 import { university } from "@repo/database/schemas";
+import type {
+  CreateRoute,
+  DeleteRoute,
+  GetOneRoute,
+  ListRoute,
+  UpdateRoute,
+} from "./university.routes";
 
-import type { CreateRoute, ListRoute, RemoveRoute } from "./university.routes";
-
-// List university entries route handler
+// List universities route handler
 export const list: AppRouteHandler<ListRoute> = async (c) => {
   const {
     page = "1",
@@ -18,40 +22,32 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     search,
   } = c.req.valid("query");
 
-  // Convert to numbers and validate
   const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.max(1, Math.min(100, parseInt(limit))); // Cap at 100 items
+  const limitNum = Math.max(1, Math.min(100, parseInt(limit)));
   const offset = (pageNum - 1) * limitNum;
 
-  // Build query conditions
   const query = db.query.university.findMany({
     limit: limitNum,
     offset,
     where: (fields, { ilike, and, or }) => {
       const conditions = [];
 
-      // Add search condition if search parameter is provided
       if (search) {
         conditions.push(
           or(
             ilike(fields.name, `%${search}%`),
-            ilike(fields.countryCode, `%${search}%`)
+            ilike(fields.countryCode, `%${search}%`),
+            ilike(fields.status, `%${search}%`)
           )
         );
       }
 
       return conditions.length ? and(...conditions) : undefined;
     },
-    orderBy: (fields) => {
-      // Handle sorting direction
-      if (sort.toLowerCase() === "asc") {
-        return fields.createdAt;
-      }
-      return desc(fields.createdAt);
-    },
+    orderBy: (fields) =>
+      sort.toLowerCase() === "asc" ? fields.createdAt : desc(fields.createdAt),
   });
 
-  // Get total count for pagination metadata
   const totalCountQuery = db
     .select({ count: sql<number>`count(*)` })
     .from(university)
@@ -59,24 +55,39 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       search
         ? or(
             ilike(university.name, `%${search}%`),
-            ilike(university.countryCode, `%${search}%`)
+            ilike(university.countryCode, `%${search}%`),
+            ilike(university.status, `%${search}%`)
           )
         : undefined
     );
 
-  const [universityEntries, _totalCount] = await Promise.all([
+  const [universities, _totalCount] = await Promise.all([
     query,
     totalCountQuery,
   ]);
-
   const totalCount = _totalCount[0]?.count || 0;
-
-  // Calculate pagination metadata
   const totalPages = Math.ceil(totalCount / limitNum);
+
+  // Normalize the response data
+  const normalizedEntries = universities.map((entry) => ({
+    ...entry,
+    id: entry.id ?? "",
+    name: entry.name ?? "",
+    countryCode: entry.countryCode ?? "",
+    status: entry.status ?? "published",
+    createdAt:
+      entry.createdAt instanceof Date
+        ? entry.createdAt.toISOString()
+        : entry.createdAt,
+    updatedAt:
+      entry.updatedAt instanceof Date
+        ? entry.updatedAt.toISOString()
+        : entry.updatedAt,
+  }));
 
   return c.json(
     {
-      data: universityEntries,
+      data: normalizedEntries,
       meta: {
         currentPage: pageNum,
         totalPages,
@@ -88,45 +99,80 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   );
 };
 
-// Create new university entry route handler
+// Get single university handler
+export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+
+  const universityEntry = await db.query.university.findFirst({
+    where: eq(university.id, id),
+  });
+
+  if (!universityEntry) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  // Normalize the response data
+  const normalizedEntry = {
+    ...universityEntry,
+    id: universityEntry.id ?? "",
+    name: universityEntry.name ?? "",
+    countryCode: universityEntry.countryCode ?? "",
+    status: universityEntry.status ?? "published",
+    createdAt:
+      universityEntry.createdAt instanceof Date
+        ? universityEntry.createdAt.toISOString()
+        : universityEntry.createdAt,
+    updatedAt:
+      universityEntry.updatedAt instanceof Date
+        ? universityEntry.updatedAt.toISOString()
+        : universityEntry.updatedAt,
+  };
+
+  return c.json(normalizedEntry, HttpStatusCodes.OK);
+};
+
+// Create university handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const universityEntry = c.req.valid("json");
   const session = c.get("session");
 
-  console.log({ session });
-
   if (!session) {
     return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED,
-      },
+      { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  const [inserted] = await db
-    .insert(university)
-    .values(universityEntry)
-    .returning();
+  // Prepare insert data with defaults
+  const insertData = {
+    name: universityEntry.name,
+    countryCode: universityEntry.countryCode,
+    status: universityEntry.status ?? "published",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const [inserted] = await db.insert(university).values(insertData).returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
 
-// Delete university entry route handler
-export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
+// Update university handler
+export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const { id } = c.req.valid("param");
+  const body = c.req.valid("json");
   const session = c.get("session");
 
   if (!session) {
     return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED,
-      },
+      { message: HttpStatusPhrases.UNAUTHORIZED },
       HttpStatusCodes.UNAUTHORIZED
     );
   }
 
-  // Check if university entry exists
   const existingEntry = await db.query.university.findFirst({
     where: eq(university.id, id),
   });
@@ -138,11 +184,47 @@ export const remove: AppRouteHandler<RemoveRoute> = async (c) => {
     );
   }
 
-  // Delete the university entry
+  const updateData = {
+    ...body,
+    status: ["published", "draft", "archived"].includes(body.status as string)
+      ? body.status
+      : existingEntry.status,
+    updatedAt: new Date(),
+  };
+
+  const [updated] = await db
+    .update(university)
+    .set(updateData)
+    .where(eq(university.id, id))
+    .returning();
+
+  return c.json(updated, HttpStatusCodes.OK);
+};
+
+// Delete university handler
+export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
+  const { id } = c.req.valid("param");
+  const session = c.get("session");
+
+  if (!session) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
+
+  const existingEntry = await db.query.university.findFirst({
+    where: eq(university.id, id),
+  });
+
+  if (!existingEntry) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
   await db.delete(university).where(eq(university.id, id));
 
-  return c.json(
-    { message: "University entry deleted successfully" },
-    HttpStatusCodes.OK
-  );
+  return c.json(null, HttpStatusCodes.NO_CONTENT as any);
 };
