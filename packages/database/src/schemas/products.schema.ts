@@ -1,15 +1,8 @@
 import { sql } from "drizzle-orm";
-import { boolean, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { user } from "./auth.schema";
-import { statusEnum } from "./shared.schema";
-
-export const conditionEnum = pgEnum("condition", [
-  "new",
-  "used",
-  "refurbished",
-  "for_parts",
-]);
+import { conditionEnum, statusEnum } from "./shared.schema";
 
 // Define productCategories table (minimal, adjust if you have a specific schema)
 export const productCategories = pgTable("product_categories", {
