@@ -1,4 +1,5 @@
 "use client";
+
 import GalleryView from "@/modules/media/components/gallery-view";
 import { Button } from "@repo/ui/components/button";
 import { Checkbox } from "@repo/ui/components/checkbox";
@@ -26,41 +27,44 @@ import {
   HomeIcon,
   ImageIcon,
   MapPinIcon,
+  PencilIcon,
   PhoneIcon,
   PlusIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { createHousing } from "../actions/create.action";
-import { InsertHousing } from "../schemas";
+import { updateHousing } from "../actions/update.action";
+import type { Housing } from "../schemas";
 
-export function NewHousing() {
-  const router = useRouter();
+type Props = {
+  housing: Housing;
+};
+
+export function EditHousingDialog({ housing }: Props) {
   const [open, setOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<InsertHousing>({
-    title: "",
-    description: "",
-    images: [],
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    price: "",
-    bedrooms: "",
-    bathrooms: "",
-    parking: "",
-    contactNumber: "",
-    housingType: "",
-    squareFootage: "",
-    yearBuilt: "",
-    isFurnished: false,
-    link: "",
-    status: "active",
+  const [formData, setFormData] = useState({
+    title: housing.title,
+    description: housing.description || "",
+    images: housing.images || [],
+    address: housing.address || "",
+    city: housing.city || "",
+    state: housing.state || "",
+    zipCode: housing.zipCode || "",
+    price: housing.price || "",
+    bedrooms: housing.bedrooms || "",
+    bathrooms: housing.bathrooms || "",
+    parking: housing.parking || "",
+    contactNumber: housing.contactNumber || "",
+    housingType: housing.housingType || "",
+    squareFootage: housing.squareFootage || "",
+    yearBuilt: housing.yearBuilt || "",
+    isFurnished: housing.isFurnished || false,
+    link: housing.link || "",
+    status: housing.status || "active",
   });
 
   const handleChange = (
@@ -69,17 +73,17 @@ export function NewHousing() {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev: any) => ({ ...prev, isFurnished: checked }));
+    setFormData((prev) => ({ ...prev, isFurnished: checked }));
   };
 
   const handleImageRemove = (idx: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_: any, i: number) => i !== idx),
+      images: prev.images.filter((_, i) => i !== idx),
     }));
   };
 
@@ -102,33 +106,14 @@ export function NewHousing() {
     setIsSubmitting(true);
 
     try {
-      await createHousing(formData);
-      toast.success("Housing listing created successfully!");
-      setFormData({
-        title: "",
-        description: "",
-        images: [],
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        price: "",
-        bedrooms: "",
-        bathrooms: "",
-        parking: "",
-        contactNumber: "",
-        housingType: "",
-        squareFootage: "",
-        yearBuilt: "",
-        isFurnished: false,
-        link: "",
-        status: "active",
-      });
+      await updateHousing(housing.id, formData);
+      toast.success("Housing listing updated successfully!");
       setOpen(false);
-      router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create housing listing. Please try again.");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update housing"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -137,23 +122,22 @@ export function NewHousing() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Add New Listing
+        <Button size="sm" variant="outline" className="h-8 px-2">
+          <PencilIcon className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle>Create New Housing Listing</DialogTitle>
+            <DialogTitle>Edit Housing Listing</DialogTitle>
             <DialogDescription>
-              Fill out the form below to add a new housing listing. Required
-              fields are marked with *.
+              Make changes to your housing listing below. Required fields are
+              marked with *.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex-grow overflow-y-auto px-8">
-            {/* Section: Basic Information */}
+            {/* Basic Information */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <HomeIcon className="h-5 w-5 text-cyan-600" />
@@ -167,7 +151,6 @@ export function NewHousing() {
                   <Input
                     id="title"
                     name="title"
-                    placeholder="Enter listing title"
                     value={formData.title}
                     onChange={handleChange}
                     required
@@ -178,8 +161,7 @@ export function NewHousing() {
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter listing description"
-                    value={formData.description || ""}
+                    value={formData.description}
                     onChange={handleChange}
                     rows={4}
                   />
@@ -187,7 +169,7 @@ export function NewHousing() {
               </div>
             </div>
 
-            {/* Section: Location */}
+            {/* Location */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <MapPinIcon className="h-5 w-5 text-cyan-600" />
@@ -201,7 +183,6 @@ export function NewHousing() {
                   <Input
                     id="address"
                     name="address"
-                    placeholder="Enter property address"
                     value={formData.address}
                     onChange={handleChange}
                     required
@@ -212,8 +193,7 @@ export function NewHousing() {
                   <Input
                     id="city"
                     name="city"
-                    placeholder="Enter city"
-                    value={formData.city || ""}
+                    value={formData.city}
                     onChange={handleChange}
                   />
                 </div>
@@ -222,8 +202,7 @@ export function NewHousing() {
                   <Input
                     id="state"
                     name="state"
-                    placeholder="Enter state"
-                    value={formData.state || ""}
+                    value={formData.state}
                     onChange={handleChange}
                   />
                 </div>
@@ -232,15 +211,14 @@ export function NewHousing() {
                   <Input
                     id="zipCode"
                     name="zipCode"
-                    placeholder="Enter zip code"
-                    value={formData.zipCode || ""}
+                    value={formData.zipCode}
                     onChange={handleChange}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Section: Property Details */}
+            {/* Property Details */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <BedIcon className="h-5 w-5 text-cyan-600" />
@@ -254,7 +232,6 @@ export function NewHousing() {
                   <Input
                     id="price"
                     name="price"
-                    placeholder="Enter property price"
                     value={formData.price}
                     onChange={handleChange}
                     required
@@ -264,12 +241,9 @@ export function NewHousing() {
                   <Label htmlFor="housingType">Housing Type</Label>
                   <Select
                     name="housingType"
-                    value={formData.housingType || ""}
+                    value={formData.housingType}
                     onValueChange={(value) =>
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        housingType: value,
-                      }))
+                      setFormData((prev) => ({ ...prev, housingType: value }))
                     }
                   >
                     <SelectTrigger>
@@ -288,8 +262,7 @@ export function NewHousing() {
                   <Input
                     id="bedrooms"
                     name="bedrooms"
-                    placeholder="Enter number of bedrooms"
-                    value={formData.bedrooms || ""}
+                    value={formData.bedrooms}
                     onChange={handleChange}
                   />
                 </div>
@@ -298,8 +271,7 @@ export function NewHousing() {
                   <Input
                     id="bathrooms"
                     name="bathrooms"
-                    placeholder="Enter number of bathrooms"
-                    value={formData.bathrooms || ""}
+                    value={formData.bathrooms}
                     onChange={handleChange}
                   />
                 </div>
@@ -308,8 +280,7 @@ export function NewHousing() {
                   <Input
                     id="squareFootage"
                     name="squareFootage"
-                    placeholder="Enter square footage"
-                    value={formData.squareFootage || ""}
+                    value={formData.squareFootage}
                     onChange={handleChange}
                   />
                 </div>
@@ -318,8 +289,7 @@ export function NewHousing() {
                   <Input
                     id="yearBuilt"
                     name="yearBuilt"
-                    placeholder="Enter year built"
-                    value={formData.yearBuilt || ""}
+                    value={formData.yearBuilt}
                     onChange={handleChange}
                   />
                 </div>
@@ -328,8 +298,7 @@ export function NewHousing() {
                   <Input
                     id="parking"
                     name="parking"
-                    placeholder="Enter parking details"
-                    value={formData.parking || ""}
+                    value={formData.parking}
                     onChange={handleChange}
                   />
                 </div>
@@ -337,14 +306,14 @@ export function NewHousing() {
                   <Label htmlFor="isFurnished">Furnished</Label>
                   <Checkbox
                     id="isFurnished"
-                    checked={formData.isFurnished || false}
+                    checked={formData.isFurnished}
                     onCheckedChange={handleCheckboxChange}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Section: Media */}
+            {/* Media */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <ImageIcon className="h-5 w-5 text-cyan-600" />
@@ -394,14 +363,14 @@ export function NewHousing() {
                 <Input
                   id="link"
                   name="link"
-                  placeholder="https://example.com"
-                  value={formData.link || ""}
+                  value={formData.link}
                   onChange={handleChange}
+                  placeholder="https://example.com"
                 />
               </div>
             </div>
 
-            {/* Section: Contact Information */}
+            {/* Contact Information */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <PhoneIcon className="h-5 w-5 text-cyan-600" />
@@ -413,8 +382,7 @@ export function NewHousing() {
                   <Input
                     id="contactNumber"
                     name="contactNumber"
-                    placeholder="Enter contact number"
-                    value={formData.contactNumber || ""}
+                    value={formData.contactNumber}
                     onChange={handleChange}
                   />
                 </div>
@@ -437,7 +405,7 @@ export function NewHousing() {
               disabled={isSubmitting}
               className="bg-cyan-600 hover:bg-cyan-700"
             >
-              {isSubmitting ? "Creating..." : "Create Listing"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

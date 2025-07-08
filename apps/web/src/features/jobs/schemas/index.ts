@@ -1,4 +1,3 @@
-
 // import { jobs } from "@repo/database";
 // import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 // import { z } from "zod";
@@ -63,7 +62,6 @@
 
 // export type UpdateJobs = z.infer<typeof updateJobsSchema>;
 
-
 import { jobs } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -118,36 +116,35 @@ export const insertJobsSchema = createInsertSchema(jobs, {
 });
 
 // Schema for updating jobs (all fields optional, omits id, createdAt, updatedAt)
-export const updateJobsSchema = createInsertSchema(jobs, {
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(500, "Title cannot exceed 500 characters"),
-  description: z.string().optional(),
-  images: z.array(z.string()).optional(),
-  isFeatured: z.boolean().default(false),
-  company: z.string().min(1, "Company name is required"),
-  status: z.enum(["published", "draft", "archived"]).default("published"), // Adjust based on statusEnum
-  requiredSkills: z.array(z.string()).optional(),
-  salaryRange: z
-    .object({
-      min: z.number().nonnegative().optional(),
-      max: z.number().nonnegative().optional(),
-      currency: z.string().optional(),
-    })
-    .optional(),
-  actionUrl: z.string().url("Must be a valid URL").optional(),
-  jobType: jobTypeEnum,
-  cvRequired: z.boolean().default(false),
-})
-
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
+export const updateJobsSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    description: z.string().optional(),
+    company: z.string().min(1, "Company is required"),
+    images: z.array(z.string()).optional().default([]),
+    isFeatured: z.boolean().optional().default(false),
+    status: z
+      .enum(["published", "draft", "archived"])
+      .optional()
+      .default("published"),
+    requiredSkills: z.array(z.string()).optional().default([]),
+    salaryRange: z
+      .object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+        currency: z.string().optional(),
+      })
+      .optional()
+      .default({}),
+    actionUrl: z.string().url("Must be a valid URL").optional().nullable(),
+    jobType: z
+      .enum(["full_time", "part_time", "contract", "internship", "temporary"])
+      .optional()
+      .default("full_time"),
+    cvRequired: z.boolean().optional().default(false),
   })
-  .partial();
 
+  .partial();
 
 // Export type definitions
 export type Jobs = z.infer<typeof selectJobSchema>;

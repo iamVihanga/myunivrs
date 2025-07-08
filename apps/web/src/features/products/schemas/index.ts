@@ -1,4 +1,3 @@
-
 import { products } from "@repo/database";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -52,7 +51,35 @@ export const insertProductSchema = createInsertSchema(products, {
 });
 
 // Update schema (for updating existing products)
-export const updateProductSchema = insertProductSchema.partial();
+export const updateProductSchema = createInsertSchema(products, {
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  images: z.array(z.string().url("Must be a valid URL")).optional().default([]),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Price must be a valid number"),
+  discountPercentage: z
+    .string()
+    .regex(/^\d+$/, "Must be a valid number")
+    .optional(),
+  location: z.string().min(1, "Location is required"),
+  condition: z
+    .enum(["new", "used", "refurbished", "for_parts"])
+    .default("used"),
+  stockQuantity: z
+    .string()
+    .regex(/^\d+$/, "Must be a valid number")
+    .default("1"),
+  isNegotiable: z.boolean().optional().default(false),
+  categoryId: z.string().optional().nullable(),
+  status: z.enum(["published", "draft", "deleted"]).default("published"),
+})
+  .partial()
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    createdBy: true,
+    agentProfile: true,
+  });
 
 // Type Definitions
 export type Product = z.infer<typeof selectProductSchema>;

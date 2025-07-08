@@ -10,18 +10,19 @@ import {
   queryParamsSchema,
   stringIdParamSchema,
 } from "@/lib/helpers";
+
 import {
-  insertHousingSchema,
-  selectHousingSchema,
-  updateHousingSchema,
-} from "./housing.schema";
+  insertNotificationSchema,
+  selectNotificationSchema,
+  updateNotificationSchema,
+} from "./notifications.schema";
 
-const tags: string[] = ["Housing"];
+const tags: string[] = ["Notifications"];
 
-// List route definition
+// List all notifications (optionally filtered by userId)
 export const list = createRoute({
   tags,
-  summary: "List all housing entries",
+  summary: "List all notifications",
   path: "/",
   method: "get",
   request: {
@@ -29,32 +30,32 @@ export const list = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectHousingSchema)),
-      "The list of housing entries"
+      getPaginatedSchema(z.array(selectNotificationSchema)),
+      "List of notifications"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
-      "An error occurred while fetching the housing entries"
+      "Error fetching notifications"
     ),
   },
 });
 
-// Create route definition
+// Create a new notification
 export const create = createRoute({
   tags,
-  summary: "Create a new housing entry",
+  summary: "Create a new notification",
   path: "/",
   method: "post",
   request: {
     body: jsonContentRequired(
-      insertHousingSchema,
-      "The housing entry to create"
+      insertNotificationSchema,
+      "The notification to create"
     ),
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectHousingSchema,
-      "The created housing entry"
+      selectNotificationSchema,
+      "The created notification"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -62,27 +63,28 @@ export const create = createRoute({
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
-      "The validation error(s)"
+      "Validation error"
     ),
   },
 });
 
+// Get one notification by ID
 export const getOne = createRoute({
   tags,
-  summary: "Get a single housing entry by ID",
-  method: "get",
+  summary: "Get a notification by ID",
   path: "/{id}",
+  method: "get",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "Requested housing entry"
+      selectNotificationSchema,
+      "Requested notification"
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Notification not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
@@ -91,23 +93,23 @@ export const getOne = createRoute({
   },
 });
 
-// Update route definition
+// Update a notification (e.g. mark as read)
 export const update = createRoute({
   tags,
-  summary: "Update an existing housing entry",
+  summary: "Update a notification",
   path: "/{id}",
   method: "put",
   request: {
     params: stringIdParamSchema,
     body: jsonContentRequired(
-      updateHousingSchema,
-      "The housing entry to update"
+      updateNotificationSchema,
+      "The notification updates"
     ),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      selectHousingSchema,
-      "The updated housing entry"
+      selectNotificationSchema,
+      "The updated notification"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -115,19 +117,19 @@ export const update = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       errorMessageSchema,
-      "Housing entry not found"
+      "Notification not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
-      "The validation error(s)"
+      "Validation error"
     ),
   },
 });
 
-// Delete route definition
+// Delete a notification
 export const remove = createRoute({
   tags,
-  summary: "Delete a housing entry",
+  summary: "Delete a notification",
   path: "/{id}",
   method: "delete",
   request: {
@@ -136,7 +138,7 @@ export const remove = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({ message: z.string() }),
-      "Housing entry deleted successfully"
+      "Notification deleted successfully"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,
@@ -144,7 +146,7 @@ export const remove = createRoute({
     ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
-      "Housing entry not found"
+      "Notification not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(IdParamsSchema),
