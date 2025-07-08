@@ -1,6 +1,8 @@
 {
+
   "id": "4e8aea8b-973e-4c53-a669-2f949350ba5c",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+
+  "prevId": "00000000-0000-0000-0000-000000000000"
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -325,10 +327,12 @@
         },
         "features": {
           "name": "features",
+
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
           "default": "'{}'::jsonb"
+
         },
         "max_ads": {
           "name": "max_ads",
@@ -1938,10 +1942,10 @@
         },
         "meta_tags": {
           "name": "meta_tags",
-          "type": "jsonb",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'::jsonb"
+          "default": "''"
         },
         "status": {
           "name": "status",
@@ -2230,7 +2234,12 @@
         "new",
         "used",
         "refurbished",
+
+        "for_parts",
+        "damaged"
+
         "for_parts"
+
       ]
     },
     "public.job_type": {

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, jsonb, numeric, pgTable, text } from "drizzle-orm/pg-core";
+import { integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { statusEnum } from "./shared.schema";
 
@@ -12,7 +12,7 @@ export const adsPaymentPlan = pgTable("ads_payment_plan", {
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("USD"),
   durationDays: integer("duration_days").notNull(),
-  features: jsonb("features").default({}),
+  features: text("features").default(""),
   maxAds: integer("max_ads").notNull().default(1),
   status: statusEnum().default("published"),
   ...timestamps,

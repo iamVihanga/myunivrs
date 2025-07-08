@@ -99,12 +99,6 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
               <div className="text-gray-300 text-sm px-1">|</div>
               <span className="text-sm">Max Ads: {adsPaymentPlan.maxAds}</span>
               <div className="text-gray-300 text-sm px-1">|</div>
-              <Badge
-                variant="outline"
-                className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit capitalize"
-              >
-                {adsPaymentPlan.status}
-              </Badge>
             </div>
             {adsPaymentPlan.description && (
               <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
@@ -121,6 +115,12 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
 
           {/* Actions section */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
+            <Badge
+              variant="outline"
+              className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit capitalize"
+            >
+              {adsPaymentPlan.status}
+            </Badge>
             <Button
               variant="destructive"
               size="sm"

@@ -10,3 +10,11 @@ export const statusEnum = pgEnum("status", [
   "swapped", // new adding
   "expired", // new adding
 ]);
+
+export const conditionEnum = pgEnum("condition", [
+  "new",
+  "used",
+  "refurbished",
+  "for_parts",
+  "damaged",
+]);

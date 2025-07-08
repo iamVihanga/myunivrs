@@ -1,36 +1,26 @@
 "use client";
-import { PlusIcon, XIcon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-
 import { Button } from "@repo/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@repo/ui/components/dialog";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Textarea } from "@repo/ui/components/textarea";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { createSiteSetting } from "../actions/create.action";
 import { InsertSiteSettings } from "../schemas";
 
 export function NewSiteSetting() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<InsertSiteSettings>({
+  const [formData, setFormData] = useState<
+    Omit<InsertSiteSettings, "logoUrl" | "faviconUrl">
+  >({
     siteName: "",
     siteDescription: "",
-    logoUrl: "",
-    faviconUrl: "",
     primaryEmail: "",
   });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -39,23 +29,19 @@ export function NewSiteSetting() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLogoFile(e.target.files?.[0] ?? null);
+  };
+
+  const handleFaviconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFaviconFile(e.target.files?.[0] ?? null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
     if (!formData.siteName) {
       toast.error("Site name is required");
-      return;
-    }
-    if (formData.logoUrl && !/^https?:\/\/.+\..+/.test(formData.logoUrl)) {
-      toast.error("Logo URL must be a valid URL");
-      return;
-    }
-    if (
-      formData.faviconUrl &&
-      !/^https?:\/\/.+\..+/.test(formData.faviconUrl)
-    ) {
-      toast.error("Favicon URL must be a valid URL");
       return;
     }
     if (
@@ -69,17 +55,26 @@ export function NewSiteSetting() {
     setIsSubmitting(true);
 
     try {
-      await createSiteSetting(formData);
+      // TODO: Upload logoFile and faviconFile to get their URLs if needed
+      // For now, we'll just pass the files directly if the backend supports it, otherwise handle upload separately
+      const data = {
+        siteName: formData.siteName,
+        siteDescription: formData.siteDescription || "",
+        primaryEmail: formData.primaryEmail || "",
+        logoUrl: logoFile ?? undefined,
+        faviconUrl: faviconFile ?? undefined,
+      };
+
+      await createSiteSetting(data);
 
       toast.success("Site settings saved successfully!");
       setFormData({
         siteName: "",
         siteDescription: "",
-        logoUrl: "",
-        faviconUrl: "",
         primaryEmail: "",
       });
-      setOpen(false);
+      setLogoFile(null);
+      setFaviconFile(null);
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -90,107 +85,89 @@ export function NewSiteSetting() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white rounded-lg shadow p-6 border"
+    >
+      <div className="grid gap-2">
+        <Label htmlFor="siteName">
+          Site Name <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          id="siteName"
+          name="siteName"
+          placeholder="Enter site name"
+          value={formData.siteName}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="siteDescription">Site Description</Label>
+        <Textarea
+          id="siteDescription"
+          name="siteDescription"
+          placeholder="Enter site description"
+          value={formData.siteDescription || ""}
+          onChange={handleChange}
+          rows={3}
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="logoUrl">Logo Image</Label>
+        <Input
+          id="logoUrl"
+          name="logoUrl"
+          type="file"
+          accept="image/*"
+          onChange={handleLogoChange}
+        />
+        {logoFile && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            Selected: {logoFile.name}
+          </div>
+        )}
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="faviconUrl">Favicon Icon</Label>
+        <Input
+          id="faviconUrl"
+          name="faviconUrl"
+          type="file"
+          accept="image/*"
+          onChange={handleFaviconChange}
+        />
+        {faviconFile && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            Selected: {faviconFile.name}
+          </div>
+        )}
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="primaryEmail">Primary Email</Label>
+        <Input
+          id="primaryEmail"
+          name="primaryEmail"
+          placeholder="admin@example.com"
+          value={formData.primaryEmail || ""}
+          onChange={handleChange}
+          type="email"
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-2">
         <Button
-          icon={<PlusIcon />}
-          size="sm"
+          type="submit"
+          disabled={isSubmitting}
           className="bg-cyan-600 hover:bg-cyan-700"
         >
-          Add Site Settings
+          {isSubmitting ? "Saving..." : "Save Settings"}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Site Settings</DialogTitle>
-            <DialogDescription>
-              Fill out the form to update your site settings.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="siteName">
-                Site Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="siteName"
-                name="siteName"
-                placeholder="Enter site name"
-                value={formData.siteName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="siteDescription">Site Description</Label>
-              <Textarea
-                id="siteDescription"
-                name="siteDescription"
-                placeholder="Enter site description"
-                value={formData.siteDescription || ""}
-                onChange={handleChange}
-                rows={3}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="logoUrl">Logo URL</Label>
-              <Input
-                id="logoUrl"
-                name="logoUrl"
-                placeholder="https://example.com/logo.png"
-                value={formData.logoUrl || ""}
-                onChange={handleChange}
-                type="url"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="faviconUrl">Favicon URL</Label>
-              <Input
-                id="faviconUrl"
-                name="faviconUrl"
-                placeholder="https://example.com/favicon.ico"
-                value={formData.faviconUrl || ""}
-                onChange={handleChange}
-                type="url"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="primaryEmail">Primary Email</Label>
-              <Input
-                id="primaryEmail"
-                name="primaryEmail"
-                placeholder="admin@example.com"
-                value={formData.primaryEmail || ""}
-                onChange={handleChange}
-                type="email"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              icon={<XIcon className="h-4 w-4" />}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-cyan-600 hover:bg-cyan-700"
-            >
-              {isSubmitting ? "Saving..." : "Save Settings"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </form>
   );
 }
