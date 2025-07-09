@@ -32,6 +32,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteJob } from "../actions/delete.action";
 import type { Jobs } from "../schemas";
+import { EditJobDialog } from "./edit-job-dialog";
 
 type Props = {
   jobs: Jobs;
@@ -140,6 +141,9 @@ export function JobsCard({ jobs }: Props) {
             >
               {jobs.status || "Published"}
             </Badge>
+
+            {/* Add Edit button */}
+            <EditJobDialog job={jobs} />
 
             <Button
               variant="destructive"

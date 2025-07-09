@@ -35,6 +35,7 @@ import Link from "next/link";
 
 import { deleteSellSwaps } from "../actions/delete.sellswaps";
 import { SellSwap } from "../schemas";
+import { EditSellSwapDialog } from "./edit-sellswap-dialog";
 
 type Props = {
   sellSwaps: SellSwap;
@@ -193,6 +194,9 @@ export function SellSwapCard({ sellSwaps }: Props) {
             >
               {sellSwaps.status || "Draft"}
             </Badge>
+
+            {/* Add Edit button */}
+            <EditSellSwapDialog sellSwap={sellSwaps} />
 
             <Button
               variant="destructive"

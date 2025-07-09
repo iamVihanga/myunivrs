@@ -28,6 +28,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteAdsPaymentPlan } from "../actions/delete.action";
 import type { AdsPaymentPlan } from "../schemas";
+import { EditAdzPaymentPlanDialog } from "./edit-adzPaymentPlan-dialog";
 
 type Props = {
   adsPaymentPlan: AdsPaymentPlan;
@@ -113,7 +114,7 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
               )}
           </div>
 
-          {/* Actions section */}
+          {/* Update Actions section */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
             <Badge
               variant="outline"
@@ -121,6 +122,9 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
             >
               {adsPaymentPlan.status}
             </Badge>
+
+            <EditAdzPaymentPlanDialog adsPaymentPlan={adsPaymentPlan} />
+
             <Button
               variant="destructive"
               size="sm"
@@ -130,6 +134,7 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
             >
               <TrashIcon className="h-4 w-4" />
             </Button>
+
             <Button size="sm" variant="outline" asChild className="h-8 px-2">
               <Link href={`/dashboard/adzPaymentPlan/${adsPaymentPlan.id}`}>
                 <ExternalLinkIcon className="h-4 w-4" />

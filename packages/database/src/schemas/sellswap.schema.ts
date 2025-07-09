@@ -4,7 +4,9 @@ import { integer, numeric, pgEnum, pgTable, text } from "drizzle-orm/pg-core";
 import { timestamps } from "../utils/helpers";
 import { user } from "./auth.schema";
 
+
 import { conditionEnum, statusEnum } from "./shared.schema";
+
 
 export const sellSwapTypes = pgEnum("sell_swap_types", ["sell", "swap"]);
 

@@ -32,6 +32,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteUniversity } from "../actions/delete.action";
 import type { university } from "../schemas";
+import { EditUniversityDialog } from "./edit-university-dialog";
 
 type Props = {
   university: university;
@@ -118,6 +119,8 @@ export function UniversityCard({ university }: Props) {
             >
               {university.status || "Published"}
             </Badge>
+
+            <EditUniversityDialog university={university} />
 
             <Button
               variant="destructive"

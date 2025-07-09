@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useId } from "react";
 import { deleteAds } from "../actions/delete.action";
 import type { Ads } from "../schemas";
+import { EditAdsDialog } from "./edit-ads-dialog";
 
 type Props = {
   ads: Ads;
@@ -132,12 +133,9 @@ export function AdsCard({ ads }: Props) {
 
           {/* Actions section */}
           <div className="flex items-center gap-2 ml-2 shrink-0">
-            {/* <Badge
-              variant="outline"
-              className="bg-cyan-50 text-cyan-700 border-cyan-200 text-xs w-fit"
-            >
-              {ads.status || "Active"}
-            </Badge> */}
+            {/* Add Edit button */}
+            <EditAdsDialog ads={ads} />
+
             <Button
               variant="destructive"
               size="sm"

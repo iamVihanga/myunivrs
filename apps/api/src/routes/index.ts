@@ -8,17 +8,22 @@ import adzPaymentPlan from "./adzPaymentPlan/adzPaymentPlan.index";
 
 import ads from "./ads/ads.index";
 import b2bplans from "./b2bplans/b2bplans.index";
+import comment from "./comment/comment.index";
 import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
 import media from "./media/media.index";
+import notifications from "./notifications/notifications.index";
+import post from "./post/post.index";
 import categories from "./products/categories/categories.index";
 import products from "./products/products.index";
 import sellswaps from "./sellswaps/sellswaps.index";
 import siteSettings from "./siteSetting/siteSetting.index";
+import subforum from "./subforum/subforum.index";
 import tasks from "./tasks/tasks.index";
 import university from "./university/university.index";
+import vote from "./vote/vote.index";
 
 export function registerRoutes(app: AppOpenAPI) {
   return app
@@ -37,8 +42,13 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/ads", ads)
 
     .route("/b2bplans", b2bplans)
-    .route("/categories", categories);
-
+    .route("/notifications", notifications)
+    .route("/categories", categories)
+    .route("/subforum", subforum)
+    .route("/post", post)
+    .route("/comment", comment)
+    .route("/vote", vote)
+    .route("/notifications", notifications);
 }
 
 // stand alone router type used for api client
