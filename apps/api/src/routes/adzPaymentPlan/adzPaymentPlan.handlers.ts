@@ -99,8 +99,6 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const adzPaymentPlanEntry = c.req.valid("json");
   const session = c.get("session");
 
-  console.log({ session });
-
   if (!session) {
     return c.json(
       {
@@ -110,9 +108,27 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     );
   }
 
+  const {
+    planName,
+    description,
+    price,
+    currency,
+    durationDays,
+    maxAds,
+    status,
+  } = adzPaymentPlanEntry;
+
   const [inserted] = await db
     .insert(adsPaymentPlan)
-    .values(adzPaymentPlanEntry)
+    .values({
+      planName,
+      description,
+      price,
+      currency,
+      durationDays,
+      maxAds,
+      status,
+    })
     .returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);

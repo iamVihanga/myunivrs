@@ -11,7 +11,6 @@ export const insertAdzPaymentPlanSchema = createInsertSchema(adsPaymentPlan, {
   currency: (val) => val.length(3),
   durationDays: (val) => val.int().min(1),
   maxAds: (val) => val.int().min(1),
-  features: () => z.string().optional(),
 }).omit({
   id: true,
   createdAt: true,

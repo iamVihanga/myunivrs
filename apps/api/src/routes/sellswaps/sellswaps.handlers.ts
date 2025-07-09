@@ -111,18 +111,18 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   }
 
   // Check if category exists (if provided)
-  if (sellSwapEntry.categoryId) {
-    const category = await db.query.productCategories.findFirst({
-      where: eq(productCategories.id, sellSwapEntry.categoryId),
-    });
+  // if (sellSwapEntry.categoryId) {
+  //   const category = await db.query.productCategories.findFirst({
+  //     where: eq(productCategories.id, sellSwapEntry.categoryId),
+  //   });
 
-    if (!category) {
-      return c.json(
-        { message: "Invalid category ID" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-  }
+  //   if (!category) {
+  //     return c.json(
+  //       { message: "Invalid category ID" },
+  //       HttpStatusCodes.UNPROCESSABLE_ENTITY
+  //     );
+  //   }
+  // }
 
   const [inserted] = await db
     .insert(sellSwaps)
@@ -192,18 +192,18 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   }
 
   // Check if category exists (if updating category)
-  if (body.categoryId) {
-    const category = await db.query.productCategories.findFirst({
-      where: eq(productCategories.id, body.categoryId),
-    });
+  // if (body.categoryId) {
+  //   const category = await db.query.productCategories.findFirst({
+  //     where: eq(productCategories.id, body.categoryId),
+  //   });
 
-    if (!category) {
-      return c.json(
-        { message: "Invalid category ID" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-  }
+  //   if (!category) {
+  //     return c.json(
+  //       { message: "Invalid category ID" },
+  //       HttpStatusCodes.UNPROCESSABLE_ENTITY
+  //     );
+  //   }
+  // }
 
   // Update the sell/swap item
   const [updated] = await db
@@ -290,14 +290,14 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
     limit: limitNum,
     offset,
     where: (fields, { ilike, and }) => {
-      const conditions = [eq(fields.categoryId, id)];
+      const conditions = [];
 
       // Add search condition if search parameter is provided
       if (search) {
         conditions.push(ilike(fields.title, `%${search}%`));
       }
 
-      return and(...conditions);
+      return conditions.length ? and(...conditions) : undefined;
     },
     orderBy: (fields) => {
       // Handle sorting direction
@@ -316,15 +316,12 @@ export const getByCategory: AppRouteHandler<GetByCategoryRoute> = async (c) => {
     .select({ count: sql<number>`count(*)` })
     .from(sellSwaps)
     .where(
-      and(
-        eq(sellSwaps.categoryId, id),
-        search
-          ? or(
-              ilike(sellSwaps.title, `%${search}%`),
-              ilike(sellSwaps.description, `%${search}%`)
-            )
-          : undefined
-      )
+      search
+        ? or(
+            ilike(sellSwaps.title, `%${search}%`),
+            ilike(sellSwaps.description, `%${search}%`)
+          )
+        : undefined
     );
 
   const [sellSwapEntries, _totalCount] = await Promise.all([

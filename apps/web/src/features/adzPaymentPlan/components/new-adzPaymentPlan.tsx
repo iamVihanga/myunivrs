@@ -33,7 +33,6 @@ export function NewAdsPaymentPlan() {
     price: "",
     currency: DEFAULT_CURRENCY,
     durationDays: 1,
-    features: "",
     maxAds: 1,
     status: "published",
   });
@@ -56,7 +55,6 @@ export function NewAdsPaymentPlan() {
             ? 0
             : Number(value)
           : value,
-
     }));
   };
 
@@ -83,18 +81,6 @@ export function NewAdsPaymentPlan() {
       return;
     }
 
-
-    let featuresObj = {};
-    if (formData.features && String(formData.features).trim() !== "") {
-      try {
-        featuresObj = JSON.parse(formData.features as string);
-      } catch {
-        toast.error("Features must be valid JSON");
-        return;
-      }
-    }
-
-
     setIsSubmitting(true);
 
     try {
@@ -104,7 +90,6 @@ export function NewAdsPaymentPlan() {
         price: String(formData.price),
         currency: formData.currency,
         durationDays: Number(formData.durationDays),
-        features: formData.features,
         maxAds: Number(formData.maxAds),
         status: formData.status,
       });
@@ -116,7 +101,6 @@ export function NewAdsPaymentPlan() {
         price: "",
         currency: DEFAULT_CURRENCY,
         durationDays: 1,
-        features: "",
         maxAds: 1,
         status: "published",
       });
@@ -241,18 +225,6 @@ export function NewAdsPaymentPlan() {
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="features">Features</Label>
-              <Textarea
-                id="features"
-                name="features"
-                placeholder='e.g. "highlighted", "24/7 support"}'
-                value={formData.features as string}
-                onChange={handleChange}
-                rows={3}
-              />
             </div>
 
             <div className="grid gap-2">

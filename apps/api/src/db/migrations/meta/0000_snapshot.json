@@ -1,5 +1,7 @@
 {
+
   "id": "6183bf65-5faa-4251-a9a5-a7730b917fb5",
+
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -323,6 +325,8 @@
           "primaryKey": false,
           "notNull": true
         },
+
+
         "features": {
           "name": "features",
           "type": "text",
@@ -330,6 +334,7 @@
           "notNull": false,
           "default": "''"
         },
+
         "max_ads": {
           "name": "max_ads",
           "type": "integer",
@@ -1731,12 +1736,6 @@
           "notNull": false,
           "default": "'{}'"
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "type": {
           "name": "type",
           "type": "sell_swap_types",
@@ -1833,19 +1832,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sell_swaps_category_id_product_categories_id_fk": {
-          "name": "sell_swaps_category_id_product_categories_id_fk",
-          "tableFrom": "sell_swaps",
-          "tableTo": "product_categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "sell_swaps_user_id_user_id_fk": {
           "name": "sell_swaps_user_id_user_id_fk",
           "tableFrom": "sell_swaps",

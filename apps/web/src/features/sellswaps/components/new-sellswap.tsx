@@ -416,7 +416,6 @@ export function NewSellSwap() {
     title: "",
     description: "",
     images: [],
-    categoryId: "",
     type: "sell",
     price: null,
     condition: "used",
@@ -470,7 +469,7 @@ export function NewSellSwap() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.categoryId || !formData.type) {
+    if (!formData.title || !formData.type) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -499,7 +498,6 @@ export function NewSellSwap() {
         title: "",
         description: "",
         images: [],
-        categoryId: "",
         type: "sell",
         price: "",
         condition: "used",
@@ -557,7 +555,7 @@ export function NewSellSwap() {
               />
             </div>
 
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
               <Label htmlFor="categoryId">
                 Category ID <span className="text-red-500">*</span>
               </Label>
@@ -569,7 +567,7 @@ export function NewSellSwap() {
                 onChange={handleChange}
                 required
               />
-            </div>
+            </div> */}
 
             <div className="grid gap-2">
               <Label htmlFor="type">
