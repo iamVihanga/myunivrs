@@ -50,7 +50,6 @@ CREATE TABLE "ads_payment_plan" (
 	"price" numeric(10, 2) NOT NULL,
 	"currency" text DEFAULT 'USD' NOT NULL,
 	"duration_days" integer NOT NULL,
-	"features" text DEFAULT '',
 	"max_ads" integer DEFAULT 1 NOT NULL,
 	"status" "status" DEFAULT 'published',
 	"created_at" timestamp DEFAULT now() NOT NULL,

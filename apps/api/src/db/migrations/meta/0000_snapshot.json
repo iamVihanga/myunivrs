@@ -1,5 +1,5 @@
 {
-  "id": "3e9a0141-b437-4db7-a337-696b63923973",
+  "id": "68cc5c65-03ef-4f75-9217-2a5982595dd1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -322,13 +322,6 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
-        },
-        "features": {
-          "name": "features",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "''"
         },
         "max_ads": {
           "name": "max_ads",
