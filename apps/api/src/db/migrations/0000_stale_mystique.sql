@@ -1,4 +1,4 @@
-CREATE TYPE "public"."condition" AS ENUM('new', 'used', 'refurbished', 'for_parts');--> statement-breakpoint
+CREATE TYPE "public"."condition" AS ENUM('new', 'used', 'refurbished', 'for_parts', 'damaged');--> statement-breakpoint
 CREATE TYPE "public"."job_type" AS ENUM('full_time', 'part_time', 'contract', 'internship', 'temporary');--> statement-breakpoint
 CREATE TYPE "public"."media_type" AS ENUM('image', 'video', 'audio', 'document');--> statement-breakpoint
 CREATE TYPE "public"."sell_swap_types" AS ENUM('sell', 'swap');--> statement-breakpoint
@@ -50,7 +50,7 @@ CREATE TABLE "ads_payment_plan" (
 	"price" numeric(10, 2) NOT NULL,
 	"currency" text DEFAULT 'USD' NOT NULL,
 	"duration_days" integer NOT NULL,
-	"features" jsonb DEFAULT '{}'::jsonb,
+	"features" text DEFAULT '',
 	"max_ads" integer DEFAULT 1 NOT NULL,
 	"status" "status" DEFAULT 'published',
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -236,7 +236,6 @@ CREATE TABLE "sell_swaps" (
 	"title" text NOT NULL,
 	"description" text,
 	"images" text[] DEFAULT '{}',
-	"category_id" text,
 	"type" "sell_swap_types",
 	"user_id" text,
 	"price" numeric(10, 2),
@@ -275,7 +274,7 @@ CREATE TABLE "site_settings" (
 	"favicon_url" text,
 	"primary_email" text,
 	"maintenance_mode" boolean DEFAULT false,
-	"meta_tags" jsonb DEFAULT '{}'::jsonb,
+	"meta_tags" text DEFAULT '',
 	"status" "status" DEFAULT 'published',
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now()
@@ -341,6 +340,5 @@ ALTER TABLE "member" ADD CONSTRAINT "member_user_id_user_id_fk" FOREIGN KEY ("us
 ALTER TABLE "products" ADD CONSTRAINT "products_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_agent_id_user_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "sell_swaps" ADD CONSTRAINT "sell_swaps_category_id_product_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."product_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sell_swaps" ADD CONSTRAINT "sell_swaps_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

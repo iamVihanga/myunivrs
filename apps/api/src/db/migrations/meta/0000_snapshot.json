@@ -1,8 +1,6 @@
 {
-
-  "id": "4e8aea8b-973e-4c53-a669-2f949350ba5c",
-
-  "prevId": "00000000-0000-0000-0000-000000000000"
+  "id": "3e9a0141-b437-4db7-a337-696b63923973",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -327,12 +325,10 @@
         },
         "features": {
           "name": "features",
-
-          "type": "jsonb",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'::jsonb"
-
+          "default": "''"
         },
         "max_ads": {
           "name": "max_ads",
@@ -1662,12 +1658,6 @@
           "notNull": false,
           "default": "'{}'"
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "type": {
           "name": "type",
           "type": "sell_swap_types",
@@ -1764,19 +1754,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sell_swaps_category_id_product_categories_id_fk": {
-          "name": "sell_swaps_category_id_product_categories_id_fk",
-          "tableFrom": "sell_swaps",
-          "tableTo": "product_categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "sell_swaps_user_id_user_id_fk": {
           "name": "sell_swaps_user_id_user_id_fk",
           "tableFrom": "sell_swaps",
@@ -2234,12 +2211,8 @@
         "new",
         "used",
         "refurbished",
-
         "for_parts",
         "damaged"
-
-        "for_parts"
-
       ]
     },
     "public.job_type": {
