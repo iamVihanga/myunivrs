@@ -22,9 +22,11 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import {
+  BuildingIcon,
+  ImageIcon,
   InfoIcon,
-  PackageIcon,
   PlusIcon,
+  Settings2Icon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
@@ -138,24 +140,26 @@ export function NewAds() {
           Add New Ad
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[1000px] h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[1000px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle>Create New Ads Listing</DialogTitle>
+          <DialogHeader className="flex-shrink-0 px-8 pt-6">
+            <DialogTitle className="text-2xl">
+              Create New Ads Listing
+            </DialogTitle>
             <DialogDescription>
               Fill out the form below to add a new ads listing. Required fields
               are marked with *.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-grow overflow-y-auto px-4">
-            {/* Section: Basic Information */}
-            <div className="mt-6">
+          <div className="flex-grow overflow-y-auto px-8 py-6 space-y-8">
+            {/* Section 1: Basic Information */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <InfoIcon className="h-5 w-5 text-cyan-600" />
                 Basic Information
               </h3>
-              <div className="grid gap-4 mt-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="title">
                     Title <span className="text-red-500">*</span>
@@ -163,7 +167,7 @@ export function NewAds() {
                   <Input
                     id="title"
                     name="title"
-                    placeholder="Enter ad title"
+                    placeholder="Enter a compelling ad title"
                     value={formData.title}
                     onChange={handleChange}
                     required
@@ -174,12 +178,22 @@ export function NewAds() {
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter ad description"
+                    placeholder="Describe your ad in detail"
                     value={formData.description || ""}
                     onChange={handleChange}
                     rows={4}
                   />
                 </div>
+              </div>
+            </section>
+
+            {/* Section 2: Ad Type & Display */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Settings2Icon className="h-5 w-5 text-cyan-600" />
+                Ad Type & Display
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="postType">
                     Post Type <span className="text-red-500">*</span>
@@ -201,85 +215,8 @@ export function NewAds() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            </div>
-
-            {/* Section: Media */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <PackageIcon className="h-5 w-5 text-cyan-600" />
-                Media
-              </h3>
-              <div className="grid gap-2 mt-4">
-                <Label>Images</Label>
-                <div className="flex flex-wrap gap-2">
-                  {formData.images.map((img, idx) => (
-                    <div key={idx} className="relative group">
-                      <img
-                        src={img}
-                        alt={`uploaded-${idx}`}
-                        className="w-16 h-16 object-cover rounded border"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
-                        onClick={() => handleImageRemove(idx)}
-                        aria-label="Remove image"
-                      >
-                        <Trash2Icon className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setGalleryOpen(true)}
-                    className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-cyan-400 rounded hover:bg-cyan-50 transition"
-                    aria-label="Add image"
-                  >
-                    <PlusIcon className="w-6 h-6 text-cyan-600" />
-                  </button>
-                </div>
-              </div>
-              <GalleryView
-                modal={true}
-                activeTab="library"
-                onUseSelected={handleGallerySelect}
-                modalOpen={galleryOpen}
-                setModalOpen={setGalleryOpen}
-              />
-            </div>
-
-            {/* Section: Additional Details */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <PackageIcon className="h-5 w-5 text-cyan-600" />
-                Additional Details
-              </h3>
-              <div className="grid gap-4 mt-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <Label htmlFor="contactInformation">
-                    Contact Information
-                  </Label>
-                  <Input
-                    id="contactInformation"
-                    name="contactInformation"
-                    placeholder="Enter contact information (e.g., phone, email)"
-                    value={formData.contactInformation || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="companyName">Company Name</Label>
-                  <Input
-                    id="companyName"
-                    name="companyName"
-                    placeholder="Enter company name"
-                    value={formData.companyName || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="occurrence">Occurrence</Label>
+                  <Label htmlFor="occurrence">Display Schedule</Label>
                   <Select
                     name="occurrence"
                     value={formData.occurrence || ""}
@@ -288,7 +225,7 @@ export function NewAds() {
                     }
                   >
                     <SelectTrigger id="occurrence">
-                      <SelectValue placeholder="Select occurrence" />
+                      <SelectValue placeholder="Select frequency" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="daily">Daily</SelectItem>
@@ -298,8 +235,8 @@ export function NewAds() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="isFeatured">Featured Listing</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="isFeatured">Featured Ad</Label>
                   <Checkbox
                     id="isFeatured"
                     checked={formData.isFeatured || false}
@@ -307,10 +244,89 @@ export function NewAds() {
                   />
                 </div>
               </div>
-            </div>
+            </section>
+
+            {/* Section 3: Media Upload */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-cyan-600" />
+                Ad Media
+              </h3>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label>Upload Images</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.images.map((img, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={img}
+                          alt={`uploaded-${idx}`}
+                          className="w-16 h-16 object-cover rounded border"
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                          onClick={() => handleImageRemove(idx)}
+                          aria-label="Remove image"
+                        >
+                          <Trash2Icon className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setGalleryOpen(true)}
+                      className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-cyan-400 rounded hover:bg-cyan-50 transition"
+                      aria-label="Add image"
+                    >
+                      <PlusIcon className="w-6 h-6 text-cyan-600" />
+                    </button>
+                  </div>
+                </div>
+                <GalleryView
+                  modal={true}
+                  activeTab="library"
+                  onUseSelected={handleGallerySelect}
+                  modalOpen={galleryOpen}
+                  setModalOpen={setGalleryOpen}
+                />
+              </div>
+            </section>
+
+            {/* Section 4: Contact Information */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <BuildingIcon className="h-5 w-5 text-cyan-600" />
+                Contact & Company Details
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input
+                    id="companyName"
+                    name="companyName"
+                    placeholder="Your company name"
+                    value={formData.companyName || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="contactInformation">
+                    Contact Information
+                  </Label>
+                  <Input
+                    id="contactInformation"
+                    name="contactInformation"
+                    placeholder="Phone, email, or website"
+                    value={formData.contactInformation || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </section>
           </div>
 
-          <DialogFooter className="flex-shrink-0 mt-6 px-4">
+          <DialogFooter className="flex-shrink-0 px-8 py-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -325,7 +341,7 @@ export function NewAds() {
               disabled={isSubmitting}
               className="bg-cyan-600 hover:bg-cyan-700"
             >
-              {isSubmitting ? "Creating..." : "Create Listing"}
+              {isSubmitting ? "Creating..." : "Create Ad"}
             </Button>
           </DialogFooter>
         </form>

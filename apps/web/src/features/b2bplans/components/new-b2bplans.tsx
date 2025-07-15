@@ -257,7 +257,14 @@ import {
   SelectValue,
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
-import { PackageIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
+import {
+  ImageIcon,
+  PackageIcon,
+  PlusIcon,
+  Settings2Icon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -354,22 +361,22 @@ export function NewB2bplans() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle>Create New B2B Plan Listing</DialogTitle>
+          <DialogHeader className="flex-shrink-0 px-8 pt-6">
+            <DialogTitle className="text-2xl">Create New B2B Plan</DialogTitle>
             <DialogDescription>
-              Fill out the form below to add a new B2B plan listing. Required
-              fields are marked with *.
+              Fill out the form below to create a new B2B plan. Required fields
+              are marked with *.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-grow overflow-y-auto px-4">
-            {/* Basic Information */}
-            <div className="mt-6">
+          <div className="flex-grow overflow-y-auto px-8 py-6 space-y-8">
+            {/* Section 1: Plan Overview */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <PackageIcon className="h-5 w-5 text-cyan-600" />
-                Basic Information
+                Plan Overview
               </h3>
-              <div className="grid gap-4 mt-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="title">
                     Title <span className="text-red-500">*</span>
@@ -377,7 +384,7 @@ export function NewB2bplans() {
                   <Input
                     id="title"
                     name="title"
-                    placeholder="Enter plan title"
+                    placeholder="Enter a descriptive plan title"
                     value={formData.title}
                     onChange={handleChange}
                     required
@@ -388,27 +395,22 @@ export function NewB2bplans() {
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter plan description"
+                    placeholder="Describe the benefits and features of this plan"
                     value={formData.description || ""}
                     onChange={handleChange}
                     rows={4}
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="prize">
-                    Price <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="prize"
-                    name="prize"
-                    placeholder="Enter plan price"
-                    value={formData.prize}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+              </div>
+            </section>
 
-                {/* New: Plan Type Select */}
+            {/* Section 2: Plan Details */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Settings2Icon className="h-5 w-5 text-cyan-600" />
+                Plan Details
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="type">
                     Plan Type <span className="text-red-500">*</span>
@@ -429,56 +431,71 @@ export function NewB2bplans() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            </div>
-
-            {/* Media Section */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <PackageIcon className="h-5 w-5 text-cyan-600" />
-                Media
-              </h3>
-              <div className="grid gap-2 mt-4">
-                <Label>Images</Label>
-                <div className="flex flex-wrap gap-2">
-                  {formData.images.map((img, idx) => (
-                    <div key={idx} className="relative group">
-                      <img
-                        src={img}
-                        alt={`uploaded-${idx}`}
-                        className="w-16 h-16 object-cover rounded border"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
-                        onClick={() => handleImageRemove(idx)}
-                        aria-label="Remove image"
-                      >
-                        <Trash2Icon className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setGalleryOpen(true)}
-                    className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-cyan-400 rounded hover:bg-cyan-50 transition"
-                    aria-label="Add image"
-                  >
-                    <PlusIcon className="w-6 h-6 text-cyan-600" />
-                  </button>
+                <div className="grid gap-2">
+                  <Label htmlFor="prize">
+                    Price <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="prize"
+                    name="prize"
+                    placeholder="Enter plan price"
+                    value={formData.prize}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
-              <GalleryView
-                modal={true}
-                activeTab="library"
-                onUseSelected={handleGallerySelect}
-                modalOpen={galleryOpen}
-                setModalOpen={setGalleryOpen}
-              />
-            </div>
+            </section>
+
+            {/* Section 3: Media Content */}
+            <section className="space-y-6 p-6 border rounded-lg bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-cyan-600" />
+                Media Content
+              </h3>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label>Plan Images</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.images.map((img, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={img}
+                          alt={`uploaded-${idx}`}
+                          className="w-16 h-16 object-cover rounded border"
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                          onClick={() => handleImageRemove(idx)}
+                          aria-label="Remove image"
+                        >
+                          <Trash2Icon className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setGalleryOpen(true)}
+                      className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-cyan-400 rounded hover:bg-cyan-50 transition"
+                      aria-label="Add image"
+                    >
+                      <PlusIcon className="w-6 h-6 text-cyan-600" />
+                    </button>
+                  </div>
+                </div>
+                <GalleryView
+                  modal={true}
+                  activeTab="library"
+                  onUseSelected={handleGallerySelect}
+                  modalOpen={galleryOpen}
+                  setModalOpen={setGalleryOpen}
+                />
+              </div>
+            </section>
           </div>
 
-          <DialogFooter className="flex-shrink-0 mt-6 px-4">
+          <DialogFooter className="flex-shrink-0 px-8 py-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -493,7 +510,7 @@ export function NewB2bplans() {
               disabled={isSubmitting}
               className="bg-cyan-600 hover:bg-cyan-700"
             >
-              {isSubmitting ? "Creating..." : "Create Listing"}
+              {isSubmitting ? "Creating..." : "Create Plan"}
             </Button>
           </DialogFooter>
         </form>

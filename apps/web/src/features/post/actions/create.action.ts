@@ -1,12 +1,12 @@
 "use server";
 
 import { client } from "@/lib/rpc";
-import type { InsertHousing } from "../schemas";
+import type { InsertPost } from "../schemas";
 
-export async function createHousing(data: InsertHousing) {
+export async function createPost(data: InsertPost) {
   const rpcClient = await client();
 
-  const response = await rpcClient.api.housing.$post({
+  const response = await rpcClient.api.post.$post({
     json: data,
   });
 
@@ -27,7 +27,7 @@ export async function createHousing(data: InsertHousing) {
     );
   }
 
-  const createdHousing = await response.json();
+  const createdPost = await response.json();
 
-  return createdHousing;
+  return createdPost;
 }

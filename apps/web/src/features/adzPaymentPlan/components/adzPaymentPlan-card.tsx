@@ -106,12 +106,6 @@ export function AdsPaymentPlanCard({ adsPaymentPlan }: Props) {
                 {adsPaymentPlan.description}
               </p>
             )}
-            {adsPaymentPlan.features &&
-              Object.keys(adsPaymentPlan.features).length > 0 && (
-                <pre className="bg-slate-50 rounded p-2 text-xs mt-2 max-h-24 overflow-auto">
-                  {JSON.stringify(adsPaymentPlan.features, null, 2)}
-                </pre>
-              )}
           </div>
 
           {/* Update Actions section */}

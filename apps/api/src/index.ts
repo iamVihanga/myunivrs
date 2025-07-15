@@ -12,7 +12,7 @@ export type AppType = typeof app;
 
 export default {
   port: env.PORT,
-  fetch: app.fetch
+  fetch: app.fetch,
 };
 
 // Test

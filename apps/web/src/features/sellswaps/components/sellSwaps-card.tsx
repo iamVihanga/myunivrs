@@ -190,7 +190,7 @@ export function SellSwapCard({ sellSwaps }: Props) {
           <div className="flex items-center gap-2 ml-2 shrink-0">
             <Badge
               variant="outline"
-              className="bg-green-50 text-green-700 border-green-200 text-xs w-fit"
+              className="bg-green-50 text-green-700 border--200 text-xs w-fit"
             >
               {sellSwaps.status || "Draft"}
             </Badge>

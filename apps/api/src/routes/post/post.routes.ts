@@ -18,13 +18,20 @@ import {
 
 const tags: string[] = ["Post"];
 
+// Update the query params schema to include search
+const postQuerySchema = queryParamsSchema.extend({
+  search: z.string().optional(),
+  sort: z.enum(["asc", "desc"]).default("desc"),
+  status: z.enum(["published", "draft", "deleted"]).optional(),
+});
+
 export const list = createRoute({
   tags,
   summary: "List all posts",
   path: "/",
   method: "get",
   request: {
-    query: queryParamsSchema,
+    query: postQuerySchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(

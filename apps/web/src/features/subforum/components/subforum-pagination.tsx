@@ -12,15 +12,15 @@ import {
   PaginationPrevious
 } from "@repo/ui/components/pagination";
 
-interface HousingPaginationProps {
+interface SubforumPaginationProps {
   currentPage: number;
   totalPages: number;
 }
 
-export function HousingPagination({
+export function SubforumPagination({
   currentPage,
   totalPages
-}: HousingPaginationProps) {
+}: SubforumPaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

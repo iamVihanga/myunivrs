@@ -1,5 +1,12 @@
 "use client";
-import { PlusIcon, XIcon } from "lucide-react";
+import {
+  ClockIcon,
+  CreditCardIcon,
+  InfoIcon,
+  PlusIcon,
+  SettingsIcon,
+  XIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -125,121 +132,157 @@ export function NewAdsPaymentPlan() {
           Add New Payment Plan
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
+      <DialogContent className="sm:max-w-[900px] h-[90vh] flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Create New Ads Payment Plan</DialogTitle>
             <DialogDescription>
-              Fill out the form below to add a new ads payment plan.
+              Fill out the form below to add a new ads payment plan. Required
+              fields are marked with *.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="planName">
-                Plan Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="planName"
-                name="planName"
-                placeholder="Enter plan name"
-                value={formData.planName}
-                onChange={handleChange}
-                required
-              />
+
+          <div className="flex-grow overflow-y-auto px-8">
+            {/* Section 1: Basic Information */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <InfoIcon className="h-5 w-5 text-cyan-600" />
+                Basic Information
+              </h3>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="planName">
+                    Plan Name <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="planName"
+                    name="planName"
+                    placeholder="Enter plan name"
+                    value={formData.planName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Enter plan description"
+                    value={formData.description || ""}
+                    onChange={handleChange}
+                    rows={3}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="price">
-                Price <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                placeholder="Enter price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                min={0}
-              />
+            {/* Section 2: Pricing Details */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <CreditCardIcon className="h-5 w-5 text-cyan-600" />
+                Pricing Details
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="price">
+                    Price <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    placeholder="Enter price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                    min={0}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="currency">
+                    Currency <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="currency"
+                    name="currency"
+                    placeholder="USD"
+                    value={formData.currency}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="currency">
-                Currency <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="currency"
-                name="currency"
-                placeholder="USD"
-                value={formData.currency}
-                onChange={handleChange}
-                required
-              />
+            {/* Section 3: Plan Limitations */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <ClockIcon className="h-5 w-5 text-cyan-600" />
+                Plan Limitations
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="durationDays">
+                    Duration (days) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="durationDays"
+                    name="durationDays"
+                    type="number"
+                    placeholder="Number of days"
+                    value={formData.durationDays}
+                    onChange={handleChange}
+                    required
+                    min={1}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="maxAds">
+                    Max Ads <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="maxAds"
+                    name="maxAds"
+                    type="number"
+                    placeholder="Maximum number of ads"
+                    value={formData.maxAds}
+                    onChange={handleChange}
+                    required
+                    min={1}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="durationDays">
-                Duration (days) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="durationDays"
-                name="durationDays"
-                type="number"
-                placeholder="Number of days"
-                value={formData.durationDays}
-                onChange={handleChange}
-                required
-                min={1}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="maxAds">
-                Max Ads <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="maxAds"
-                name="maxAds"
-                type="number"
-                placeholder="Maximum number of ads"
-                value={formData.maxAds}
-                onChange={handleChange}
-                required
-                min={1}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="status">Status</Label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1"
-              >
-                {STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Enter plan description"
-                value={formData.description || ""}
-                onChange={handleChange}
-                rows={3}
-              />
+            {/* Section 4: Plan Settings */}
+            <div className="mt-6 mb-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <SettingsIcon className="h-5 w-5 text-cyan-600" />
+                Plan Settings
+              </h3>
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="status">Status</Label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status || ""}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1"
+                  >
+                    {STATUS_OPTIONS.map((status) => (
+                      <option key={status} value={status}>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="px-8 py-4">
             <Button
               type="button"
               variant="outline"

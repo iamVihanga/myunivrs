@@ -3,15 +3,15 @@
 import { client } from "@/lib/rpc";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { updateHousingSchema } from "../schemas";
+import { updatePostSchema } from "../schemas";
 
-type UpdateInput = z.infer<typeof updateHousingSchema>;
+type UpdateInput = z.infer<typeof updatePostSchema>;
 
-export async function updateHousing(id: string, data: UpdateInput) {
+export async function updatePost(id: string, data: UpdateInput) {
   const rpcClient = await client();
 
   try {
-    const parsed = updateHousingSchema.safeParse(data);
+    const parsed = updatePostSchema.safeParse(data);
     if (!parsed.success) {
       const errorMessage = parsed.error.issues
         .map((issue) => issue.message)
@@ -19,7 +19,7 @@ export async function updateHousing(id: string, data: UpdateInput) {
       throw new Error(`Validation failed: ${errorMessage}`);
     }
 
-    const result = await rpcClient.api.housing[":id"].$put({
+    const result = await rpcClient.api.post[":id"].$put({
       param: { id },
       json: parsed.data,
     });
@@ -32,16 +32,16 @@ export async function updateHousing(id: string, data: UpdateInput) {
         "message" in errorData &&
         typeof (errorData as any).message === "string"
           ? (errorData as any).message
-          : `Failed to update housing: ${result.status}`
+          : `Failed to update post: ${result.status}`
       );
     }
 
-    revalidatePath("/dashboard/housing");
+    revalidatePath("/dashboard/post");
     return { success: true, data: await result.json() };
   } catch (error) {
-    console.error("Housing update error:", error);
+    console.error("Post update error:", error);
     throw error instanceof Error
       ? error
-      : new Error("An unexpected error occurred while updating housing");
+      : new Error("An unexpected error occurred while updating post");
   }
 }

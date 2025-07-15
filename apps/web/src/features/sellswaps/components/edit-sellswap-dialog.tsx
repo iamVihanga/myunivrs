@@ -53,7 +53,6 @@ export function EditSellSwapDialog({ sellSwap }: Props) {
     title: sellSwap.title,
     description: sellSwap.description || "",
     images: sellSwap.images || [],
-    categoryId: sellSwap.categoryId || "",
     type: sellSwap.type || "sell",
     price: sellSwap.price,
     condition: sellSwap.condition || "used",
@@ -108,7 +107,7 @@ export function EditSellSwapDialog({ sellSwap }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.categoryId || !formData.type) {
+    if (!formData.title || !formData.type) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -210,18 +209,6 @@ export function EditSellSwapDialog({ sellSwap }: Props) {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="categoryId">
-                      Category <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="categoryId"
-                      name="categoryId"
-                      value={formData.categoryId}
-                      onChange={handleChange}
-                      required
-                    />
                   </div>
                 </div>
               </div>

@@ -1,31 +1,27 @@
 import { Card, CardContent } from "@repo/ui/components/card";
-import { getAllHousing } from "../actions/getAll.action";
-import { HousingCard } from "./housing-card";
-import { HousingPagination } from "./housing-pagination";
+import { getAllSubforum } from "../actions/getAll.action";
 import { SearchBar } from "./search-bar";
+import { SubforumCard } from "./subforum-card";
 
-interface HousingsListProps {
+interface SubforumListProps {
   page?: string;
   limit?: string;
   search?: string;
+  sort: "hot" | "trending" | "new";
 }
 
-export async function HousingsList({
+export async function SubforumList({
   page = "1",
-  limit = "8",
-  search = ""
-}: HousingsListProps) {
-  // Get housing data with pagination
-  const response = await getAllHousing({ page, limit, search });
+  limit = "10",
+  search = "",
+}: SubforumListProps) {
+  const response = await getAllSubforum({ page, limit, search });
 
-  // Convert string dates to Date objects
-  const housings = response.data.map((housing: any) => ({
-    ...housing,
-    createdAt: new Date(housing.createdAt),
-    updatedAt: housing.updatedAt ? new Date(housing.updatedAt) : null
+  const subforums = response.data.map((subforum: any) => ({
+    ...subforum,
+    createdAt: new Date(subforum.createdAt),
   }));
 
-  // Get pagination metadata
   const { currentPage, totalPages, totalCount } = response.meta;
 
   return (
@@ -34,12 +30,12 @@ export async function HousingsList({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <SearchBar />
         <div className="text-sm text-muted-foreground">
-          {totalCount} {totalCount === 1 ? "listing" : "listings"} found
+          {totalCount} {totalCount === 1 ? "subforum" : "subforums"} found
         </div>
       </div>
 
-      {/* Housing List */}
-      {housings.length === 0 ? (
+      {/* Subforum List */}
+      {subforums.length === 0 ? (
         <Card className="bg-cyan-50 border-none">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-cyan-100 p-3 mb-4">
@@ -60,25 +56,24 @@ export async function HousingsList({
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-1">
-              No listings found
+              No subforums found
             </h3>
             <p className="text-muted-foreground max-w-sm">
               {search
                 ? `No results found for "${search}". Try a different search term.`
-                : "Create a new listing to get started."}
+                : "Create a new subforum to get started."}
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {housings.map((housing: any) => (
-            <HousingCard key={housing.id} housing={housing} />
+          {subforums.map((subforum: any) => (
+            <SubforumCard key={subforum.id} subforum={subforum} />
           ))}
         </div>
       )}
 
-      {/* Pagination */}
-      <HousingPagination currentPage={currentPage} totalPages={totalPages} />
+      {/* Add Pagination component here if needed */}
     </div>
   );
 }

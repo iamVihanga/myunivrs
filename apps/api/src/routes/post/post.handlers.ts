@@ -25,51 +25,65 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const limitNum = Math.max(1, Math.min(100, parseInt(limit)));
   const offset = (pageNum - 1) * limitNum;
 
-  const query = db.query.post.findMany({
-    limit: limitNum,
-    offset,
-    where: search
-      ? (fields) =>
-          or(
-            ilike(fields.title, `%${search}%`),
-            ilike(fields.content || "", `%${search}%`)
-          )
-      : undefined,
-    orderBy: (fields) =>
-      sort.toLowerCase() === "asc" ? fields.createdAt : desc(fields.createdAt),
-    with: {
-      subforum: true,
-    },
-  });
+  try {
+    // Basic select query without relations
+    const posts = await db
+      .select()
+      .from(post)
+      .limit(limitNum)
+      .offset(offset)
+      .where(
+        search
+          ? or(
+              ilike(post.title, `%${search}%`),
+              ilike(post.content || "", `%${search}%`)
+            )
+          : undefined
+      )
+      .orderBy(sort === "asc" ? post.createdAt : desc(post.createdAt));
 
-  const totalCountQuery = db
-    .select({ count: sql<number>`count(*)` })
-    .from(post)
-    .where(
-      search
-        ? or(
-            ilike(post.title, `%${search}%`),
-            ilike(post.content || "", `%${search}%`)
-          )
-        : undefined
-    );
+    // Count query
+    const countResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(post)
+      .where(
+        search
+          ? or(
+              ilike(post.title, `%${search}%`),
+              ilike(post.content || "", `%${search}%`)
+            )
+          : undefined
+      );
 
-  const [posts, _totalCount] = await Promise.all([query, totalCountQuery]);
-  const totalCount = _totalCount[0]?.count || 0;
-  const totalPages = Math.ceil(totalCount / limitNum);
+    const totalCount = Number(countResult?.[0]?.count ?? 0);
+    const totalPages = Math.ceil(totalCount / limitNum);
 
-  return c.json(
-    {
-      data: posts,
-      meta: {
-        currentPage: pageNum,
-        totalPages,
-        totalCount,
-        limit: limitNum,
+    // Return formatted response
+    return c.json(
+      {
+        data: posts.map((post) => ({
+          ...post,
+          content: post.content || "",
+          url: post.url || "",
+          voteScore: post.voteScore || 0,
+          status: post.status || "published",
+        })),
+        meta: {
+          currentPage: pageNum,
+          totalPages,
+          totalCount,
+          limit: limitNum,
+        },
       },
-    },
-    HttpStatusCodes.OK
-  );
+      HttpStatusCodes.OK
+    );
+  } catch (error) {
+    console.error("List posts error:", error);
+    return c.json(
+      { message: "Failed to fetch posts" },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 };
 
 export const create: AppRouteHandler<CreateRoute> = async (c) => {

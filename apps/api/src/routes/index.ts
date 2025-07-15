@@ -55,3 +55,76 @@ export function registerRoutes(app: AppOpenAPI) {
 export const router = registerRoutes(createRouter().basePath(BASE_PATH));
 
 export type Router = typeof router;
+
+// import { createRouter } from "@/lib/create-app";
+// import { AppOpenAPI } from "@/types";
+// import { BASE_PATH } from "../lib/constants";
+
+// // Import route handlers
+// import aboutUs from "./about-us/aboutus.index";
+// import ads from "./ads/ads.index";
+// import adzPaymentPlan from "./adzPaymentPlan/adzPaymentPlan.index";
+// import b2bplans from "./b2bplans/b2bplans.index";
+// import comment from "./comment/comment.index";
+// import events from "./events/events.index";
+// import housing from "./housing/housing.index";
+// import index from "./index.route";
+// import jobs from "./jobs/jobs.index";
+// import media from "./media/media.index";
+// import notifications from "./notifications/notifications.index";
+// import post from "./post/post.index";
+// import categories from "./products/categories/categories.index";
+// import products from "./products/products.index";
+// import sellswaps from "./sellswaps/sellswaps.index";
+// import siteSettings from "./siteSetting/siteSetting.index";
+// import subforum from "./subforum/subforum.index";
+// import tasks from "./tasks/tasks.index";
+// import university from "./university/university.index";
+// import vote from "./vote/vote.index";
+
+// // Split route registration into manageable parts
+// function registerBasicRoutes(app: AppOpenAPI) {
+//   return app
+//     .route("/", index)
+//     .route("/tasks", tasks)
+//     .route("/housing", housing)
+//     .route("/jobs", jobs)
+//     .route("/university", university)
+//     .route("/events", events)
+//     .route("/products", products);
+// }
+
+// function registerAdditionalRoutes(app: AppOpenAPI) {
+//   return app
+//     .route("/sellswaps", sellswaps)
+//     .route("/about-us", aboutUs)
+//     .route("/ads-payment-plan", adzPaymentPlan)
+//     .route("/site-settings", siteSettings)
+//     .route("/media", media)
+//     .route("/ads", ads);
+// }
+
+// function registerRemainingRoutes(app: AppOpenAPI) {
+//   return app
+//     .route("/b2bplans", b2bplans)
+//     .route("/notifications", notifications)
+//     .route("/categories", categories)
+//     .route("/subforum", subforum)
+//     .route("/post", post)
+//     .route("/comment", comment)
+//     .route("/vote", vote);
+// }
+
+// export function registerRoutes(app: AppOpenAPI) {
+//   let result = registerBasicRoutes(app);
+//   result = registerAdditionalRoutes(result);
+//   result = registerRemainingRoutes(result);
+//   return result;
+// }
+
+// // Create router and base path
+// const app = createRouter().basePath(BASE_PATH);
+// export const router = registerRoutes(app);
+
+// // ✅ Safe type inference for router
+// export type Router = typeof router;

@@ -22,7 +22,7 @@ import {
 } from "@repo/ui/components/select";
 import { Textarea } from "@repo/ui/components/textarea";
 import {
-  BedIcon,
+  BuildingIcon,
   HomeIcon,
   ImageIcon,
   MapPinIcon,
@@ -153,62 +153,104 @@ export function NewHousing() {
           </DialogHeader>
 
           <div className="flex-grow overflow-y-auto px-8">
-            {/* Section: Basic Information */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 1: Essential Information */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <HomeIcon className="h-5 w-5 text-cyan-600" />
-                Basic Information
+                Essential Information
               </h3>
-              <div className="grid gap-4 mt-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2 sm:col-span-2">
+                  <Label htmlFor="title" className="font-medium">
                     Title <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="title"
                     name="title"
-                    placeholder="Enter listing title"
+                    placeholder="Enter a descriptive title"
                     value={formData.title}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
+                <div className="grid gap-2 sm:col-span-2">
+                  <Label htmlFor="description" className="font-medium">
+                    Description
+                  </Label>
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter listing description"
+                    placeholder="Describe the property in detail"
                     value={formData.description || ""}
                     onChange={handleChange}
                     rows={4}
                   />
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="price" className="font-medium">
+                    Price <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    placeholder="Enter monthly rent"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="housingType" className="font-medium">
+                    Housing Type
+                  </Label>
+                  <Select
+                    name="housingType"
+                    value={formData.housingType || ""}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        housingType: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="condo">Condo</SelectItem>
+                      <SelectItem value="townhouse">Townhouse</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
-            {/* Section: Location */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 2: Location Details */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <MapPinIcon className="h-5 w-5 text-cyan-600" />
-                Location
+                Location Details
               </h3>
-              <div className="grid gap-4 mt-4 sm:grid-cols-2">
-                <div className="grid gap-2">
-                  <Label htmlFor="address">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2 sm:col-span-2">
+                  <Label htmlFor="address" className="font-medium">
                     Address <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="address"
                     name="address"
-                    placeholder="Enter property address"
+                    placeholder="Enter full address"
                     value={formData.address}
                     onChange={handleChange}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city" className="font-medium">
+                    City
+                  </Label>
                   <Input
                     id="city"
                     name="city"
@@ -218,7 +260,9 @@ export function NewHousing() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="state">State</Label>
+                  <Label htmlFor="state" className="font-medium">
+                    State
+                  </Label>
                   <Input
                     id="state"
                     name="state"
@@ -228,7 +272,9 @@ export function NewHousing() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="zipCode">Zip Code</Label>
+                  <Label htmlFor="zipCode" className="font-medium">
+                    Zip Code
+                  </Label>
                   <Input
                     id="zipCode"
                     name="zipCode"
@@ -240,101 +286,81 @@ export function NewHousing() {
               </div>
             </div>
 
-            {/* Section: Property Details */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <BedIcon className="h-5 w-5 text-cyan-600" />
-                Property Details
+            {/* Section 3: Property Features */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <BuildingIcon className="h-5 w-5 text-cyan-600" />
+                Property Features
               </h3>
-              <div className="grid gap-4 mt-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div className="grid gap-2">
-                  <Label htmlFor="price">
-                    Price <span className="text-red-500">*</span>
+                  <Label htmlFor="bedrooms" className="font-medium">
+                    Bedrooms
                   </Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    placeholder="Enter property price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="housingType">Housing Type</Label>
-                  <Select
-                    name="housingType"
-                    value={formData.housingType || ""}
-                    onValueChange={(value) =>
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        housingType: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select housing type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="apartment">Apartment</SelectItem>
-                      <SelectItem value="house">House</SelectItem>
-                      <SelectItem value="condo">Condo</SelectItem>
-                      <SelectItem value="townhouse">Townhouse</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="bedrooms">Bedrooms</Label>
                   <Input
                     id="bedrooms"
                     name="bedrooms"
-                    placeholder="Enter number of bedrooms"
+                    type="number"
+                    placeholder="Number of bedrooms"
                     value={formData.bedrooms || ""}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="bathrooms">Bathrooms</Label>
+                  <Label htmlFor="bathrooms" className="font-medium">
+                    Bathrooms
+                  </Label>
                   <Input
                     id="bathrooms"
                     name="bathrooms"
-                    placeholder="Enter number of bathrooms"
+                    type="number"
+                    placeholder="Number of bathrooms"
                     value={formData.bathrooms || ""}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="squareFootage">Square Footage</Label>
+                  <Label htmlFor="squareFootage" className="font-medium">
+                    Square Footage
+                  </Label>
                   <Input
                     id="squareFootage"
                     name="squareFootage"
-                    placeholder="Enter square footage"
+                    type="number"
+                    placeholder="Total area"
                     value={formData.squareFootage || ""}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="yearBuilt">Year Built</Label>
+                  <Label htmlFor="yearBuilt" className="font-medium">
+                    Year Built
+                  </Label>
                   <Input
                     id="yearBuilt"
                     name="yearBuilt"
-                    placeholder="Enter year built"
+                    type="number"
+                    placeholder="Construction year"
                     value={formData.yearBuilt || ""}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="parking">Parking</Label>
+                  <Label htmlFor="parking" className="font-medium">
+                    Parking
+                  </Label>
                   <Input
                     id="parking"
                     name="parking"
-                    placeholder="Enter parking details"
+                    placeholder="Parking details"
                     value={formData.parking || ""}
                     onChange={handleChange}
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="isFurnished">Furnished</Label>
+                <div className="grid gap-2 items-center">
+                  <Label htmlFor="isFurnished" className="font-medium">
+                    Furnished
+                  </Label>
                   <Checkbox
                     id="isFurnished"
                     checked={formData.isFurnished || false}
@@ -344,11 +370,11 @@ export function NewHousing() {
               </div>
             </div>
 
-            {/* Section: Media */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 4: Media & Links */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <ImageIcon className="h-5 w-5 text-cyan-600" />
-                Media
+                Media & Links
               </h3>
               <div className="grid gap-2 mt-4">
                 <Label>Images</Label>
@@ -390,7 +416,9 @@ export function NewHousing() {
                 setModalOpen={setGalleryOpen}
               />
               <div className="grid gap-2 mt-4">
-                <Label htmlFor="link">Website Link</Label>
+                <Label htmlFor="link" className="font-medium">
+                  Website Link
+                </Label>
                 <Input
                   id="link"
                   name="link"
@@ -401,15 +429,17 @@ export function NewHousing() {
               </div>
             </div>
 
-            {/* Section: Contact Information */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 5: Contact Information */}
+            <div className="mt-6 mb-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <PhoneIcon className="h-5 w-5 text-cyan-600" />
                 Contact Information
               </h3>
-              <div className="grid gap-4 mt-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="contactNumber">Contact Number</Label>
+                  <Label htmlFor="contactNumber" className="font-medium">
+                    Contact Number
+                  </Label>
                   <Input
                     id="contactNumber"
                     name="contactNumber"

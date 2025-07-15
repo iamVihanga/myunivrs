@@ -25,7 +25,6 @@ import {
 import { Textarea } from "@repo/ui/components/textarea";
 import {
   BriefcaseIcon,
-  BuildingIcon,
   CodeIcon,
   DollarSignIcon,
   LinkIcon,
@@ -174,14 +173,14 @@ export function NewJob() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-grow overflow-y-auto px-4">
-            {/* Section: Basic Information */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+          <div className="flex-grow overflow-y-auto px-8">
+            {/* Section 1: Basic Information */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <BriefcaseIcon className="h-5 w-5 text-cyan-600" />
                 Basic Information
               </h3>
-              <div className="grid gap-4 mt-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="title">
                     Title <span className="text-red-500">*</span>
@@ -200,22 +199,12 @@ export function NewJob() {
                   <Textarea
                     id="description"
                     name="description"
-                    placeholder="Enter listing description"
+                    placeholder="Enter detailed job description"
                     value={formData.description || ""}
                     onChange={handleChange}
                     rows={4}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Section: Company Details */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <BuildingIcon className="h-5 w-5 text-cyan-600" />
-                Company Details
-              </h3>
-              <div className="grid gap-4 mt-4">
                 <div className="grid gap-2">
                   <Label htmlFor="company">
                     Company <span className="text-red-500">*</span>
@@ -232,13 +221,13 @@ export function NewJob() {
               </div>
             </div>
 
-            {/* Section: Job Requirements */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 2: Job Requirements & Type */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <CodeIcon className="h-5 w-5 text-cyan-600" />
                 Job Requirements
               </h3>
-              <div className="grid gap-4 mt-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="jobType">Job Type</Label>
                   <Select
@@ -286,7 +275,6 @@ export function NewJob() {
                         cvRequired: value === "yes",
                       }))
                     }
-                    name="cvRequired"
                   >
                     <SelectTrigger id="cvRequired">
                       <SelectValue placeholder="Select option" />
@@ -300,20 +288,20 @@ export function NewJob() {
               </div>
             </div>
 
-            {/* Section: Compensation */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 3: Compensation */}
+            <div className="mt-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <DollarSignIcon className="h-5 w-5 text-cyan-600" />
                 Compensation
               </h3>
-              <div className="grid gap-4 mt-4 sm:grid-cols-2">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
                   <Label>Salary Range</Label>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <Input
                       name="min"
                       type="number"
-                      placeholder="Min"
+                      placeholder="Min salary"
                       value={formData.salaryRange.min ?? ""}
                       onChange={handleSalaryChange}
                       min={0}
@@ -321,14 +309,14 @@ export function NewJob() {
                     <Input
                       name="max"
                       type="number"
-                      placeholder="Max"
+                      placeholder="Max salary"
                       value={formData.salaryRange.max ?? ""}
                       onChange={handleSalaryChange}
                       min={0}
                     />
                     <Input
                       name="currency"
-                      placeholder="Currency"
+                      placeholder="Currency (e.g. USD)"
                       value={formData.salaryRange.currency ?? ""}
                       onChange={handleSalaryChange}
                     />
@@ -337,15 +325,15 @@ export function NewJob() {
               </div>
             </div>
 
-            {/* Section: Application Details */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
+            {/* Section 4: Listing Details & Media */}
+            <div className="mt-6 mb-6 p-4 rounded-lg border bg-muted/10">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                 <LinkIcon className="h-5 w-5 text-cyan-600" />
-                Application Details
+                Listing Details
               </h3>
-              <div className="grid gap-4 mt-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label>Images</Label>
+                  <Label>Listing Images</Label>
                   <div className="flex flex-wrap gap-2">
                     {formData.images.map((img, idx) => (
                       <div key={idx} className="relative group">
@@ -373,74 +361,73 @@ export function NewJob() {
                       <PlusIcon className="w-6 h-6 text-cyan-600" />
                     </button>
                   </div>
-                </div>
-                <GalleryView
-                  modal={true}
-                  activeTab="library"
-                  onUseSelected={handleGallerySelect}
-                  modalOpen={galleryOpen}
-                  setModalOpen={setGalleryOpen}
-                />
-``
-                <div className="grid gap-2">
-                  <Label htmlFor="actionUrl">Application Link</Label>
-                  <Input
-                    id="actionUrl"
-                    name="actionUrl"
-                    placeholder="https://company.com/apply"
-                    value={formData.actionUrl || ""}
-                    onChange={handleChange}
-                    type="url"
+                  <GalleryView
+                    modal={true}
+                    activeTab="library"
+                    onUseSelected={handleGallerySelect}
+                    modalOpen={galleryOpen}
+                    setModalOpen={setGalleryOpen}
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="isFeatured">Featured?</Label>
-                  <Select
-                    value={formData.isFeatured ? "yes" : "no"}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        isFeatured: value === "yes",
-                      }))
-                    }
-                    name="isFeatured"
-                  >
-                    <SelectTrigger id="isFeatured">
-                      <SelectValue placeholder="Select option" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        status: value as InsertJobs["status"],
-                      }))
-                    }
-                    name="status"
-                  >
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="actionUrl">Application URL</Label>
+                    <Input
+                      id="actionUrl"
+                      name="actionUrl"
+                      placeholder="https://company.com/apply"
+                      value={formData.actionUrl || ""}
+                      onChange={handleChange}
+                      type="url"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="isFeatured">Featured Listing?</Label>
+                    <Select
+                      value={formData.isFeatured ? "yes" : "no"}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isFeatured: value === "yes",
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="isFeatured">
+                        <SelectValue placeholder="Select option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">Yes</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">Listing Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: value as InsertJobs["status"],
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="status">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="published">Published</SelectItem>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="archived">Archived</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <DialogFooter className="flex-shrink-0 mt-6 px-4">
+          <DialogFooter className="flex-shrink-0 px-8 py-4">
             <Button
               type="button"
               variant="outline"
