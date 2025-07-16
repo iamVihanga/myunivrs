@@ -36,6 +36,20 @@
       "when": 1752492928690,
       "tag": "0004_narrow_mandroid",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752567676342,
+      "tag": "0005_curvy_cobalt_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1752645529937,
+      "tag": "0006_secret_deathbird",
+      "breakpoints": true
     }
   ]
 }

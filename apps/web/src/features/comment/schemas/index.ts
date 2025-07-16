@@ -7,7 +7,6 @@ export const selectCommentSchema = createSelectSchema(comment);
 export const insertCommentSchema = createInsertSchema(comment, {
   content: z.string().min(1),
   postId: z.string().min(1),
-  parentCommentId: z.string().optional(), // Add parent comment ID as optional
   voteScore: z.number().default(0),
 }).omit({
   id: true,
@@ -21,7 +20,6 @@ export const updateCommentSchema = createInsertSchema(comment)
     createdBy: true,
     createdAt: true,
     postId: true,
-    parentCommentId: true, // Add parentCommentId to omitted fields
     voteScore: true,
   })
   .partial();
@@ -30,8 +28,3 @@ export const updateCommentSchema = createInsertSchema(comment)
 export type Comment = z.infer<typeof selectCommentSchema>;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type UpdateComment = z.infer<typeof updateCommentSchema>;
-
-// Add a helper type for nested comments
-export interface CommentWithReplies extends Comment {
-  replies?: CommentWithReplies[];
-}

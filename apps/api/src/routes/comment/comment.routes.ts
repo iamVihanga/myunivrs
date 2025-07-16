@@ -18,23 +18,28 @@ import {
 
 const tags: string[] = ["Comment"];
 
-// List route definition
+// List route definition with nested replies support
 export const list = createRoute({
   tags,
-  summary: "List comments for a post",
+  summary: "List comments for a post with nested replies",
   path: "/",
   method: "get",
   request: {
     query: z.object({
       ...queryParamsSchema.shape,
       postId: z.string().optional(),
-      parentCommentId: z.string().optional(),
     }),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      getPaginatedSchema(z.array(selectCommentSchema)),
-      "The list of comments"
+      getPaginatedSchema(
+        z.array(
+          selectCommentSchema.extend({
+            replies: z.array(selectCommentSchema).optional(),
+          })
+        )
+      ),
+      "The list of comments with their replies"
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: jsonContent(
       errorMessageSchema,
@@ -43,10 +48,10 @@ export const list = createRoute({
   },
 });
 
-// Create route definition
+// Create route definition with parent comment support
 export const create = createRoute({
   tags,
-  summary: "Create a new comment",
+  summary: "Create a new comment or reply",
   path: "/",
   method: "post",
   request: {
@@ -63,22 +68,40 @@ export const create = createRoute({
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       errorMessageSchema,
-      "The validation error(s)"
+      "Invalid parent comment or validation error"
     ),
   },
 });
 
-// Get One route definition
+// Get One route definition with replies included
 export const getOne = createRoute({
   tags,
-  summary: "Get a single comment by ID",
+  summary: "Get a single comment by ID with its replies",
   method: "get",
   path: "/{id}",
   request: {
     params: stringIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(selectCommentSchema, "Requested comment"),
+    [HttpStatusCodes.OK]: jsonContent(
+      selectCommentSchema.extend({
+        replies: z.array(selectCommentSchema).optional(),
+        user: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            image: z.string().nullable(),
+          })
+          .optional(),
+        post: z
+          .object({
+            id: z.string(),
+            title: z.string(),
+          })
+          .optional(),
+      }),
+      "Requested comment with replies"
+    ),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(
       notFoundSchema,
       "Comment not found"
@@ -90,7 +113,7 @@ export const getOne = createRoute({
   },
 });
 
-// Update route definition
+// Update route definition (parentCommentId cannot be modified)
 export const update = createRoute({
   tags,
   summary: "Update an existing comment",
@@ -120,10 +143,10 @@ export const update = createRoute({
   },
 });
 
-// Delete route definition
+// Delete route definition with cascade delete for replies
 export const remove = createRoute({
   tags,
-  summary: "Delete a comment",
+  summary: "Delete a comment and its replies",
   path: "/{id}",
   method: "delete",
   request: {
@@ -131,7 +154,7 @@ export const remove = createRoute({
   },
   responses: {
     [HttpStatusCodes.NO_CONTENT]: {
-      description: "Comment deleted successfully",
+      description: "Comment and its replies deleted successfully",
     },
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
       errorMessageSchema,

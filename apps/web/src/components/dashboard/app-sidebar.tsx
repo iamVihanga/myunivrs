@@ -106,17 +106,17 @@ const data = {
       icon: IconBuildings,
     },
     {
-      name: "Forum",
+      name: "Communities",
       url: "/dashboard/forum",
 
       icon: IconBuildings,
     },
-    {
-      name: "Post",
-      url: "/dashboard/post",
+    // {
+    //   name: "Post",
+    //   url: "/dashboard/post",
 
-      icon: IconBuildings,
-    },
+    //   icon: IconBuildings,
+    // },
   ],
 };
 

@@ -7,8 +7,8 @@ export const selectPostSchema = createSelectSchema(post);
 export const insertPostSchema = createInsertSchema(post, {
   title: z.string().min(1).max(500),
   content: z.string().optional(),
-  images: z.string().array().optional(), // Assuming images is an array of strings
-  url: z.string().min(1).url().optional(), // Added URL validation
+  images: z.array(z.string()).optional(),
+  url: z.string().url().optional().or(z.literal("")), // Allow empty string or valid URL
   subforumId: z.string().min(1),
   status: z.enum(["published", "draft", "deleted"]).default("published"),
   voteScore: z.number().default(0),
