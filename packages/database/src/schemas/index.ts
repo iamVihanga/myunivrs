@@ -33,3 +33,5 @@ export * from "./b2bplans.schema";
 export * from "./notifications.schema";
 
 export * from "./forum.schema";
+
+export * from "./connection.schema";

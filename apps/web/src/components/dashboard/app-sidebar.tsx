@@ -111,6 +111,12 @@ const data = {
 
       icon: IconBuildings,
     },
+    {
+      name: "Connections",
+      url: "/dashboard/connection",
+
+      icon: IconBuildings,
+    },
     // {
     //   name: "Post",
     //   url: "/dashboard/post",

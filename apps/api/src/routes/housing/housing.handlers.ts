@@ -163,6 +163,14 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       HttpStatusCodes.UNAUTHORIZED
     );
   }
+  if (!session.activeOrganizationId) {
+    return c.json(
+      {
+        message: HttpStatusPhrases.UNAUTHORIZED,
+      },
+      HttpStatusCodes.UNAUTHORIZED
+    );
+  }
 
   const allowedStatuses = [
     "published",
@@ -193,6 +201,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     housingType: housingEntry.housingType ?? "",
     images: housingEntry.images ?? [],
     isFurnished: housingEntry.isFurnished ?? undefined,
+    agentProfile: session.activeOrganizationId,
     // Add any other required fields with default values if needed
   };
 

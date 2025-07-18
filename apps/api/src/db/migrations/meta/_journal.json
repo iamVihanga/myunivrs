@@ -50,6 +50,13 @@
       "when": 1752645529937,
       "tag": "0006_secret_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1752820956376,
+      "tag": "0007_damp_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

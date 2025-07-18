@@ -9,12 +9,16 @@ import adzPaymentPlan from "./adzPaymentPlan/adzPaymentPlan.index";
 import ads from "./ads/ads.index";
 import b2bplans from "./b2bplans/b2bplans.index";
 import comment from "./comment/comment.index";
+import connection from "./connection/connection.index";
 import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
 import media from "./media/media.index";
 import notifications from "./notifications/notifications.index";
+import poll from "./poll/poll.index";
+import pollOption from "./pollOption/pollOption.index";
+import pollVote from "./pollVote/pollVote.index";
 import post from "./post/post.index";
 import categories from "./products/categories/categories.index";
 import products from "./products/products.index";
@@ -23,6 +27,7 @@ import siteSettings from "./siteSetting/siteSetting.index";
 import subforum from "./subforum/subforum.index";
 import tasks from "./tasks/tasks.index";
 import university from "./university/university.index";
+import user from "./user/user.index";
 import vote from "./vote/vote.index";
 
 export function registerRoutes(app: AppOpenAPI) {
@@ -48,6 +53,11 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/post", post)
     .route("/comment", comment)
     .route("/vote", vote)
+    .route("/poll", poll)
+    .route("/poll-vote", pollVote)
+    .route("/poll-option", pollOption)
+    .route("/connection", connection)
+    .route("/user", user)
     .route("/notifications", notifications);
 }
 
