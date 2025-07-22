@@ -35,3 +35,7 @@ export * from "./notifications.schema";
 export * from "./forum.schema";
 
 export * from "./connection.schema";
+
+export * from "./userProfile.schema";
+
+export * from "./b2bProfile.schema";

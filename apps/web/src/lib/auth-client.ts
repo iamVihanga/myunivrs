@@ -1,7 +1,7 @@
 import {
   adminClient,
   apiKeyClient,
-  organizationClient
+  organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { toast } from "sonner";
@@ -16,6 +16,11 @@ export const authClient = createAuthClient({
   fetchOptions: {
     onError: (ctx) => {
       toast.error(ctx.error.message);
-    }
-  }
+    },
+  },
+});
+
+export const { signIn, signOut, signUp, useSession } = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000",
+  plugins: [organizationClient()],
 });

@@ -8,6 +8,7 @@ import adzPaymentPlan from "./adzPaymentPlan/adzPaymentPlan.index";
 
 import ads from "./ads/ads.index";
 import b2bplans from "./b2bplans/b2bplans.index";
+import b2bProfile from "./b2bProfile/b2bProfile.index";
 import comment from "./comment/comment.index";
 import connection from "./connection/connection.index";
 import events from "./events/events.index";
@@ -28,6 +29,7 @@ import subforum from "./subforum/subforum.index";
 import tasks from "./tasks/tasks.index";
 import university from "./university/university.index";
 import user from "./user/user.index";
+import userProfile from "./userProfile/userProfile.index";
 import vote from "./vote/vote.index";
 
 export function registerRoutes(app: AppOpenAPI) {
@@ -58,6 +60,8 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/poll-option", pollOption)
     .route("/connection", connection)
     .route("/user", user)
+    .route("/user-profile", userProfile)
+    .route("/b2b-profile", b2bProfile)
     .route("/notifications", notifications);
 }
 

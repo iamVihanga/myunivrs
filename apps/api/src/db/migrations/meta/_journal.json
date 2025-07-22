@@ -57,6 +57,41 @@
       "when": 1752820956376,
       "tag": "0007_damp_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1753089380059,
+      "tag": "0008_sparkling_lionheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1753090566419,
+      "tag": "0009_sparkling_sersi",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1753093239228,
+      "tag": "0010_flaky_lord_tyger",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1753093727715,
+      "tag": "0011_worried_sabretooth",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1753099275426,
+      "tag": "0012_steady_stingray",
+      "breakpoints": true
     }
   ]
 }

@@ -1,16 +1,16 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
+import { createErrorSchema } from "stoker/openapi/schemas";
 
 import { notFoundSchema } from "@/lib/constants";
 import {
   errorMessageSchema,
   getPaginatedSchema,
   queryParamsSchema,
-  stringIdParamSchema,
 } from "@/lib/helpers";
 import {
+  connectionParamSchema,
   insertConnectionSchema,
   selectConnectionSchema,
   updateConnectionSchema,
@@ -74,7 +74,18 @@ export const create = createRoute({
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
-      selectConnectionSchema,
+      selectConnectionSchema.extend({
+        sender: z.object({
+          id: z.string(),
+          name: z.string(),
+          image: z.string().nullable(),
+        }),
+        receiver: z.object({
+          id: z.string(),
+          name: z.string(),
+          image: z.string().nullable(),
+        }),
+      }),
       "The created connection request"
     ),
     [HttpStatusCodes.UNAUTHORIZED]: jsonContent(
@@ -94,7 +105,7 @@ export const getOne = createRoute({
   method: "get",
   path: "/{id}",
   request: {
-    params: stringIdParamSchema,
+    params: connectionParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -121,7 +132,7 @@ export const getOne = createRoute({
       "Connection not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(IdParamsSchema),
+      createErrorSchema(connectionParamSchema),
       "Invalid ID format"
     ),
   },
@@ -133,7 +144,7 @@ export const update = createRoute({
   path: "/{id}",
   method: "put",
   request: {
-    params: stringIdParamSchema,
+    params: connectionParamSchema,
     body: jsonContentRequired(
       updateConnectionSchema,
       "The connection status update"
@@ -169,7 +180,7 @@ export const remove = createRoute({
   path: "/{id}",
   method: "delete",
   request: {
-    params: stringIdParamSchema,
+    params: connectionParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
@@ -189,7 +200,7 @@ export const remove = createRoute({
       "Connection not found"
     ),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(IdParamsSchema),
+      createErrorSchema(connectionParamSchema),
       "Invalid ID format"
     ),
   },

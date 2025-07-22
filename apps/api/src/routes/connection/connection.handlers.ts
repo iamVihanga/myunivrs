@@ -35,7 +35,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   const offset = (pageNum - 1) * limitNum;
 
   try {
-    // Build base query conditions
     const conditions = [];
 
     // Filter by connection type (sent/received)
@@ -44,7 +43,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     } else if (type === "received") {
       conditions.push(eq(connections.receiverId, session.userId));
     } else {
-      // If no type specified, show both sent and received
       conditions.push(
         or(
           eq(connections.senderId, session.userId),
@@ -58,16 +56,11 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       conditions.push(eq(connections.status, status));
     }
 
-    // Execute query with joins for user details
+    // Fix the join query - need separate joins for sender and receiver
     const query = db
       .select({
         connection: connections,
-        sender: {
-          id: user.id,
-          name: user.name,
-          image: user.image,
-        },
-        receiver: {
+        senderUser: {
           id: user.id,
           name: user.name,
           image: user.image,
@@ -75,7 +68,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
       })
       .from(connections)
       .leftJoin(user, eq(connections.senderId, user.id))
-      .leftJoin(user, eq(connections.receiverId, user.id))
       .where(and(...conditions))
       .orderBy(
         sort === "asc" ? connections.createdAt : desc(connections.createdAt)
@@ -86,38 +78,59 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     const [connectionsList, countResult] = await Promise.all([
       query,
       db
-        .select({ count: sql<number>`count(*)` })
+        .select({ count: sql<number>`count(*)::int` })
         .from(connections)
         .where(and(...conditions)),
     ]);
     const count = countResult && countResult[0] ? countResult[0].count : 0;
 
-    // Format response
-    const normalizedConnections = connectionsList.map(
-      ({ connection, sender, receiver }) => ({
-        ...connection,
-        createdAt:
-          connection.createdAt instanceof Date
+    // Get receiver details separately
+    const connectionsWithUsers = await Promise.all(
+      connectionsList.map(async ({ connection, senderUser }) => {
+        const [receiverUser] = await db
+          .select({
+            id: user.id,
+            name: user.name,
+            image: user.image,
+          })
+          .from(user)
+          .where(eq(user.id, connection.receiverId))
+          .limit(1);
+
+        return {
+          ...connection,
+          createdAt: connection.createdAt
             ? connection.createdAt.toISOString()
-            : connection.createdAt,
-        updatedAt:
-          connection.updatedAt instanceof Date
+            : null,
+          updatedAt: connection.updatedAt
             ? connection.updatedAt.toISOString()
-            : connection.updatedAt,
-        sender,
-        receiver,
+            : null,
+          sender: senderUser || {
+            id: connection.senderId,
+            name: "",
+            image: null,
+          },
+          receiver: receiverUser || {
+            id: connection.receiverId,
+            name: "",
+            image: null,
+          },
+        };
       })
     );
 
-    return c.json({
-      data: normalizedConnections,
-      meta: {
-        currentPage: pageNum,
-        totalPages: Math.ceil(Number(count) / limitNum),
-        totalCount: Number(count),
-        limit: limitNum,
+    return c.json(
+      {
+        data: connectionsWithUsers,
+        meta: {
+          currentPage: pageNum,
+          totalPages: Math.ceil(Number(count) / limitNum),
+          totalCount: Number(count),
+          limit: limitNum,
+        },
       },
-    });
+      HttpStatusCodes.OK
+    );
   } catch (error) {
     console.error("Error listing connections:", error);
     return c.json(
@@ -127,7 +140,6 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
   }
 };
 
-// Update the create handler
 export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const data = c.req.valid("json");
   const session = c.get("session");
@@ -165,11 +177,10 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       );
     }
 
-    // Create new connection with UUID
+    // Create new connection - don't specify ID, let database generate it
     const [created] = await db
       .insert(connections)
       .values({
-        id: crypto.randomUUID(), // Add UUID for id
         senderId: session.userId,
         receiverId: data.receiverId,
         status: "pending",
@@ -178,62 +189,45 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       })
       .returning();
 
-    // Return with joined user data
-    if (!created || !created.id) {
+    if (!created) {
       return c.json(
         { message: "Failed to create connection" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
       );
     }
 
-    const connection = await db
+    // Get sender and receiver details
+    const [senderUser] = await db
       .select({
-        connection: connections,
-        sender: {
-          id: user.id,
-          name: user.name,
-          image: user.image,
-        },
-        receiver: {
-          id: user.id,
-          name: user.name,
-          image: user.image,
-        },
+        id: user.id,
+        name: user.name,
+        image: user.image,
       })
-      .from(connections)
-      .leftJoin(user, eq(connections.senderId, user.id))
-      .leftJoin(user, eq(connections.receiverId, user.id))
-      .where(eq(connections.id, created.id))
+      .from(user)
+      .where(eq(user.id, created.senderId))
       .limit(1);
 
-    if (!connection.length) {
-      return c.json(
-        { message: "Failed to create connection" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-
-    if (!connection[0]) {
-      return c.json(
-        { message: "Failed to create connection" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-    const { connection: connectionData, sender, receiver } = connection[0];
+    const [receiverUser] = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+      })
+      .from(user)
+      .where(eq(user.id, created.receiverId))
+      .limit(1);
 
     return c.json(
       {
-        ...connectionData,
-        createdAt:
-          connectionData.createdAt instanceof Date
-            ? connectionData.createdAt.toISOString()
-            : connectionData.createdAt,
-        updatedAt:
-          connectionData.updatedAt instanceof Date
-            ? connectionData.updatedAt.toISOString()
-            : connectionData.updatedAt,
-        sender,
-        receiver,
+        ...created,
+        createdAt: created.createdAt?.toISOString(),
+        updatedAt: created.updatedAt?.toISOString(),
+        sender: senderUser || { id: created.senderId, name: "", image: null },
+        receiver: receiverUser || {
+          id: created.receiverId,
+          name: "",
+          image: null,
+        },
       },
       HttpStatusCodes.CREATED
     );
@@ -258,58 +252,50 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   }
 
   try {
-    const connection = await db
-      .select({
-        connection: connections,
-        sender: {
-          id: user.id,
-          name: user.name,
-          image: user.image,
-        },
-        receiver: {
-          id: user.id,
-          name: user.name,
-          image: user.image,
-        },
-      })
+    const [connection] = await db
+      .select()
       .from(connections)
-      .leftJoin(user, eq(connections.senderId, user.id))
-      .leftJoin(user, eq(connections.receiverId, user.id))
       .where(eq(connections.id, id))
       .limit(1);
 
-    if (!connection.length) {
+    if (!connection) {
       return c.json(
         { message: HttpStatusPhrases.NOT_FOUND },
         HttpStatusCodes.NOT_FOUND
       );
     }
 
-    const connObj = connection[0];
-    if (
-      !connObj ||
-      !("connection" in connObj) ||
-      !connObj.connection
-    ) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-    const { connection: connectionData, sender, receiver } = connObj;
+    // Get sender and receiver details
+    const [senderUser] = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+      })
+      .from(user)
+      .where(eq(user.id, connection.senderId))
+      .limit(1);
+
+    const [receiverUser] = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+      })
+      .from(user)
+      .where(eq(user.id, connection.receiverId))
+      .limit(1);
 
     return c.json({
-      ...connectionData,
-      createdAt:
-        connectionData.createdAt instanceof Date
-          ? connectionData.createdAt.toISOString()
-          : connectionData.createdAt,
-      updatedAt:
-        connectionData.updatedAt instanceof Date
-          ? connectionData.updatedAt.toISOString()
-          : connectionData.updatedAt,
-      sender,
-      receiver,
+      ...connection,
+      createdAt: connection.createdAt?.toISOString(),
+      updatedAt: connection.updatedAt?.toISOString(),
+      sender: senderUser || { id: connection.senderId, name: "", image: null },
+      receiver: receiverUser || {
+        id: connection.receiverId,
+        name: "",
+        image: null,
+      },
     });
   } catch (error) {
     console.error("Error fetching connection:", error);
@@ -333,13 +319,13 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   }
 
   try {
-    const existingConnection = await db
+    const [existingConnection] = await db
       .select()
       .from(connections)
       .where(eq(connections.id, id))
       .limit(1);
 
-    if (!existingConnection.length) {
+    if (!existingConnection) {
       return c.json(
         { message: HttpStatusPhrases.NOT_FOUND },
         HttpStatusCodes.NOT_FOUND
@@ -347,10 +333,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     }
 
     // Only receiver can update status
-    if (
-      !existingConnection[0] ||
-      existingConnection[0].receiverId !== session.userId
-    ) {
+    if (existingConnection.receiverId !== session.userId) {
       return c.json(
         { message: "Not authorized to update this connection" },
         HttpStatusCodes.FORBIDDEN
@@ -388,13 +371,13 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   }
 
   try {
-    const existingConnection = await db
+    const [existingConnection] = await db
       .select()
       .from(connections)
       .where(eq(connections.id, id))
       .limit(1);
 
-    if (!existingConnection.length) {
+    if (!existingConnection) {
       return c.json(
         { message: HttpStatusPhrases.NOT_FOUND },
         HttpStatusCodes.NOT_FOUND
@@ -403,9 +386,8 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
 
     // Only sender or receiver can delete the connection
     if (
-      existingConnection[0] &&
-      existingConnection[0].senderId !== session.userId &&
-      existingConnection[0].receiverId !== session.userId
+      existingConnection.senderId !== session.userId &&
+      existingConnection.receiverId !== session.userId
     ) {
       return c.json(
         { message: "Not authorized to delete this connection" },

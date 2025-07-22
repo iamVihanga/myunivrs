@@ -9,44 +9,41 @@ export const selectConnectionSchema = createSelectSchema(connections);
 
 // Insert schema (for creating requests)
 export const insertConnectionSchema = createInsertSchema(connections, {
-  senderId: z.string().uuid(),
-  receiverId: z.string().uuid(),
-  status: z
-    .enum(["pending", "accepted", "rejected"])
-    .optional()
-    .default("pending"),
+  receiverId: z.string().min(1, "Receiver ID is required"),
+  status: z.enum(["pending", "accepted", "rejected"]).default("pending"),
 }).omit({
-  id: true,
+  id: true, // Will be auto-generated
+  senderId: true, // Will be set from session
   createdAt: true,
   updatedAt: true,
 });
 
 // Update schema (for accepting/rejecting requests)
-export const updateConnectionSchema = createInsertSchema(connections, {
+export const updateConnectionSchema = z.object({
   status: z.enum(["pending", "accepted", "rejected"]),
-}).omit({
-  id: true,
-  senderId: true,
-  receiverId: true,
-  createdAt: true,
-  updatedAt: true,
+});
+
+// Parameter schema for routes
+export const connectionParamSchema = z.object({
+  id: z.string().min(1, "Connection ID is required"),
 });
 
 // TypeScript Types
 export type Connection = z.infer<typeof selectConnectionSchema>;
 export type InsertConnection = z.infer<typeof insertConnectionSchema>;
 export type UpdateConnection = z.infer<typeof updateConnectionSchema>;
+export type ConnectionParam = z.infer<typeof connectionParamSchema>;
 
-export interface UserDetails {
-  id: string;
-  name: string;
-  image: string | null;
-  email: string;
-}
-
+// Helper type for connection with user details
 export interface ConnectionWithUsers extends Connection {
-  sender: UserDetails;
-  receiver: UserDetails;
-  createdAt: Date | null;
-  updatedAt: Date | null;
+  sender: {
+    id: string;
+    name: string;
+    image: string | null;
+  };
+  receiver: {
+    id: string;
+    name: string;
+    image: string | null;
+  };
 }

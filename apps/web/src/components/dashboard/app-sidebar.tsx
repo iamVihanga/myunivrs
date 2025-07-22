@@ -117,12 +117,18 @@ const data = {
 
       icon: IconBuildings,
     },
-    // {
-    //   name: "Post",
-    //   url: "/dashboard/post",
+    {
+      name: "Profile",
+      url: "/dashboard/profile",
 
-    //   icon: IconBuildings,
-    // },
+      icon: IconBuildings,
+    },
+    {
+      name: "B2B-Profile",
+      url: "/dashboard/b2bProfile",
+
+      icon: IconBuildings,
+    },
   ],
 };
 
