@@ -12,7 +12,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
@@ -41,9 +41,9 @@ export function SignupForm({
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
     },
-    onSubmit: ({ value }) => handleSignup(value)
+    onSubmit: ({ value }) => handleSignup(value),
   });
 
   const handleSubmit = useCallback(
@@ -72,8 +72,8 @@ export function SignupForm({
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
-        }
-      }
+        },
+      },
     });
   };
 

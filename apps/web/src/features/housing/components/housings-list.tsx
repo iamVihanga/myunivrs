@@ -1,10 +1,10 @@
+import { authClient } from "@/lib/auth-client";
 import { Card, CardContent } from "@repo/ui/components/card";
+import { headers } from "next/headers";
 import { getAllHousing } from "../actions/getAll.action";
 import { HousingCard } from "./housing-card";
 import { HousingPagination } from "./housing-pagination";
 import { SearchBar } from "./search-bar";
-import { authClient } from "@/lib/auth-client";
-import { headers } from "next/headers";
 
 interface HousingsListProps {
   page?: string;
@@ -15,7 +15,7 @@ interface HousingsListProps {
 export async function HousingsList({
   page = "1",
   limit = "8",
-  search = ""
+  search = "",
 }: HousingsListProps) {
   const headersList = await headers();
   const cookieHeader = headersList.get("cookie");
@@ -23,11 +23,11 @@ export async function HousingsList({
   const session = await authClient.getSession({
     fetchOptions: {
       headers: {
-        ...(cookieHeader && { cookie: cookieHeader })
-      }
-    }
+        ...(cookieHeader && { cookie: cookieHeader }),
+      },
+    },
   });
-  if(session.error){
+  if (session.error) {
     return (
       <Card className="bg-red-50 border-none">
         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -45,11 +45,16 @@ export async function HousingsList({
   const response = await getAllHousing({ page, limit, search });
 
   // Convert string dates to Date objects
-  const housings = response.data.filter((housing: any) => (housing.agentProfile === session.data.session.activeOrganizationId)).map((housing: any) => ({
-    ...housing,
-    createdAt: new Date(housing.createdAt),
-    updatedAt: housing.updatedAt ? new Date(housing.updatedAt) : null
-  }));
+  const housings = response.data
+    .filter(
+      (housing: any) =>
+        housing.agentProfile === session.data.session.activeOrganizationId
+    )
+    .map((housing: any) => ({
+      ...housing,
+      createdAt: new Date(housing.createdAt),
+      updatedAt: housing.updatedAt ? new Date(housing.updatedAt) : null,
+    }));
 
   // Get pagination metadata
   const { currentPage, totalPages, totalCount } = response.meta;

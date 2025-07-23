@@ -59,84 +59,39 @@ const data = {
   documents: [
     {
       name: "Housing",
-      url: "/dashboard/housing",
-      icon: IconBuildings,
-    },
-    {
-      name: "Sell/Swap",
-      url: "/dashboard/sellswap",
+      url: "/b2bdashboard/housing",
       icon: IconBuildings,
     },
     {
       name: "Jobs",
-      url: "/dashboard/jobs",
-      icon: IconBuildings,
-    },
-
-    {
-      name: "University",
-      url: "/dashboard/university",
-      icon: IconBuildings,
-    },
-    {
-      name: "Ads Payment Plan",
-      url: "/dashboard/adzPaymentPlan",
-      icon: IconBuildings,
-    },
-    {
-      name: "Products",
-      url: "/dashboard/products",
+      url: "/b2bdashboard/jobs",
       icon: IconBuildings,
     },
     {
       name: "Events",
-      url: "/dashboard/events",
+      url: "/b2bdashboard/events",
       icon: IconBuildings,
     },
     {
-      name: "Ads",
-      url: "/dashboard/ads",
+      name: "Products",
+      url: "/b2bdashboard/products",
       icon: IconBuildings,
     },
     {
       name: "B2B plans",
-      url: "/dashboard/b2bplans",
-
-      icon: IconBuildings,
-    },
-    {
-      name: "Notifications",
-      url: "/dashboard/notifications",
-
-      icon: IconBuildings,
-    },
-    {
-      name: "Communities",
-      url: "/dashboard/forum",
-
-      icon: IconBuildings,
-    },
-    {
-      name: "Connections",
-      url: "/dashboard/connection",
-
-      icon: IconBuildings,
-    },
-    {
-      name: "Profile",
-      url: "/dashboard/profile",
+      url: "/b2bdashboard/b2bplans",
 
       icon: IconBuildings,
     },
     {
       name: "B2B-Profile",
-      url: "/dashboard/b2bProfile",
+      url: "/b2bdashboard/b2bProfile",
 
       icon: IconBuildings,
     },
     {
       name: "Categories",
-      url: "/dashboard/categories",
+      url: "/b2bdashboard/categories",
 
       icon: IconBuildings,
     },

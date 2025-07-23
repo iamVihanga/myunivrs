@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "donext.s3.ap-south-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+        // You can optionally add `port: ''` or `pathname: '/:path*'` if needed,
+        // but for simple placeholder images, just hostname should be enough.
+      },
     ],
   },
   async rewrites() {
