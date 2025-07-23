@@ -15,6 +15,7 @@ import events from "./events/events.index";
 import housing from "./housing/housing.index";
 import index from "./index.route";
 import jobs from "./jobs/jobs.index";
+import like from "./like/like.index";
 import media from "./media/media.index";
 import notifications from "./notifications/notifications.index";
 import poll from "./poll/poll.index";
@@ -62,6 +63,7 @@ export function registerRoutes(app: AppOpenAPI) {
     .route("/user", user)
     .route("/user-profile", userProfile)
     .route("/b2b-profile", b2bProfile)
+    .route("/like", like)
     .route("/notifications", notifications);
 }
 

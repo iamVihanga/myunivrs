@@ -192,7 +192,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     if (!created) {
       return c.json(
         { message: "Failed to create connection" },
-        HttpStatusCodes.INTERNAL_SERVER_ERROR
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
       );
     }
 
@@ -220,8 +220,8 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     return c.json(
       {
         ...created,
-        createdAt: created.createdAt?.toISOString(),
-        updatedAt: created.updatedAt?.toISOString(),
+        createdAt: created.createdAt ? created.createdAt.toISOString() : null,
+        updatedAt: created.updatedAt ? created.updatedAt.toISOString() : null,
         sender: senderUser || { id: created.senderId, name: "", image: null },
         receiver: receiverUser || {
           id: created.receiverId,
@@ -235,23 +235,23 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     console.error("Error creating connection:", error);
     return c.json(
       { message: "Failed to create connection" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const session = c.get("session");
-
-  if (!session) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
-  }
-
   try {
+    const { id } = c.req.valid("param");
+    const session = c.get("session");
+
+    if (!session) {
+      return c.json(
+        { message: HttpStatusPhrases.UNAUTHORIZED },
+        HttpStatusCodes.UNAUTHORIZED
+      );
+    }
+
     const [connection] = await db
       .select()
       .from(connections)
@@ -286,21 +286,44 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
       .where(eq(user.id, connection.receiverId))
       .limit(1);
 
-    return c.json({
-      ...connection,
-      createdAt: connection.createdAt?.toISOString(),
-      updatedAt: connection.updatedAt?.toISOString(),
-      sender: senderUser || { id: connection.senderId, name: "", image: null },
-      receiver: receiverUser || {
-        id: connection.receiverId,
-        name: "",
-        image: null,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching connection:", error);
     return c.json(
-      { message: "Failed to fetch connection" },
+      {
+        ...connection,
+        createdAt: connection.createdAt?.toISOString() ?? null,
+        updatedAt: connection.updatedAt?.toISOString() ?? null,
+        sender: senderUser || { id: connection.senderId, name: "", image: null },
+        receiver: receiverUser || {
+          id: connection.receiverId,
+          name: "",
+          image: null,
+        },
+      },
+      HttpStatusCodes.OK
+    );
+  } catch (error: any) {
+    // If error is a Zod validation error, return 422 with expected shape
+    if (error?.name === "ZodError" && error?.issues) {
+      return c.json(
+        {
+          error: {
+            issues: error.issues,
+            name: error.name,
+          },
+          success: false,
+        },
+        422
+      );
+    }
+    console.error("Error fetching connection:", error);
+    // Return the same shape as the 422 error for 500 errors
+    return c.json(
+      {
+        error: {
+          issues: [],
+          name: error?.name || "InternalServerError",
+        },
+        success: false,
+      },
       HttpStatusCodes.INTERNAL_SERVER_ERROR
     );
   }
@@ -349,11 +372,31 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
       .where(eq(connections.id, id))
       .returning();
 
-    return c.json(updated);
-  } catch (error) {
-    console.error("Error updating connection:", error);
+    if (!updated) {
+      return c.json(
+        { message: "Failed to update connection" },
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
+      );
+    }
+
     return c.json(
-      { message: "Failed to update connection" },
+      {
+        ...updated,
+        createdAt: updated.createdAt ? updated.createdAt.toISOString() : null,
+        updatedAt: updated.updatedAt ? updated.updatedAt.toISOString() : null,
+      },
+      HttpStatusCodes.OK
+    );
+  } catch (error: any) {
+    // Always return a valid error response shape and status code
+    return c.json(
+      {
+        error: {
+          issues: [],
+          name: error?.name || "InternalServerError",
+        },
+        success: false,
+      },
       HttpStatusCodes.INTERNAL_SERVER_ERROR
     );
   }

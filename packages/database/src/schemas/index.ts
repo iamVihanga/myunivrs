@@ -39,3 +39,5 @@ export * from "./connection.schema";
 export * from "./userProfile.schema";
 
 export * from "./b2bProfile.schema";
+
+export * from "./like.schema";

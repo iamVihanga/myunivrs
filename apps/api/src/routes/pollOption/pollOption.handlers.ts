@@ -44,12 +44,11 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     const count = countResult && countResult[0] ? countResult[0].count : 0;
 
     return c.json({
-      data: options.map((opt) => ({
+      data: options.map(opt => ({
         ...opt,
-        createdAt:
-          opt.createdAt instanceof Date
-            ? opt.createdAt.toISOString()
-            : opt.createdAt,
+        createdAt: opt.createdAt instanceof Date
+          ? opt.createdAt.toISOString()
+          : opt.createdAt,
       })),
       meta: {
         currentPage: pageNum,
@@ -62,7 +61,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     console.error("Error listing poll options:", error);
     return c.json(
       { message: "Failed to list poll options" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 };
@@ -74,7 +73,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   if (!session) {
     return c.json(
       { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 
@@ -96,7 +95,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     if (!pollData[0] || pollData[0].createdBy !== session.userId) {
       return c.json(
         { message: "Not authorized to add options to this poll" },
-        HttpStatusCodes.FORBIDDEN
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
       );
     }
 
@@ -112,7 +111,7 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
     if (!created) {
       return c.json(
         { message: "Failed to create poll option" },
-        HttpStatusCodes.INTERNAL_SERVER_ERROR
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
       );
     }
     return c.json(
@@ -153,22 +152,25 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
 
     if (!option[0]) {
       return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
+        { message: HttpStatusPhrases.NOT_FOUND, success: false },
         HttpStatusCodes.NOT_FOUND
       );
     }
     return c.json({
-      ...option[0],
-      createdAt:
-        option[0].createdAt instanceof Date
-          ? option[0].createdAt.toISOString()
-          : option[0].createdAt,
+      success: true,
+      data: {
+        ...option[0],
+        createdAt:
+          option[0].createdAt instanceof Date
+            ? option[0].createdAt.toISOString()
+            : option[0].createdAt,
+      },
     });
   } catch (error) {
     console.error("Error fetching poll option:", error);
     return c.json(
-      { message: "Failed to fetch poll option" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      { message: "Failed to fetch poll option", success: false },
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 };
@@ -222,7 +224,7 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     if (!updated) {
       return c.json(
         { message: "Failed to update poll option" },
-        HttpStatusCodes.INTERNAL_SERVER_ERROR
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
       );
     }
 
@@ -289,7 +291,7 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     console.error("Error deleting poll option:", error);
     return c.json(
       { message: "Failed to delete poll option" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 };

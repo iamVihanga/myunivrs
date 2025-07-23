@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
 // Import Navbar and Footer components
+import React from "react";
 import Footer from "../../footer/footer";
 import Navbar from "../../navigation/navigation";
 
@@ -100,7 +101,8 @@ const EventCard: React.FC<EventCardProps> = ({ item }) => {
 
   const CardContent = (
     <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer h-full">
-      <div className="relative w-full pb-[100%]">
+      {/* MODIFIED: Changed pb-[100%] to pb-[42.85%] for a shorter, wider image aspect ratio (approx 21:9) */}
+      <div className="relative w-full pb-[42.85%]">
         <Image
           src={imageUrl}
           alt={item.title}
@@ -166,8 +168,11 @@ export default function EventsPage() {
 
   const scrollLeftFeatured = () => {
     if (featuredEventsScrollRef.current) {
+      // MODIFIED: Adjusted cardWidth to 500px to match the w-[500px] class
+      const cardWidth = 500;
+      const gap = 24; // space-x-6 is 1.5rem = 24px
       featuredEventsScrollRef.current.scrollBy({
-        left: -320,
+        left: -(cardWidth + gap),
         behavior: "smooth",
       });
     }
@@ -175,10 +180,30 @@ export default function EventsPage() {
 
   const scrollRightFeatured = () => {
     if (featuredEventsScrollRef.current) {
-      featuredEventsScrollRef.current.scrollBy({
-        left: 320,
-        behavior: "smooth",
-      });
+      const container = featuredEventsScrollRef.current;
+      // MODIFIED: Adjusted cardWidth to 500px to match the w-[500px] class
+      const cardWidth = 500;
+      const gap = 24; // space-x-6 is 1.5rem = 24px
+      const scrollAmount = cardWidth + gap;
+
+      // Check if we are at or near the end of the scroll
+      const isAtEnd =
+        container.scrollLeft + container.clientWidth >=
+        container.scrollWidth - 1; // -1 for a small buffer
+
+      if (isAtEnd) {
+        // Jump back to the beginning if at the end
+        container.scrollTo({
+          left: 0,
+          behavior: "smooth",
+        });
+      } else {
+        // Otherwise, scroll normally
+        container.scrollBy({
+          left: scrollAmount,
+          behavior: "smooth",
+        });
+      }
     }
   };
 
@@ -217,10 +242,24 @@ export default function EventsPage() {
     loadEvents();
   }, []);
 
+  // Auto-scrolling effect for featured events
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    if (!loading && eventItems.length > 0) {
+      intervalId = setInterval(() => {
+        scrollRightFeatured();
+      }, 2000); // Scroll every 2 seconds
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); // Clean up the interval on component unmount
+      }
+    };
+  }, [loading, eventItems.length]); // Re-run effect if loading state or item count changes
+
   // --- MODIFICATION START ---
   // To display all event cards in both sections, simply assign eventItems to both.
-  // This means the "Upcoming Events" section will also show past events,
-  // which might make the title slightly misleading, but fulfills the request.
   const allEvents = eventItems; // Get all events after initial processing
 
   const upcomingEvents = allEvents; // Now contains ALL fetched events
@@ -313,12 +352,17 @@ export default function EventsPage() {
           ) : (
             <div
               ref={featuredEventsScrollRef}
-              className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide"
+              className="flex overflow-x-auto space-x-6 pb-4 no-scrollbar"
+              style={{
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
             >
+              {/* MODIFIED: Set fixed width for EventCard wrapper in Featured Events */}
               {featuredEvents.map((item) => (
                 <div
                   key={item.id}
-                  className="min-w-[280px] max-w-[320px] flex-shrink-0"
+                  className="w-[500px] flex-shrink-0" // Fixed width for EventCard wrapper
                 >
                   <EventCard item={item} />
                 </div>
@@ -327,7 +371,7 @@ export default function EventsPage() {
           )}
         </section>
 
-        {/* Latest Listings Section (Grid Layout) */}
+        {/* Latest Listings Section (Grid Layout) - No changes here as per request */}
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold text-gray-900">
