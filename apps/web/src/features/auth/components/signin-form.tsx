@@ -6,7 +6,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@repo/ui/components/card";
 import { Input } from "@repo/ui/components/input";
 import { useAppForm } from "@repo/ui/components/tanstack-form";
@@ -40,9 +40,9 @@ export function SigninForm({
     validators: { onChange: signinSchema },
     defaultValues: {
       email: "",
-      password: ""
+      password: "",
     },
-    onSubmit: ({ value }) => handleSignin(value)
+    onSubmit: ({ value }) => handleSignin(value),
   });
 
   const handleSubmit = useCallback(
@@ -62,14 +62,20 @@ export function SigninForm({
         onRequest() {
           toast.loading("Signing in...", { id: toastId });
         },
-        onSuccess(ctx) {
+        onSuccess: async (ctx) => {
           toast.success("User signed in successfully!", { id: toastId });
-          mode === "agent" ? router.push("/dashboard") : router.refresh();
+          // Fetch session to check activeOrganizationId
+          const { data: session } = await authClient.getSession();
+          if (session?.session?.user?.activeOrganizationId) {
+            router.push("/dashboard/housing");
+          } else {
+            router.push("/webApp/page");
+          }
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
-        }
-      }
+        },
+      },
     });
   };
 

@@ -1,8 +1,9 @@
-
 import { Card, CardContent } from "@repo/ui/components/card";
 import { getAllSellSwaps } from "../actions/getAll.sellswaps";
 import { SearchBar } from "./search-bar";
 
+import { authClient } from "@/lib/auth-client";
+import { headers } from "next/headers";
 import { SellSwapPagination } from "./sellswap-pagination";
 import { SellSwapCard } from "./sellSwaps-card";
 
@@ -17,7 +18,30 @@ export async function SellSwapList({
   limit = "8",
   search = "",
 }: SellSwapListProps) {
+  const headersList = await headers();
+  const cookieHeader = headersList.get("cookie");
 
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: {
+        ...(cookieHeader && { cookie: cookieHeader }),
+      },
+    },
+  });
+  if (session.error) {
+    return (
+      <Card className="bg-red-50 border-none">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <h3 className="text-lg font-medium text-red-600 mb-1">
+            Authentication Error
+          </h3>
+          <p className="text-muted-foreground max-w-sm">
+            Please log in to view housing listings.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
   // Get sellswap data with pagination
 
   const response = await getAllSellSwaps({ page, limit, search });
@@ -41,7 +65,6 @@ export async function SellSwapList({
           {totalCount} {totalCount === 1 ? "listing" : "listings"} found
         </div>
       </div>
-
 
       {/* sellswap List */}
 

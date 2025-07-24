@@ -4,15 +4,15 @@ import { redirect } from "next/navigation";
 
 export default async function AccountPageLayout({
   panel,
-  login
+  login,
 }: {
   panel?: React.ReactNode;
   login?: React.ReactNode;
 }) {
   const { data: session } = await authClient.getSession({
     fetchOptions: {
-      headers: await headers()
-    }
+      headers: await headers(),
+    },
   });
 
   if (session && session.session.activeOrganizationId) {

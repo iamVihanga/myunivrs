@@ -1,9 +1,9 @@
-import { desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import * as HttpStatusPhrases from "stoker/http-status-phrases";
 
-import type { AppRouteHandler } from "@/types";
 import { db } from "@/db";
+import type { AppRouteHandler } from "@/types";
 import { products } from "@repo/database";
 import type {
   CreateRoute,
@@ -23,22 +23,39 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     search,
   } = c.req.valid("query");
 
+  const session = c.get("session");
+  if (!session) {
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.INTERNAL_SERVER_ERROR // Use 500 if that's what your OpenAPI expects
+    );
+  }
+
   const pageNum = Math.max(1, parseInt(page));
   const limitNum = Math.max(1, Math.min(100, parseInt(limit)));
   const offset = (pageNum - 1) * limitNum;
 
-  const conditions = search
-    ? or(
+  // Build search conditions
+  const conditions = [
+    eq(products.createdBy, session.userId), // Only self-created products
+  ];
+
+  if (search) {
+    conditions.push(
+      or(
         ilike(products.title, `%${search}%`),
         ilike(products.description, `%${search}%`),
         ilike(products.location, `%${search}%`),
         ilike(products.brand, `%${search}%`)
       )
-    : undefined;
+    );
+  }
+
+  const whereCondition = conditions.length ? and(...conditions) : undefined;
 
   const [items, total] = await Promise.all([
     db.query.products.findMany({
-      where: conditions,
+      where: whereCondition,
       limit: limitNum,
       offset,
       orderBy: sort === "asc" ? products.createdAt : desc(products.createdAt),
@@ -46,7 +63,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     db
       .select({ count: sql<number>`count(*)` })
       .from(products)
-      .where(conditions),
+      .where(whereCondition),
   ]);
 
   const totalCount = total[0]?.count ?? 0;
@@ -71,18 +88,24 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const session = c.get("session");
 
   if (!session) {
-    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
   }
 
   const now = new Date();
 
-  const [inserted] = await db.insert(products).values({
-    ...input,
-    createdBy: session.userId,
-    agentProfile: session.userId,
-    createdAt: now,
-    updatedAt: now,
-  }).returning();
+  const [inserted] = await db
+    .insert(products)
+    .values({
+      ...input,
+      createdBy: session.userId,
+      agentProfile: session.userId,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning();
 
   return c.json(inserted, HttpStatusCodes.CREATED);
 };
@@ -96,7 +119,10 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
   });
 
   if (!product) {
-    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
   }
 
   return c.json(product, HttpStatusCodes.OK);
@@ -109,7 +135,10 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   const session = c.get("session");
 
   if (!session) {
-    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
   }
 
   const existing = await db.query.products.findFirst({
@@ -117,7 +146,10 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
   });
 
   if (!existing) {
-    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
   }
 
   const [updated] = await db
@@ -138,7 +170,10 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const session = c.get("session");
 
   if (!session) {
-    return c.json({ message: HttpStatusPhrases.UNAUTHORIZED }, HttpStatusCodes.UNAUTHORIZED);
+    return c.json(
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
+    );
   }
 
   const existing = await db.query.products.findFirst({
@@ -146,10 +181,16 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   });
 
   if (!existing) {
-    return c.json({ message: HttpStatusPhrases.NOT_FOUND }, HttpStatusCodes.NOT_FOUND);
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
   }
 
   await db.delete(products).where(eq(products.id, id));
 
-  return c.json({ message: "Product entry deleted successfully" }, HttpStatusCodes.OK);
+  return c.json(
+    { message: "Product entry deleted successfully" },
+    HttpStatusCodes.OK
+  );
 };

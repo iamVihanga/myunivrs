@@ -2,7 +2,7 @@
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useId } from "react";
+import { useCallback, useId, useState } from "react";
 import { CiFacebook } from "react-icons/ci";
 import { toast } from "sonner";
 
@@ -35,6 +35,7 @@ export function SignupForm({
 }: React.ComponentProps<"div"> & SignupFormProps) {
   const toastId = useId();
   const router = useRouter();
+  const [showB2BPopup, setShowB2BPopup] = useState(false);
 
   const form = useAppForm({
     validators: { onChange: signupSchema },
@@ -66,15 +67,22 @@ export function SignupForm({
         },
         onSuccess(ctx) {
           toast.success("User registered successfully !", { id: toastId });
-          type === "agent"
-            ? router.push("/setup")
-            : onAccountLayoutModalChange("login");
+          setShowB2BPopup(true); // Show popup after signup
         },
         onError(ctx) {
           toast.error(`Failed: ${ctx.error.message}`, { id: toastId });
         },
       },
     });
+  };
+
+  const handleB2BChoice = (isB2B: boolean) => {
+    setShowB2BPopup(false);
+    if (isB2B) {
+      router.push("/setup");
+    } else {
+      router.push("/webApp/page");
+    }
   };
 
   return (
@@ -200,6 +208,22 @@ export function SignupForm({
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </div>
+
+      {/* B2B Popup */}
+      {showB2BPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <h2 className="text-lg font-bold mb-4">Register as a B2B User?</h2>
+            <p className="mb-6">Would you like to register in B2B format?</p>
+            <div className="flex justify-center gap-4">
+              <Button onClick={() => handleB2BChoice(true)}>Yes</Button>
+              <Button variant="outline" onClick={() => handleB2BChoice(false)}>
+                No
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

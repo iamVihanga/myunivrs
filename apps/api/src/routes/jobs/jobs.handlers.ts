@@ -19,6 +19,11 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
     limit = "10",
     sort = "asc",
     search,
+  }: {
+    page?: string;
+    limit?: string;
+    sort?: string;
+    search?: string;
   } = c.req.valid("query");
 
   // Convert to numbers and validate

@@ -1,4 +1,3 @@
-
 // "use client";
 // import { Card, CardContent } from "@repo/ui/components/card";
 // import { getAllProduct } from "../actions/getAll.action";
@@ -126,25 +125,49 @@
 //   );
 // }
 
+import { authClient } from "@/lib/auth-client";
 import { Card, CardContent } from "@repo/ui/components/card";
+import { headers } from "next/headers";
 import { getAllProducts } from "../actions/getAll.action";
 import { ProductsCard } from "./products-card";
 import { ProductsPagination } from "./products-pagination";
 import { SearchBar } from "./search-bar";
 
 interface ProductssListProps {
-
   page?: string;
   limit?: string;
   search?: string;
 }
-
 
 export async function ProductssList({
   page = "1",
   limit = "8",
   search = "",
 }: ProductssListProps) {
+  const headersList = await headers();
+  const cookieHeader = headersList.get("cookie");
+
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: {
+        ...(cookieHeader && { cookie: cookieHeader }),
+      },
+    },
+  });
+  if (session.error) {
+    return (
+      <Card className="bg-red-50 border-none">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <h3 className="text-lg font-medium text-red-600 mb-1">
+            Authentication Error
+          </h3>
+          <p className="text-muted-foreground max-w-sm">
+            Please log in to view housing listings.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
   // Get products data with pagination
   const response = await getAllProducts({ page, limit, search });
 
@@ -153,7 +176,6 @@ export async function ProductssList({
     ...products,
     createdAt: new Date(products.createdAt),
     updatedAt: products.updatedAt ? new Date(products.updatedAt) : null,
-
   }));
 
   // Get pagination metadata
@@ -169,10 +191,8 @@ export async function ProductssList({
         </div>
       </div>
 
-
       {/* Products List */}
       {productss.length === 0 ? (
-
         <Card className="bg-cyan-50 border-none">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-cyan-100 p-3 mb-4">
@@ -204,10 +224,8 @@ export async function ProductssList({
         </Card>
       ) : (
         <div className="space-y-4">
-
           {productss.map((products: any) => (
             <ProductsCard key={products.id} products={products} />
-
           ))}
         </div>
       )}

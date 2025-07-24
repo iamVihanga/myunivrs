@@ -1,4 +1,6 @@
+import { authClient } from "@/lib/auth-client";
 import { Card, CardContent } from "@repo/ui/components/card";
+import { headers } from "next/headers";
 import { getAllJobs } from "../actions/getAll.action";
 import { JobsPagination } from "./jobs-pagination";
 import { JobsCard } from "./jobscard";
@@ -15,6 +17,16 @@ export async function JobsList({
   limit = "8",
   search = "",
 }: JobsListProps) {
+  const headersList = await headers();
+  const cookieHeader = headersList.get("cookie");
+
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: {
+        ...(cookieHeader && { cookie: cookieHeader }),
+      },
+    },
+  });
   // Get housing data with pagination
   const response = await getAllJobs({ page, limit, search });
 
