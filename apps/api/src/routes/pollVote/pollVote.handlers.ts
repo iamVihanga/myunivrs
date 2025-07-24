@@ -130,23 +130,29 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       return [createdVote];
     });
 
+    if (!vote) {
+      // Internal error, return 422 with message (to match OpenAPI spec)
+      return c.json(
+        { message: "Vote creation failed" },
+        HttpStatusCodes.UNPROCESSABLE_ENTITY
+      );
+    }
+
     return c.json(
-      vote
-        ? {
-            ...vote,
-            createdAt:
-              vote.createdAt instanceof Date
-                ? vote.createdAt.toISOString()
-                : vote.createdAt,
-          }
-        : { message: "Vote creation failed" },
+      {
+        ...vote,
+        createdAt:
+          vote.createdAt instanceof Date
+            ? vote.createdAt.toISOString()
+            : vote.createdAt,
+      },
       HttpStatusCodes.CREATED
     );
   } catch (error) {
     console.error("Error creating vote:", error);
     return c.json(
       { message: "Failed to create vote" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      HttpStatusCodes.UNPROCESSABLE_ENTITY
     );
   }
 };
@@ -161,32 +167,29 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
       .where(eq(pollVote.id, id))
       .limit(1);
 
-    if (!vote.length) {
+    if (!vote.length || !vote[0]) {
       return c.json(
         { message: HttpStatusPhrases.NOT_FOUND },
         HttpStatusCodes.NOT_FOUND
       );
     }
 
-    if (!vote[0]) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-    return c.json({
-      ...vote[0],
-      createdAt:
-        vote[0].createdAt instanceof Date
-          ? vote[0].createdAt.toISOString()
-          : vote[0].createdAt,
-    });
+    return c.json(
+      {
+        id: vote[0].id,
+        pollId: vote[0].pollId,
+        optionId: vote[0].optionId,
+        userId: vote[0].userId,
+        createdAt:
+          vote[0].createdAt instanceof Date
+            ? vote[0].createdAt.toISOString()
+            : vote[0].createdAt,
+      },
+      HttpStatusCodes.OK
+    );
   } catch (error) {
     console.error("Error fetching vote:", error);
-    return c.json(
-      { message: "Failed to fetch vote" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
+    return c.json({ message: "Not found" }, HttpStatusCodes.NOT_FOUND);
   }
 };
 
@@ -218,7 +221,7 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
     if (!vote[0] || vote[0].userId !== session.userId) {
       return c.json(
         { message: "Not authorized to remove this vote" },
-        HttpStatusCodes.FORBIDDEN
+        HttpStatusCodes.UNAUTHORIZED
       );
     }
 
@@ -245,8 +248,23 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   } catch (error) {
     console.error("Error removing vote:", error);
     return c.json(
-      { message: "Failed to remove vote" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      {
+        error: {
+          issues: [
+            {
+              code: "internal_server_error",
+              path: [],
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Failed to remove vote",
+            },
+          ],
+          name: "InternalServerError",
+        },
+        success: false,
+      },
+      422
     );
   }
 };

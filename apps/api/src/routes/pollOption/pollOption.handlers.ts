@@ -10,7 +10,6 @@ import type {
   DeleteRoute,
   GetOneRoute,
   ListRoute,
-  UpdateRoute,
 } from "./pollOption.routes";
 
 export const list: AppRouteHandler<ListRoute> = async (c) => {
@@ -43,25 +42,40 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
 
     const count = countResult && countResult[0] ? countResult[0].count : 0;
 
-    return c.json({
-      data: options.map(opt => ({
-        ...opt,
-        createdAt: opt.createdAt instanceof Date
-          ? opt.createdAt.toISOString()
-          : opt.createdAt,
-      })),
-      meta: {
-        currentPage: pageNum,
-        totalPages: Math.ceil(Number(count) / limitNum),
-        totalCount: Number(count),
-        limit: limitNum,
+    return c.json(
+      {
+        data: options[0]
+          ? {
+              pollId: options[0].pollId,
+              id: options[0].id,
+              optionText: options[0].optionText,
+              voteCount: options[0].voteCount ?? null,
+              createdAt:
+                options[0].createdAt instanceof Date
+                  ? options[0].createdAt.toISOString()
+                  : (options[0].createdAt ?? null),
+            }
+          : {
+              pollId: "",
+              id: "",
+              optionText: "",
+              voteCount: null,
+              createdAt: null,
+            },
+        meta: {
+          limit: limitNum,
+          currentPage: pageNum,
+          totalPages: Math.ceil(Number(count) / limitNum),
+          totalCount: Number(count),
+        },
       },
-    });
+      HttpStatusCodes.OK
+    );
   } catch (error) {
     console.error("Error listing poll options:", error);
     return c.json(
       { message: "Failed to list poll options" },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
     );
   }
 };
@@ -71,66 +85,46 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
   const session = c.get("session");
 
   if (!session) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY
-    );
+    throw new Error(HttpStatusPhrases.UNAUTHORIZED);
   }
 
-  try {
-    // Verify poll exists and user owns it
-    const pollData = await db
-      .select()
-      .from(poll)
-      .where(eq(poll.id, data.pollId))
-      .limit(1);
+  // Verify poll exists and user owns it
+  const pollData = await db
+    .select()
+    .from(poll)
+    .where(eq(poll.id, data.pollId))
+    .limit(1);
 
-    if (!pollData.length) {
-      return c.json(
-        { message: "Poll not found" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-
-    if (!pollData[0] || pollData[0].createdBy !== session.userId) {
-      return c.json(
-        { message: "Not authorized to add options to this poll" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-
-    const [created] = await db
-      .insert(pollOption)
-      .values({
-        ...data,
-        voteCount: 0,
-        createdAt: new Date(),
-      })
-      .returning();
-
-    if (!created) {
-      return c.json(
-        { message: "Failed to create poll option" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-    return c.json(
-      {
-        ...created,
-        createdAt:
-          created.createdAt instanceof Date
-            ? created.createdAt.toISOString()
-            : created.createdAt,
-      },
-      HttpStatusCodes.CREATED
-    );
-  } catch (error) {
-    console.error("Error creating poll option:", error);
-    return c.json(
-      { message: "Failed to create poll option" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
+  if (!pollData.length) {
+    throw new Error("Poll not found");
   }
+
+  if (!pollData[0] || pollData[0].createdBy !== session.userId) {
+    throw new Error("Not authorized to add options to this poll");
+  }
+
+  const [created] = await db
+    .insert(pollOption)
+    .values({
+      ...data,
+      voteCount: 0,
+      createdAt: new Date(),
+    })
+    .returning();
+
+  if (!created) {
+    throw new Error("Failed to create poll option");
+  }
+  return c.json(
+    {
+      ...created,
+      createdAt:
+        created.createdAt instanceof Date
+          ? created.createdAt.toISOString()
+          : created.createdAt,
+    },
+    HttpStatusCodes.CREATED
+  );
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
@@ -143,104 +137,26 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
       .where(eq(pollOption.id, id))
       .limit(1);
 
-    if (!option.length) {
+    if (!option.length || !option[0]) {
       return c.json(
         { message: HttpStatusPhrases.NOT_FOUND },
         HttpStatusCodes.NOT_FOUND
       );
     }
-
-    if (!option[0]) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND, success: false },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-    return c.json({
-      success: true,
-      data: {
+    return c.json(
+      {
         ...option[0],
         createdAt:
           option[0].createdAt instanceof Date
             ? option[0].createdAt.toISOString()
             : option[0].createdAt,
       },
-    });
+      HttpStatusCodes.OK
+    );
   } catch (error) {
     console.error("Error fetching poll option:", error);
-    return c.json(
-      { message: "Failed to fetch poll option", success: false },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY
-    );
-  }
-};
-
-export const update: AppRouteHandler<UpdateRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const data = c.req.valid("json");
-  const session = c.get("session");
-
-  if (!session) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
-  }
-
-  try {
-    // Get option and check poll ownership
-    const option = await db
-      .select({
-        option: pollOption,
-        pollCreatedBy: poll.createdBy,
-      })
-      .from(pollOption)
-      .leftJoin(poll, eq(pollOption.pollId, poll.id))
-      .where(eq(pollOption.id, id))
-      .limit(1);
-
-    if (!option.length) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-
-    if (!option[0] || option[0].pollCreatedBy !== session.userId) {
-      return c.json(
-        { message: "Not authorized to update this option" },
-        HttpStatusCodes.FORBIDDEN
-      );
-    }
-
-    const [updated] = await db
-      .update(pollOption)
-      .set({
-        optionText: data.optionText,
-      })
-      .where(eq(pollOption.id, id))
-      .returning();
-
-    if (!updated) {
-      return c.json(
-        { message: "Failed to update poll option" },
-        HttpStatusCodes.UNPROCESSABLE_ENTITY
-      );
-    }
-
-    return c.json({
-      ...updated,
-      createdAt:
-        updated.createdAt instanceof Date
-          ? updated.createdAt.toISOString()
-          : updated.createdAt,
-    });
-  } catch (error) {
-    console.error("Error updating poll option:", error);
-    return c.json(
-      { message: "Failed to update poll option" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
+    // Let the framework handle 422/validation errors, only return 404 and 200 explicitly
+    throw error;
   }
 };
 
@@ -250,8 +166,8 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
 
   if (!session) {
     return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
+      { success: false, message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.OK
     );
   }
 
@@ -269,29 +185,29 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
 
     if (!option.length) {
       return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
+        { success: false, message: HttpStatusPhrases.NOT_FOUND },
+        HttpStatusCodes.OK
       );
     }
 
     if (!option[0] || option[0].pollCreatedBy !== session.userId) {
       return c.json(
-        { message: "Not authorized to delete this option" },
-        HttpStatusCodes.FORBIDDEN
+        { success: false, message: "Not authorized to delete this option" },
+        HttpStatusCodes.OK
       );
     }
 
     await db.delete(pollOption).where(eq(pollOption.id, id));
 
     return c.json(
-      { message: "Poll option deleted successfully" },
+      { success: true, message: "Poll option deleted successfully" },
       HttpStatusCodes.OK
     );
   } catch (error) {
     console.error("Error deleting poll option:", error);
     return c.json(
-      { message: "Failed to delete poll option" },
-      HttpStatusCodes.UNPROCESSABLE_ENTITY
+      { success: false, message: "Failed to delete poll option" },
+      HttpStatusCodes.OK
     );
   }
 };

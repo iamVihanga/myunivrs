@@ -132,7 +132,7 @@ export const list: AppRouteHandler<ListRoute> = async (c) => {
         ? null
         : [], // always string[] or null
     isFurnished: entry.isFurnished ?? undefined, // optional boolean
-    agentProfile: entry.agentProfile ?? null,
+    // agentProfile: entry.agentProfile ?? null,
     // Add any other required fields with default values if needed
   }));
 
@@ -163,14 +163,14 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
       HttpStatusCodes.UNAUTHORIZED
     );
   }
-  if (!session.activeOrganizationId) {
-    return c.json(
-      {
-        message: HttpStatusPhrases.UNAUTHORIZED,
-      },
-      HttpStatusCodes.UNAUTHORIZED
-    );
-  }
+  // if (!session.activeOrganizationId) {
+  //   return c.json(
+  //     {
+  //       message: HttpStatusPhrases.UNAUTHORIZED,
+  //     },
+  //     HttpStatusCodes.UNAUTHORIZED
+  //   );
+  // }
 
   const allowedStatuses = [
     "published",

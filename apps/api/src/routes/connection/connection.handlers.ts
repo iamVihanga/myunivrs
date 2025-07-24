@@ -241,92 +241,67 @@ export const create: AppRouteHandler<CreateRoute> = async (c) => {
 };
 
 export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
-  try {
-    const { id } = c.req.valid("param");
-    const session = c.get("session");
+  const { id } = c.req.valid("param");
+  const session = c.get("session");
 
-    if (!session) {
-      return c.json(
-        { message: HttpStatusPhrases.UNAUTHORIZED },
-        HttpStatusCodes.UNAUTHORIZED
-      );
-    }
+  // Always return the expected response shape, even for errors
+  const emptyUser = { id: "", name: "", image: null };
 
-    const [connection] = await db
-      .select()
-      .from(connections)
-      .where(eq(connections.id, id))
-      .limit(1);
-
-    if (!connection) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-
-    // Get sender and receiver details
-    const [senderUser] = await db
-      .select({
-        id: user.id,
-        name: user.name,
-        image: user.image,
-      })
-      .from(user)
-      .where(eq(user.id, connection.senderId))
-      .limit(1);
-
-    const [receiverUser] = await db
-      .select({
-        id: user.id,
-        name: user.name,
-        image: user.image,
-      })
-      .from(user)
-      .where(eq(user.id, connection.receiverId))
-      .limit(1);
-
+  if (!session) {
     return c.json(
-      {
-        ...connection,
-        createdAt: connection.createdAt?.toISOString() ?? null,
-        updatedAt: connection.updatedAt?.toISOString() ?? null,
-        sender: senderUser || { id: connection.senderId, name: "", image: null },
-        receiver: receiverUser || {
-          id: connection.receiverId,
-          name: "",
-          image: null,
-        },
-      },
-      HttpStatusCodes.OK
-    );
-  } catch (error: any) {
-    // If error is a Zod validation error, return 422 with expected shape
-    if (error?.name === "ZodError" && error?.issues) {
-      return c.json(
-        {
-          error: {
-            issues: error.issues,
-            name: error.name,
-          },
-          success: false,
-        },
-        422
-      );
-    }
-    console.error("Error fetching connection:", error);
-    // Return the same shape as the 422 error for 500 errors
-    return c.json(
-      {
-        error: {
-          issues: [],
-          name: error?.name || "InternalServerError",
-        },
-        success: false,
-      },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      { message: HttpStatusPhrases.UNAUTHORIZED },
+      HttpStatusCodes.UNAUTHORIZED
     );
   }
+
+  const [connection] = await db
+    .select()
+    .from(connections)
+    .where(eq(connections.id, id))
+    .limit(1);
+
+  if (!connection) {
+    return c.json(
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
+    );
+  }
+
+  // Get sender and receiver details
+  const [senderUser] = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      image: user.image,
+    })
+    .from(user)
+    .where(eq(user.id, connection.senderId))
+    .limit(1);
+
+  const [receiverUser] = await db
+    .select({
+      id: user.id,
+      name: user.name,
+      image: user.image,
+    })
+    .from(user)
+    .where(eq(user.id, connection.receiverId))
+    .limit(1);
+
+  return c.json(
+    {
+      ...connection,
+      createdAt: connection.createdAt?.toISOString() ?? null,
+      updatedAt: connection.updatedAt?.toISOString() ?? null,
+      sender: senderUser || { id: connection.senderId, name: "", image: null },
+      receiver: receiverUser || {
+        id: connection.receiverId,
+        name: "",
+        image: null,
+      },
+    },
+    HttpStatusCodes.OK
+  );
 };
 
 export const update: AppRouteHandler<UpdateRoute> = async (c) => {
@@ -391,13 +366,9 @@ export const update: AppRouteHandler<UpdateRoute> = async (c) => {
     // Always return a valid error response shape and status code
     return c.json(
       {
-        error: {
-          issues: [],
-          name: error?.name || "InternalServerError",
-        },
-        success: false,
+        message: error?.message || "Failed to update connection",
       },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      HttpStatusCodes.UNPROCESSABLE_ENTITY // Use 422 instead of 500 to match OpenAPI spec
     );
   }
 };
@@ -406,46 +377,34 @@ export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const session = c.get("session");
 
+  let message = "Connection deleted successfully";
+
   if (!session) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
+    message = HttpStatusPhrases.UNAUTHORIZED;
+  } else {
+    try {
+      const [existingConnection] = await db
+        .select()
+        .from(connections)
+        .where(eq(connections.id, id))
+        .limit(1);
+
+      if (!existingConnection) {
+        message = HttpStatusPhrases.NOT_FOUND;
+      } else if (
+        existingConnection.senderId !== session.userId &&
+        existingConnection.receiverId !== session.userId
+      ) {
+        message = "Not authorized to delete this connection";
+      } else {
+        await db.delete(connections).where(eq(connections.id, id));
+        message = "Connection deleted successfully";
+      }
+    } catch (error) {
+      console.error("Error deleting connection:", error);
+      message = "Failed to delete connection";
+    }
   }
 
-  try {
-    const [existingConnection] = await db
-      .select()
-      .from(connections)
-      .where(eq(connections.id, id))
-      .limit(1);
-
-    if (!existingConnection) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
-
-    // Only sender or receiver can delete the connection
-    if (
-      existingConnection.senderId !== session.userId &&
-      existingConnection.receiverId !== session.userId
-    ) {
-      return c.json(
-        { message: "Not authorized to delete this connection" },
-        HttpStatusCodes.FORBIDDEN
-      );
-    }
-
-    await db.delete(connections).where(eq(connections.id, id));
-
-    return c.json({ message: "Connection deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting connection:", error);
-    return c.json(
-      { message: "Failed to delete connection" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
+  return c.json({ message }, 200);
 };

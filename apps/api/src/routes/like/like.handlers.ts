@@ -384,18 +384,12 @@ export const getCount: AppRouteHandler<GetCountRoute> = async (c) => {
   let userVote = null;
 
   likes.forEach((likeEntry) => {
-    // If you have voteType field, use it. Otherwise, treat all as upvotes
-    const voteType = likeEntry.voteType || "upvote";
-
-    if (voteType === "upvote") {
-      upvotes++;
-    } else if (voteType === "downvote") {
-      downvotes++;
-    }
+    // Treat all as upvotes since voteType does not exist
+    upvotes++;
 
     // Check user's vote
     if (userId && likeEntry.userId === userId) {
-      userVote = voteType;
+      userVote = "upvote";
     }
   });
 

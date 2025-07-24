@@ -823,6 +823,7 @@ const UserCard: React.FC<UserCardProps> = ({
   const isNotConnected = user.connectionStatus === "not-connected";
 
   return (
+    
     <div className="relative bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 transform group">
       {/* Hover ring effect */}
       <div className="absolute inset-0 rounded-xl pointer-events-none group-hover:ring-2 group-hover:ring-blue-400 group-hover:ring-opacity-60 transition-all duration-300"></div>

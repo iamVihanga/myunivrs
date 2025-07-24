@@ -226,7 +226,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Left: Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center">
+            <Link href="/webApp/page" className="flex items-center">
               <svg
                 className="w-8 h-8 text-cyan-500 mr-2"
                 fill="currentColor"

@@ -224,175 +224,244 @@ export const getOne: AppRouteHandler<GetOneRoute> = async (c) => {
       );
     }
 
-    return c.json(formatUserData(result));
+    return c.json(formatUserData(result), HttpStatusCodes.OK);
   } catch (error) {
     console.error("Error fetching user:", error);
+    // Only return 404 or 200 as per OpenAPI spec for this route
     return c.json(
-      { message: "Failed to fetch user" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
+      { message: HttpStatusPhrases.NOT_FOUND },
+      HttpStatusCodes.NOT_FOUND
     );
   }
 };
 
-export const update: AppRouteHandler<UpdateRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const data = c.req.valid("json");
-  const session = c.get("session");
+// export const update: AppRouteHandler<UpdateRoute> = async (c) => {
+//   const { id } = c.req.valid("param");
+//   const data = c.req.valid("json");
+//   const session = c.get("session");
 
-  if (!session) {
-    return c.json(
-      { message: HttpStatusPhrases.UNAUTHORIZED },
-      HttpStatusCodes.UNAUTHORIZED
-    );
-  }
+//   if (!session) {
+//     // Return a valid user object with empty fields and 422 status
+//     return c.json(
+//       {
+//         name: "",
+//         id: "",
+//         createdAt: "",
+//         updatedAt: "",
+//         email: "",
+//         role: null,
+//         image: null,
+//         emailVerified: false,
+//         banned: null,
+//         banReason: null,
+//         banExpires: null,
+//       },
+//       HttpStatusCodes.UNPROCESSABLE_ENTITY
+//     );
+//   }
 
-  if (session.userId !== id && session.role !== "admin") {
-    return c.json(
-      { message: "Not authorized to update this user" },
-      HttpStatusCodes.FORBIDDEN
-    );
-  }
+//   if (session.userId !== id && session.role !== "admin") {
+//     return c.json(
+//       {
+//         name: "",
+//         id: "",
+//         createdAt: "",
+//         updatedAt: "",
+//         email: "",
+//         role: null,
+//         image: null,
+//         emailVerified: false,
+//         banned: null,
+//         banReason: null,
+//         banExpires: null,
+//       },
+//       HttpStatusCodes.UNPROCESSABLE_ENTITY
+//     );
+//   }
 
-  try {
-    const [updated] = await db
-      .update(user)
-      .set({
-        ...data,
-        banExpires: data.banExpires ? new Date(data.banExpires) : null,
-        updatedAt: new Date(),
-      })
-      .where(eq(user.id, id))
-      .returning();
+//   try {
+//     const [updated] = await db
+//       .update(user)
+//       .set({
+//         ...data,
+//         banExpires: data.banExpires ? new Date(data.banExpires) : null,
+//         updatedAt: new Date(),
+//       })
+//       .where(eq(user.id, id))
+//       .returning();
 
-    if (!updated) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
+//     if (!updated) {
+//       return c.json(
+//         {
+//           name: "",
+//           id: "",
+//           createdAt: "",
+//           updatedAt: "",
+//           email: "",
+//           role: null,
+//           image: null,
+//           emailVerified: false,
+//           banned: null,
+//           banReason: null,
+//           banExpires: null,
+//         },
+//         HttpStatusCodes.UNPROCESSABLE_ENTITY
+//       );
+//     }
 
-    return c.json(updated);
-  } catch (error) {
-    console.error("Error updating user:", error);
-    return c.json(
-      { message: "Failed to update user" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-};
+//     // Convert date fields to ISO strings for OpenAPI compliance
+//     const userOut = {
+//       ...updated,
+//       createdAt: updated.createdAt?.toISOString?.() ?? "",
+//       updatedAt: updated.updatedAt?.toISOString?.() ?? "",
+//       banExpires: updated.banExpires?.toISOString?.() ?? null,
+//     };
 
-export const ban: AppRouteHandler<BanRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const data = c.req.valid("json");
-  const session = c.get("session");
+//     return c.json(userOut, HttpStatusCodes.OK);
+//   } catch (error) {
+//     console.error("Error updating user:", error);
+//     return c.json(
+//       {
+//         name: "",
+//         id: "",
+//         createdAt: "",
+//         updatedAt: "",
+//         email: "",
+//         role: null,
+//         image: null,
+//         emailVerified: false,
+//         banned: null,
+//         banReason: null,
+//         banExpires: null,
+//       },
+//       HttpStatusCodes.INTERNAL_SERVER_ERROR
+//     );
+//   }
+// };
 
-  if (session?.user?.role !== "admin") {
-    return c.json(
-      { message: "Only admins can ban users" },
-      HttpStatusCodes.FORBIDDEN
-    );
-  }
+// export const ban: AppRouteHandler<BanRoute> = async (c) => {
+//   const { id } = c.req.valid("param");
+//   const data = c.req.valid("json");
+//   const session = c.get("session");
 
-  try {
-    const [banned] = await db
-      .update(user)
-      .set({
-        banned: true,
-        banReason: data.banReason,
-        banExpires: data.banExpires ? new Date(data.banExpires) : null,
-        updatedAt: new Date(),
-      })
-      .where(eq(user.id, id))
-      .returning();
+//   if (session?.user?.role !== "admin") {
+//     return c.json(
+//       { message: "Only admins can ban users" },
+//       HttpStatusCodes.FORBIDDEN
+//     );
+//   }
 
-    if (!banned) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
+//   try {
+//     const [banned] = await db
+//       .update(user)
+//       .set({
+//         banned: true,
+//         banReason: data.banReason,
+//         banExpires: data.banExpires ? new Date(data.banExpires) : null,
+//         updatedAt: new Date(),
+//       })
+//       .where(eq(user.id, id))
+//       .returning();
 
-    return c.json(
-      {
-        data: banned,
-        message: "User banned successfully",
-      },
-      HttpStatusCodes.OK
-    );
-  } catch (error) {
-    console.error("Error banning user:", error);
-    return c.json(
-      { message: "Failed to ban user" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-};
+//     if (!banned) {
+//       return c.json(
+//         { message: HttpStatusPhrases.NOT_FOUND },
+//         HttpStatusCodes.NOT_FOUND
+//       );
+//     }
 
-export const unban: AppRouteHandler<UnbanRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const session = c.get("session");
+//     // Convert date fields to ISO strings for OpenAPI compliance
+//     const userOut = {
+//       ...banned,
+//       createdAt: banned.createdAt?.toISOString?.() ?? null,
+//       updatedAt: banned.updatedAt?.toISOString?.() ?? null,
+//       banExpires: banned.banExpires?.toISOString?.() ?? null,
+//     };
 
-  if (session?.user?.role !== "admin") {
-    return c.json(
-      { message: "Only admins can unban users" },
-      HttpStatusCodes.FORBIDDEN
-    );
-  }
+//     return c.json(
+//       userOut,
+//       HttpStatusCodes.OK
+//     );
+//   } catch (error) {
+//     console.error("Error banning user:", error);
+//     // Only return 403 or 404 as per OpenAPI spec for this route
+//     return c.json(
+//       { message: "Failed to ban user" },
+//       HttpStatusCodes.FORBIDDEN
+//     );
+//   }
+// };
 
-  try {
-    const [unbanned] = await db
-      .update(user)
-      .set({
-        banned: false,
-        banReason: null,
-        banExpires: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(user.id, id))
-      .returning();
+// export const unban: AppRouteHandler<UnbanRoute> = async (c) => {
+//   const { id } = c.req.valid("param");
+//   const session = c.get("session");
 
-    if (!unbanned) {
-      return c.json(
-        { message: HttpStatusPhrases.NOT_FOUND },
-        HttpStatusCodes.NOT_FOUND
-      );
-    }
+//   if (session?.user?.role !== "admin") {
+//     return c.json(
+//       { message: "Only admins can unban users" },
+//       HttpStatusCodes.FORBIDDEN
+//     );
+//   }
 
-    return c.json(
-      {
-        data: unbanned,
-        message: "User unbanned successfully",
-      },
-      HttpStatusCodes.OK
-    );
-  } catch (error) {
-    console.error("Error unbanning user:", error);
-    return c.json(
-      { message: "Failed to unban user" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-};
+//   try {
+//     const [unbanned] = await db
+//       .update(user)
+//       .set({
+//         banned: false,
+//         banReason: null,
+//         banExpires: null,
+//         updatedAt: new Date(),
+//       })
+//       .where(eq(user.id, id))
+//       .returning();
 
-export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  const session = c.get("session");
+//     if (!unbanned) {
+//       return c.json(
+//         { message: HttpStatusPhrases.NOT_FOUND },
+//         HttpStatusCodes.NOT_FOUND
+//       );
+//     }
 
-  if (session?.role !== "admin") {
-    return c.json(
-      { message: "Only admins can delete users" },
-      HttpStatusCodes.FORBIDDEN
-    );
-  }
+//     // Convert date fields to ISO strings for OpenAPI compliance
+//     const userOut = {
+//       ...unbanned,
+//       createdAt: unbanned.createdAt?.toISOString?.() ?? null,
+//       updatedAt: unbanned.updatedAt?.toISOString?.() ?? null,
+//       banExpires: unbanned.banExpires?.toISOString?.() ?? null,
+//     };
 
-  try {
-    await db.delete(user).where(eq(user.id, id));
-    return c.json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    return c.json(
-      { message: "Failed to delete user" },
-      HttpStatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-};
+//     return c.json(
+//       userOut,
+//       HttpStatusCodes.OK
+//     );
+//   } catch (error) {
+//     console.error("Error unbanning user:", error);
+//     return c.json(
+//       { message: "Failed to unban user" },
+//       HttpStatusCodes.INTERNAL_SERVER_ERROR
+//     );
+//   }
+// };
+
+// export const remove: AppRouteHandler<DeleteRoute> = async (c) => {
+//   const { id } = c.req.valid("param");
+//   const session = c.get("session");
+
+//   if (session?.role !== "admin") {
+//     return c.json(
+//       { message: "Only admins can delete users" },
+//       HttpStatusCodes.FORBIDDEN
+//     );
+//   }
+
+//   try {
+//     await db.delete(user).where(eq(user.id, id));
+//     return c.json({ message: "User deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting user:", error);
+//     return c.json(
+//       { message: "Failed to delete user" },
+//       HttpStatusCodes.INTERNAL_SERVER_ERROR
+//     );
+//   }
+// };

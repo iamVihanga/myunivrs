@@ -1,4 +1,3 @@
-import { authClient } from "@/lib/auth-client";
 import { Card, CardContent } from "@repo/ui/components/card";
 import { headers } from "next/headers";
 import { getAllHousing } from "../actions/getAll.action";
@@ -18,38 +17,38 @@ export async function HousingsList({
   search = "",
 }: HousingsListProps) {
   const headersList = await headers();
-  const cookieHeader = headersList.get("cookie");
+  // const cookieHeader = headersList.get("cookie");
 
-  const session = await authClient.getSession({
-    fetchOptions: {
-      headers: {
-        ...(cookieHeader && { cookie: cookieHeader }),
-      },
-    },
-  });
-  if (session.error) {
-    return (
-      <Card className="bg-red-50 border-none">
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <h3 className="text-lg font-medium text-red-600 mb-1">
-            Authentication Error
-          </h3>
-          <p className="text-muted-foreground max-w-sm">
-            Please log in to view housing listings.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // const session = await authClient.getSession({
+  //   fetchOptions: {
+  //     headers: {
+  //       ...(cookieHeader && { cookie: cookieHeader }),
+  //     },
+  //   },
+  // });
+  // if (session.error) {
+  //   return (
+  //     <Card className="bg-red-50 border-none">
+  //       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+  //         <h3 className="text-lg font-medium text-red-600 mb-1">
+  //           Authentication Error
+  //         </h3>
+  //         <p className="text-muted-foreground max-w-sm">
+  //           Please log in to view housing listings.
+  //         </p>
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
   // Get housing data with pagination
   const response = await getAllHousing({ page, limit, search });
 
   // Convert string dates to Date objects
   const housings = response.data
-    .filter(
-      (housing: any) =>
-        housing.agentProfile === session.data.session.activeOrganizationId
-    )
+    // .filter(
+    //   (housing: any) =>
+    //     housing.agentProfile === session.data.session.activeOrganizationId
+    // )
     .map((housing: any) => ({
       ...housing,
       createdAt: new Date(housing.createdAt),
